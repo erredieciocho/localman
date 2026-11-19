@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A browser-based localisation manager for The Coffin of Andy and Leyley (TCOAAL).">
+    <meta name="theme-color" content="#821c2a">
+    <title>LOCALMAN</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./assets/localman.svg">
+    <link rel="stylesheet" href="./styles/components/table.css">
+    <link rel="stylesheet" href="./styles/components/modal.css">
+    <link rel="stylesheet" href="./styles/components/statistics-grid.css">
+    <link rel="stylesheet" href="./styles/components/treemap.css">
+    <link rel="stylesheet" href="./styles/app.css">
+    <script src="./src/vendor/jszip/jszip.min.js"></script>
+    <script type="module" src="./src/ui/app.js"></script>
+    <script type="module" src="./src/ui/service-worker-registration.js"></script>
+  </head>
+
+  <body>
+    <main id="app" class="app-shell">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div>
+          <p class="eyebrow"><a href="https://store.steampowered.com/app/2378900/The_Coffin_of_Andy_and_Leyley/">The Coffin of Andy and Leyley</a></p>
+          <h1><img class="app-logo" src="./assets/localman.svg" alt="">LOCALMAN™ <small>(Not an actual trademark!)</small></h1>
+          <small class="muted">Created by <a href="https://steamcommunity.com/id/6dot9/">@6dot9</a> for the <a href="https://discord.gg/K46HFNX6t7"><i>Comunidad Hispana de TCOAAL</i></a> translation project.</small>
+        </div>
+        <img class="app-header-logo" src="./assets/localman.png" alt="LOCALMAN logo">
+        <div class="file-actions">
+
+          <!-- File actions -->
+          <button id="open-button" class="button button-secondary" type="button"
+            title="Open a localisation file">Open</button>
+          <input id="file-input" class="visually-hidden" type="file" accept=".csv,text/csv"
+            aria-label="Open a localisation file">
+          <button id="save-button" class="button button-secondary" type="button" disabled
+            title="Overwrite the currently open localisation file">Save</button>
+          <button id="export-button" class="button button-secondary" type="button" disabled
+            title="Save a copy of the current localisation under a new name">Export</button>
+
+          <!-- Launch game -->
+          <a id="launch-game-button" class="button" href="steam://rungameid/2378900"
+            title="Launch The Coffin of Andy and Leyley in Steam">Launch game</a>
+
+          <!-- Theme toggle -->
+          <button id="theme-toggle" class="button button-secondary theme-toggle-button" type="button"
+            aria-label="Toggle light/dark mode" aria-pressed="true" title="Toggle light/dark mode">
+            <svg class="theme-icon" data-theme-icon="sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+            </svg>
+            <svg class="theme-icon" data-theme-icon="moon" viewBox="0 0 24 24" aria-hidden="true" hidden>
+              <path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path>
+            </svg>
+          </button>
+
+        </div>
+      </header>
+
+      <p id="save-status" class="save-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+
+      <!-- File state -->
+      <section class="file-state visually-hidden" aria-live="polite" aria-atomic="true">
+        <span id="file-status">No file loaded</span>
+      </section>
+
+      <!-- Tab navigation -->
+      <nav class="tabs" aria-label="Application sections">
+        <button class="tab-button" type="button" data-tab="dashboard" aria-selected="false">Dashboard
+          <span class="dictionary-status-dot tab-status-dot" data-loaded="false" aria-hidden="true"></span>
+        </button>
+        <button class="tab-button" type="button" data-tab="editor" aria-selected="false">Editor
+          <span class="dictionary-status-dot tab-status-dot" data-loaded="false" aria-hidden="true"></span>
+        </button>
+        <button class="tab-button" type="button" data-tab="compare" aria-selected="false">Compare
+          <span class="dictionary-status-dot tab-status-dot" data-loaded="false" aria-hidden="true"></span>
+        </button>
+        <button class="tab-button" type="button" data-tab="qa" aria-selected="false" aria-disabled="true" disabled>
+          QA <span class="dictionary-status-dot tab-status-dot" data-loaded="false" aria-hidden="true"></span>
+        </button>
+        <span class="tab-separator" aria-hidden="true"></span>
+        <button class="tab-button" type="button" data-tab="terminology" aria-selected="false">Terminology
+          <span class="dictionary-status-dot tab-status-dot" data-loaded="false" aria-hidden="true"></span>
+        </button>
+        <button class="tab-button" type="button" data-tab="maps" aria-selected="false">Maps
+          <span class="dictionary-status-dot tab-status-dot" data-loaded="true" aria-hidden="true"></span>
+        </button>
+        <span class="tab-separator" aria-hidden="true"></span>
+        <button class="tab-button" type="button" data-tab="settings" aria-selected="false">Settings
+        </button>
+        <button class="tab-button is-active" type="button" data-tab="about" aria-selected="true">About
+        </button>
+      </nav>
+
+      <!-- Sections -->
+      <!-- Dashboard -->
+      <section id="panel-dashboard" class="tab-panel" aria-label="Translation dashboard" hidden>
+        <section id="dashboard-file-meta" class="statistics dashboard-file-meta" aria-label="Loaded localisation file metadata"></section>
+        <section class="statistics" aria-label="Translation statistics"></section>
+        <section class="statistics" aria-label="Localisation overview"></section>
+
+        <!-- Treemap -->
+        <section class="workspace dashboard-workspace map-distribution-panel" aria-label="Map distribution">
+          <div class="panel-heading dashboard-heading">
+            <h2>Statistics</h2>
+          </div>
+          <div class="map-visualisations">
+
+            <!-- Map distribution -->
+            <section class="map-visualisation" aria-label="Map distribution">
+              <div class="map-visualisation-heading">
+                <div class="map-distribution-title">
+                  <h3 id="map-distribution-title">Maps by complexity</h3>
+                  <button id="map-sort-toggle" type="button" class="map-sort-button"
+                    aria-label="Change map sort order to smallest first" title="Largest first; click to show smallest first">
+                    <span aria-hidden="true" data-map-sort-icon="largest">↓</span>
+                    <span aria-hidden="true" data-map-sort-icon="smallest" hidden>↑</span>
+                  </button>
+                </div>
+                <div class="map-distribution-modes" role="group" aria-label="Map ranking mode">
+                  <button type="button" class="map-mode-button" data-map-ranking="complexity" aria-pressed="true">Complexity</button>
+                  <button type="button" class="map-mode-button" data-map-ranking="entries" aria-pressed="false">Entry count</button>
+                  <button type="button" class="map-mode-button" data-map-ranking="uniqueWords" aria-pressed="false">Unique words</button>
+                  <button type="button" class="map-mode-button" data-map-ranking="issues" aria-pressed="false">Issues</button>
+                </div>
+              </div>
+              <div id="map-distribution-grid" class="treemap">
+                <p class="empty-state">Load a file to view map distribution.</p>
+              </div>
+            </section>
+
+            <!-- Source tag distribution -->
+            <section class="map-visualisation" aria-label="Source tag distribution">
+              <div class="map-visualisation-heading">
+                <div class="map-distribution-title">
+                  <h3>Source Tags by Occurrence</h3>
+                  <button id="source-tag-sort-toggle" type="button" class="map-sort-button"
+                    aria-label="Change source tag occurrence sort order to smallest first"
+                    title="Largest source tag occurrence first; click to show smallest first">
+                    <span aria-hidden="true" data-map-sort-icon="largest">↓</span>
+                    <span aria-hidden="true" data-map-sort-icon="smallest" hidden>↑</span>
+                  </button>
+                </div>
+                <div id="source-tag-pagination" class="source-tag-pagination" aria-label="Source tag pages" hidden>
+                  <button type="button" class="source-tag-page-button" data-source-page="previous" aria-label="Previous source-tag page" aria-controls="source-distribution-grid">Previous</button>
+                  <span id="source-tag-page-status" aria-live="polite">Page 1 of 1</span>
+                  <button type="button" class="source-tag-page-button" data-source-page="next" aria-label="Next source-tag page" aria-controls="source-distribution-grid">Next</button>
+                </div>
+              </div>
+              <div id="source-distribution-grid" class="source-distribution-grid">
+                <p class="empty-state">Load a file to view source tag distribution.</p>
+              </div>
+            </section>
+
+          </div>
+        </section>
+
+        <!-- Section progress -->
+        <div class="workspace dashboard-workspace section-progress-panel ui-table-component">
+          <header class="ui-table-header">
+            <div class="ui-table-heading">
+              <h2 class="ui-table-title">Section progress</h2>
+              <p id="dashboard-section-progress-summary" class="ui-table-context section-progress-summary">
+                Load a file to view section progress.
+              </p>
+            </div>
+
+            <!-- Section progress controls -->
+            <div class="ui-table-controls section-progress-controls" role="group" aria-label="Section progress filters">
+              <label for="dashboard-progress-threshold">
+                <span>Threshold</span>
+                <input id="dashboard-progress-threshold" type="number" min="0" max="100" step="1" value="95">
+                <span>%</span>
+              </label>
+              <label>
+                <input id="dashboard-incomplete-only" type="checkbox" checked>
+                <span>Incomplete only</span>
+              </label>
+            </div>
+          </header>
+          <div class="ui-table-body table-scroll">
+            <table>
+              <thead>
+                <tr><th scope="col" data-progress-header="section"><button type="button" class="text-button" data-progress-sort="section"><span class="text-button-label">Section</span></button></th><th scope="col">Translated</th><th scope="col" data-progress-header="remaining"><button type="button" class="text-button" data-progress-sort="remaining"><span class="text-button-label">Remaining</span></button></th><th scope="col" data-progress-header="progress"><button type="button" class="text-button" data-progress-sort="progress"><span class="text-button-label">Progress</span></button></th></tr>
+              </thead>
+              <tbody id="dashboard-rows"><tr><td class="empty-state" colspan="4">Load a file to view progress.</td></tr></tbody>
+            </table>
+          </div>
+          <footer class="ui-table-footer" hidden></footer>
+        </div>
+
+        <!-- Target-language word usage -->
+        <div class="workspace dashboard-workspace ui-table-component">
+          <header class="ui-table-header">
+            <div class="ui-table-heading">
+              <div class="word-usage-title">
+                <h2 class="ui-table-title">Word usage</h2>
+                <button id="word-usage-sort-toggle" type="button" class="treemap-sort-button"
+                  aria-label="Change word frequency sort order to smallest first"
+                  title="Largest word frequency first; click to show smallest first">
+                  <span aria-hidden="true" data-treemap-sort-icon="largest">↓</span>
+                  <span aria-hidden="true" data-treemap-sort-icon="smallest" hidden>↑</span>
+                </button>
+              </div>
+              <p class="ui-table-context word-usage-totals">
+                Unique words: <strong id="word-usage-unique-count">—</strong>
+                <span aria-hidden="true">·</span>
+                Total word occurrences: <strong id="word-usage-occurrence-count">—</strong>
+              </p>
+              <p id="word-filter-status" class="ui-table-context settings-note" aria-live="polite"></p>
+            </div>
+
+            <!-- Word usage controls -->
+            <div class="ui-table-controls word-filter-controls" role="group" aria-label="Target-language word filters">
+              <label class="inline-control" for="word-min-length">
+                <span>Minimum characters</span>
+                <input id="word-min-length" type="number" min="1" max="50" value="3">
+              </label>
+              <label class="inline-control" for="word-max-length">
+                <span>Maximum characters</span>
+                <input id="word-max-length" type="number" min="1" max="100" placeholder="No limit">
+              </label>
+              <label class="inline-control" for="word-min-occurrences">
+                <span>Minimum occurrences</span>
+                <input id="word-min-occurrences" type="number" min="1" max="1000000" value="1">
+              </label>
+              <label class="inline-control" for="word-max-occurrences">
+                <span>Maximum occurrences</span>
+                <input id="word-max-occurrences" type="number" min="0" max="1000000" placeholder="No limit">
+              </label>
+              <label class="inline-control" for="word-spellcheck-filter">
+                <span>Spellcheck status</span>
+                <select id="word-spellcheck-filter">
+                  <option value="all">All</option>
+                  <option value="ok">OK</option>
+                  <option value="not-ok" selected>Not OK</option>
+                </select>
+              </label>
+            </div>
+            <nav id="word-usage-pagination" class="ui-table-controls ui-table-controls--right word-usage-pagination"
+              aria-label="Target-language word pages" hidden>
+              <button type="button" class="button button-secondary" data-word-page="previous" aria-label="Previous word page">Previous</button>
+              <span id="word-usage-page-status" aria-live="polite">Page 1 of 1</span>
+              <button type="button" class="button button-secondary" data-word-page="next" aria-label="Next word page">Next</button>
+            </nav>
+          </header>
+
+          <div class="word-usage-legend" aria-label="Word spellcheck colours">
+            <span><i class="word-usage-swatch word-usage-swatch--not-ok"></i>Misspelt</span>
+            <span><i class="word-usage-swatch word-usage-swatch--na"></i>Not spellchecked</span>
+            <span><i class="word-usage-swatch word-usage-swatch--ok"></i>Spelt correctly</span>
+          </div>
+          <div id="word-usage-grid" class="treemap word-usage-treemap">
+            <p class="empty-state">Load a file to view target-language word usage.</p>
+          </div>
+          <footer class="ui-table-footer" hidden></footer>
+        </div>
+      </section>
+      <!-- Editor -->
+      <section id="panel-editor" class="tab-panel" aria-label="Localisation editor" hidden>
+        <div class="workspace ui-table-component editor-table-component">
+          <header class="ui-table-header">
+            <div class="ui-table-heading">
+              <h2 class="ui-table-title">Entries</h2>
+              <p id="table-caption" class="ui-table-context">Import a localisation CSV to view its entries.</p>
+              <p id="entry-count" class="ui-table-context entry-count" aria-live="polite">Load a file to begin.</p>
+              <button id="text-escape-codes-button" type="button" class="text-button">
+                View text escape codes
+              </button>
+              <p id="section-file-status" class="ui-table-context section-file-status" aria-live="polite"></p>
+            </div>
+            <div class="ui-table-controls ui-table-controls--right editor-table-controls">
+              <div class="toolbar">
+                <label>
+                  <span>Section</span>
+                  <select id="section-select" disabled>
+                    <option value="">Load a CSV file first</option>
+                  </select>
+                </label>
+                <label class="search-control">
+                  <span>Search entries</span>
+                  <input id="search-input" type="search" placeholder="Search keys or text…" disabled>
+                </label>
+                <label>
+                  <span>Translation status</span>
+                  <select id="status-filter" disabled>
+                    <option value="">All entries</option>
+                    <option value="translated">Translated</option>
+                    <option value="untranslated">Untranslated</option>
+                    <option value="untranslatable">Untranslatable</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Translation suggestions</span>
+                  <select id="autocomplete-mode">
+                    <option value="off">Off</option>
+                    <option value="exact" selected>Exact matches</option>
+                    <option value="fuzzy">Exact and similar matches</option>
+                  </select>
+                </label>
+                <button id="section-export-button" type="button" class="button button-secondary" disabled>
+                  Export section
+                </button>
+                <button id="section-import-button" type="button" class="button button-secondary" disabled>
+                  Import section
+                </button>
+                <input id="section-import-input" type="file" accept=".csv,text/csv" hidden>
+              </div>
+            </div>
+          </header>
+
+          <div class="find-replace-controls" role="group" aria-label="Find and replace in the selected section">
+            <label for="editor-find-input">
+              <span>Find in editable columns</span>
+              <input id="editor-find-input" type="search" placeholder="Text to find">
+            </label>
+            <label for="editor-replace-input">
+              <span>Replace with</span>
+              <input id="editor-replace-input" type="text" placeholder="Replacement text">
+            </label>
+            <button id="editor-find-next" class="button button-secondary" type="button" disabled>Find next</button>
+            <button id="editor-replace-current" class="button button-secondary" type="button" disabled>Replace</button>
+            <button id="editor-replace-all" class="button button-secondary" type="button" disabled>Replace all</button>
+            <p id="editor-find-status" class="muted" aria-live="polite"></p>
+          </div>
+
+        <div id="table-scroll" class="ui-table-body table-scroll">
+          <table id="entry-table">
+            <thead><tr id="table-headers"></tr></thead>
+            <tbody id="table-rows"></tbody>
+          </table>
+        </div>
+          <footer class="ui-table-footer" hidden></footer>
+        </div>
+        <details id="issues-panel" class="workspace dashboard-workspace issues-panel ui-table-component">
+          <summary class="ui-table-header">
+            <div class="ui-table-heading">
+              <h2 class="ui-table-title">Issues</h2>
+              <p class="ui-table-context">Issues for the selected editor section.</p>
+            </div>
+            <div class="ui-table-controls ui-table-controls--right">
+              <strong id="validation-count" aria-live="polite">0 / 0 issues (0.00%)</strong>
+            </div>
+          </summary>
+          <div class="ui-table-body table-scroll">
+            <table>
+              <thead><tr><th scope="col">Section</th><th scope="col">Entry</th><th scope="col">Check</th></tr></thead>
+              <tbody id="validation-rows"><tr><td class="empty-state" colspan="3">Load a file to run configured checks.</td></tr></tbody>
+            </table>
+          </div>
+          <footer class="ui-table-footer" hidden></footer>
+        </details>
+      </section>
+      <!-- Compare -->
+      <section id="panel-compare" class="tab-panel" aria-label="Compare localisation files" hidden>
+        <section class="workspace compare-panel">
+          <header class="panel-heading">
+            <h2>Compare localisation files</h2>
+            <p>Review changed fields, extra entries in the current file, and entries missing from the current file. Entries are matched by section and ID.</p>
+          </header>
+          <div class="compare-controls">
+            <div class="compare-file-label">
+              <span>Current file (extra entries are listed here)</span>
+              <strong id="compare-current-file">No current file</strong>
+            </div>
+            <div class="compare-file-label">
+              <span>Target file (missing current entries are listed here)</span>
+              <strong id="compare-target-name">No target file selected</strong>
+            </div>
+            <button id="compare-target-button" class="button button-secondary" type="button" disabled>
+              Select target file
+            </button>
+            <input id="compare-target-file" type="file" accept=".csv,text/csv" hidden>
+            <p id="compare-status" class="muted" aria-live="polite">Open a current localisation file to begin comparing.</p>
+          </div>
+          <div id="compare-summary" class="compare-summary" aria-label="Comparison summary"></div>
+          <nav id="compare-pagination" class="compare-pagination" aria-label="Comparison section pages" hidden>
+            <button type="button" class="button button-secondary" data-compare-page="previous"
+              aria-label="Previous comparison sections">Previous</button>
+            <span id="compare-page-status" aria-live="polite">Page 1 of 1</span>
+            <button type="button" class="button button-secondary" data-compare-page="next"
+              aria-label="Next comparison sections">Next</button>
+          </nav>
+          <div id="compare-results" class="compare-results" aria-live="polite"></div>
+        </section>
+      </section>
+      <!-- QA -->
+      <section id="panel-qa" class="tab-panel" aria-label="Localisation quality assurance" hidden>
+        <section class="workspace qa-panel">
+          <header class="panel-heading">
+            <div class="qa-heading-copy">
+              <h2>Quality assurance</h2>
+              <p>Review validation issues by map, track resolved items and move directly to the affected entry.</p>
+            </div>
+            <section id="qa-count" aria-label="Issue counts"></section>
+          </header>
+          <section class="qa-legend" aria-label="Issue type legend">
+            <h3>Issue types</h3>
+            <dl>
+              <div><dt>Spelling <span class="qa-legend-count" data-qa-type-count="spelling">—</span></dt><dd>A translated word is not recognised by the loaded dictionary.</dd></div>
+              <div><dt>Sentence length <span class="qa-legend-count" data-qa-type-count="sentence-length">—</span></dt><dd>A translation is outside the configured character limits.</dd></div>
+              <div><dt>Terminology <span class="qa-legend-count" data-qa-type-count="terminology">—</span></dt><dd>A defined glossary term is missing from the translation.</dd></div>
+            </dl>
+          </section>
+          <div class="qa-controls">
+            <label for="qa-status-filter">
+              <span>Show issues</span>
+              <select id="qa-status-filter">
+                <option value="unresolved" selected>Unresolved</option>
+                <option value="resolved">Resolved</option>
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label class="search-control" for="qa-search">
+              <span>Search issues</span>
+              <input id="qa-search" type="search" placeholder="Search maps, entries or issue text">
+            </label>
+            <div class="qa-file-actions">
+              <button id="qa-import-button" class="button button-secondary" type="button" disabled>Import issues</button>
+              <input id="qa-import-input" type="file" accept=".json,application/json" hidden>
+              <button id="qa-export-button" class="button button-secondary" type="button" disabled>Export issues</button>
+            </div>
+          </div>
+          <nav id="qa-pagination" class="qa-pagination" aria-label="QA section pages" hidden>
+            <button type="button" class="button button-secondary" data-qa-page="previous"
+              aria-label="Previous QA sections">Previous</button>
+            <span id="qa-page-status" aria-live="polite">Page 1 of 1</span>
+            <button type="button" class="button button-secondary" data-qa-page="next"
+              aria-label="Next QA sections">Next</button>
+          </nav>
+          <div id="qa-issues" class="qa-issues" aria-live="polite"></div>
+        </section>
+      </section>
+      <!-- Maps -->
+      <section id="panel-maps" class="tab-panel" aria-label="Game map catalogue" hidden>
+        <div class="maps-layout">
+          <aside class="workspace maps-browser" aria-label="Map list and filters">
+            <header class="ui-table-header">
+              <div class="ui-table-heading">
+                <h2 class="ui-table-title">Maps</h2>
+                <p id="map-count" class="ui-table-context">Open Maps to load the catalogue.</p>
+                <button id="map-view-endings" type="button" class="text-button">View endings</button>
+              </div>
+              <div class="ui-table-controls maps-filters">
+                <label for="map-episode-filter">
+                  <span>Episode</span>
+                  <select id="map-episode-filter" disabled>
+                    <option value="">All episodes</option>
+                  </select>
+                </label>
+                <label for="map-route-filter">
+                  <span>Route</span>
+                  <select id="map-route-filter" disabled>
+                    <option value="">All routes</option>
+                  </select>
+                </label>
+                <label class="search-control" for="map-search">
+                  <span>Search maps</span>
+                  <input id="map-search" type="search" placeholder="Search map details…" disabled>
+                </label>
+              </div>
+            </header>
+            <div class="word-usage-legend map-ending-legend" aria-label="Map ending association colours">
+              <span><i class="map-ending-swatch map-ending-swatch--none"></i>No endings</span>
+              <span><i class="map-ending-swatch map-ending-swatch--ending"></i>One or more endings</span>
+            </div>
+            <ul id="map-list" class="map-list" aria-label="Game maps">
+              <li class="empty-state">Open Maps to load the catalogue.</li>
+            </ul>
+          </aside>
+
+          <section class="workspace maps-detail" aria-label="Selected map details">
+            <p id="map-empty-state" class="empty-state">Select a map to view its details.</p>
+            <div id="map-detail-content" hidden>
+              <header class="map-detail-heading">
+                <div>
+                  <p class="muted">Game map</p>
+                  <h2 id="map-detail-name"></h2>
+                  <p id="map-detail-description" class="map-detail-description"></p>
+                  <button id="map-open-editor" type="button" class="button button-primary map-open-editor">
+                    Open map in Editor
+                  </button>
+                </div>
+                <dl class="term-detail-metadata">
+                  <div><dt>Episode</dt><dd id="map-detail-episode"></dd></div>
+                  <div><dt>Route</dt><dd id="map-detail-route"></dd></div>
+                  <div><dt>Ending</dt><dd class="map-detail-ending" id="map-detail-ending"></dd></div>
+                </dl>
+              </header>
+              <p id="map-detail-summary" class="map-detail-summary"></p>
+              <dl class="map-detail-statistics" aria-label="Map progress and complexity">
+                <div>
+                  <dt>Progress</dt>
+                  <dd><progress id="map-detail-progress-bar" max="100" value="0"
+                    aria-label="Map translation progress"></progress><span id="map-detail-progress">—</span></dd>
+                </div>
+                <div><dt>Complexity score</dt><dd id="map-detail-complexity">—</dd></div>
+                <div><dt>Entries</dt><dd id="map-detail-entry-count">—</dd></div>
+                <div><dt>Unique words</dt><dd id="map-detail-unique-word-count">—</dd></div>
+              </dl>
+              <p id="map-entry-empty-state" class="empty-state" hidden></p>
+              <section id="map-entry-panel" class="workspace ui-table-component map-entry-panel"
+                aria-label="Entries in the selected map" hidden>
+                <header class="ui-table-header">
+                  <div class="ui-table-heading">
+                    <h3 class="ui-table-title">Entries</h3>
+                    <p id="map-entry-count" class="ui-table-context"></p>
+                  </div>
+                  <nav id="map-entry-pagination" class="ui-table-controls ui-table-controls--right map-entry-pagination"
+                    aria-label="Map entry pages" hidden>
+                    <button type="button" class="button button-secondary" data-map-entry-page="previous">Previous</button>
+                    <span id="map-entry-page-status" aria-live="polite">Page 1 of 1</span>
+                    <button type="button" class="button button-secondary" data-map-entry-page="next">Next</button>
+                  </nav>
+                </header>
+                <div class="ui-table-body table-scroll">
+                  <table id="map-entry-table">
+                    <thead><tr id="map-entry-headers">
+                      <th scope="col">ID</th>
+                      <th scope="col">Source</th>
+                      <th scope="col">Original</th>
+                      <th scope="col">Translation</th>
+                    </tr></thead>
+                    <tbody id="map-entry-rows"></tbody>
+                  </table>
+                </div>
+                <footer class="ui-table-footer" hidden></footer>
+              </section>
+            </div>
+          </section>
+        </div>
+      </section>
+      <!-- Terminology -->
+      <section id="panel-terminology" class="tab-panel" aria-label="Terminology and glossary" hidden>
+        <div class="terminology-layout">
+          <aside class="workspace terminology-browser" aria-label="Term list and filters">
+            <header class="ui-table-header">
+              <div class="ui-table-heading">
+                <h2 class="ui-table-title">Terminology</h2>
+                <p id="term-count" class="ui-table-context">Load a file to inspect terminology.</p>
+              </div>
+              <div class="ui-table-controls terminology-filters">
+                <label for="term-type-filter">
+                  <span>Type</span>
+                  <select id="term-type-filter" disabled>
+                    <option value="">All types</option>
+                  </select>
+                </label>
+                <label class="search-control" for="term-search">
+                  <span>Filter terms</span>
+                  <input id="term-search" type="search" placeholder="Search either language…" disabled>
+                </label>
+              </div>
+            </header>
+            <ul id="term-list" class="term-list" aria-label="Terminology terms">
+              <li class="empty-state">Load a file to view terminology.</li>
+            </ul>
+          </aside>
+
+          <section id="term-details" class="workspace terminology-detail" aria-label="Selected term details">
+            <p id="term-empty-state" class="empty-state">Select a term to view its translation and map usage.</p>
+            <div id="term-detail-content" hidden>
+              <header class="term-detail-heading">
+                <div>
+                  <p class="muted">Translated term</p>
+                  <h2 id="term-detail-translation"></h2>
+                  <p id="term-detail-description" class="term-detail-description"></p>
+                  <button id="term-definition-button" type="button" class="button button-primary">
+                    Open definition in the Editor
+                  </button>
+                </div>
+                <dl class="term-detail-metadata">
+                  <div><dt>ID</dt><dd id="term-detail-id"></dd></div>
+                  <div><dt>Type</dt><dd id="term-detail-type"></dd></div>
+                  <div><dt>T/S</dt><dd id="term-detail-usage"></dd></div>
+                </dl>
+              </header>
+              <div class="term-map-tables">
+                <section class="workspace ui-table-component term-map-panel" aria-label="Maps containing the original term">
+                  <header class="ui-table-header">
+                    <div class="ui-table-heading">
+                      <h3 class="ui-table-title">Original-language maps</h3>
+                    </div>
+                    <div class="ui-table-controls ui-table-controls--right">
+                      <nav id="term-source-map-pagination" class="term-map-pagination" aria-label="Original-language map pages" hidden>
+                        <button type="button" class="button button-secondary" data-term-map-page="source-previous">Previous</button>
+                        <span id="term-source-map-page-status" aria-live="polite">Page 1 of 1</span>
+                        <button type="button" class="button button-secondary" data-term-map-page="source-next">Next</button>
+                      </nav>
+                    </div>
+                  </header>
+                  <div class="ui-table-body table-scroll">
+                    <table>
+                      <thead><tr><th scope="col">Map</th><th scope="col">Occurrences</th></tr></thead>
+                      <tbody id="term-source-map-rows"></tbody>
+                    </table>
+                  </div>
+                  <footer class="ui-table-footer" hidden></footer>
+                </section>
+                <section class="workspace ui-table-component term-map-panel" aria-label="Maps containing the translated term">
+                  <header class="ui-table-header">
+                    <div class="ui-table-heading">
+                      <h3 class="ui-table-title">Translated-language maps</h3>
+                    </div>
+                    <div class="ui-table-controls ui-table-controls--right">
+                      <nav id="term-target-map-pagination" class="term-map-pagination" aria-label="Translated-language map pages" hidden>
+                        <button type="button" class="button button-secondary" data-term-map-page="target-previous">Previous</button>
+                        <span id="term-target-map-page-status" aria-live="polite">Page 1 of 1</span>
+                        <button type="button" class="button button-secondary" data-term-map-page="target-next">Next</button>
+                      </nav>
+                    </div>
+                  </header>
+                  <div class="ui-table-body table-scroll">
+                    <table>
+                      <thead><tr><th scope="col">Map</th><th scope="col">Occurrences</th></tr></thead>
+                      <tbody id="term-target-map-rows"></tbody>
+                    </table>
+                  </div>
+                  <footer class="ui-table-footer" hidden></footer>
+                </section>
+              </div>
+            </div>
+          </div>
+      </section>
+      <!-- Settings -->
+      <section id="panel-settings" class="tab-panel" aria-label="Application settings" hidden>
+        <div class="workspace settings-panel">
+          <div class="panel-heading">
+            <h2>Browser application preferences</h2>
+            <p class="muted">Settings are stored in this browser.</p>
+          </div>
+          <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+            <button type="button" class="settings-tab is-active" id="settings-tab-general"
+              role="tab" aria-selected="true" aria-controls="settings-category-general"
+              data-settings-tab="general">General</button>
+            <button type="button" class="settings-tab" id="settings-tab-validation"
+              role="tab" aria-selected="false" aria-controls="settings-category-validation"
+              data-settings-tab="validation">Validation</button>
+            <button type="button" class="settings-tab" id="settings-tab-dictionary"
+              role="tab" aria-selected="false" aria-controls="settings-category-dictionary"
+              data-settings-tab="dictionary">Dictionary</button>
+            <button type="button" class="settings-tab" id="settings-tab-appearance"
+              role="tab" aria-selected="false" aria-controls="settings-category-appearance"
+              data-settings-tab="appearance">Appearance</button>
+            <button type="button" class="settings-tab" id="settings-tab-configuration"
+              role="tab" aria-selected="false" aria-controls="settings-category-configuration"
+              data-settings-tab="configuration">Configuration</button>
+          </div>
+          <section id="settings-category-general" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-general" data-settings-panel="general">
+            <div class="settings-groups">
+              <fieldset class="settings-group">
+                <legend>Language</legend>
+                <label class="settings-control" for="target-language">
+                  <span>Target language</span>
+                  <select id="target-language">
+                    <option value="es">Spanish</option>
+                    <option value="ca">Catalan</option>
+                  </select>
+                  <small>The matching bundled dictionary is selected and loaded automatically when available.</small>
+                </label>
+              </fieldset>
+              <fieldset class="settings-group">
+                <legend>Sections</legend>
+                <label class="settings-control" for="section-ids">
+                  <span>Section IDs</span>
+                  <input id="section-ids" type="text" placeholder="Leave blank to include all sections">
+                  <small>Comma-separated list.</small>
+                </label>
+              </fieldset>
+            </div>
+          </section>
+          <section id="settings-category-validation" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-validation" data-settings-panel="validation" hidden>
+            <div class="settings-groups">
+              <fieldset class="settings-group">
+                <legend>Glossary</legend>
+                <label class="check-control">
+                  <input id="terminology-validation" type="checkbox">
+                  <span>Check against defined glossary terms</span>
+                </label>
+              </fieldset>
+              <fieldset class="settings-group">
+                <legend>Validation limits</legend>
+                <label class="settings-control" for="min-sentence-length">
+                  <span>Minimum sentence length (characters)</span>
+                  <input id="min-sentence-length" type="number" min="0">
+                </label>
+                <label class="settings-control" for="max-sentence-length">
+                  <span>Maximum sentence length (characters)</span>
+                  <input id="max-sentence-length" type="number" min="1">
+                  <small id="max-sentence-length-note" aria-live="polite">
+                    Load a localisation file to see the longest original sentence.
+                  </small>
+                </label>
+              </fieldset>
+            </div>
+          </section>
+          <section id="settings-category-dictionary" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-dictionary" data-settings-panel="dictionary" hidden>
+            <div class="settings-groups">
+              <fieldset class="settings-group">
+                <legend>Dictionary validation</legend>
+                <label class="check-control">
+                  <input id="dictionary-validation" type="checkbox">
+                  <span>Check translated text with a bundled Hunspell dictionary</span>
+                </label>
+                <label class="settings-control" for="dictionary-select">
+                  <span class="dictionary-label">Bundled dictionary
+                    <span id="dictionary-status-dot" class="dictionary-status-dot" data-loaded="false"
+                      role="status" aria-label="Loading bundled dictionaries." title="Loading bundled dictionaries."></span>
+                  </span>
+                  <select id="dictionary-select" disabled>
+                    <option value="">Loading available dictionaries...</option>
+                  </select>
+                  <small>Hunspell AFF+DIC pairs and packaged OXT, XPI, or ZIP dictionaries are supported.</small>
+                </label>
+                <div class="settings-control">
+                  <span>Dictionary exclusions</span>
+                  <input id="dictionary-exclusions-import" type="file" accept=".txt,text/plain" hidden>
+                  <button id="dictionary-exclusions-import-button" class="button button-secondary" type="button">
+                    Import exclusion list
+                  </button>
+                  <button id="dictionary-exclusions-export-button" class="button button-secondary" type="button">
+                    Export exclusion list
+                  </button>
+                  <small>Choose a line-separated text file. Import replaces the current list.</small>
+                </div>
+                <p id="dictionary-exclusions-status" class="muted settings-note" aria-live="polite"></p>
+              </fieldset>
+              <fieldset class="settings-group">
+                <legend>Browser spellcheck</legend>
+                <label class="check-control">
+                  <input id="spellcheck-enabled" type="checkbox">
+                  <span>Use the browser's built-in spellcheck for translation fields</span>
+                </label>
+                <p class="muted settings-note">Spellchecking depends on the browser and installed dictionaries. No external services are used.</p>
+                <p id="spellcheck-support" class="muted settings-note" hidden>Spellchecking is not supported by this browser.</p>
+              </fieldset>
+            </div>
+          </section>
+          <section id="settings-category-appearance" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-appearance" data-settings-panel="appearance" hidden>
+            <fieldset class="settings-group">
+              <legend>Table density</legend>
+              <label class="settings-control" for="density-select">
+                <span>Table density</span>
+                <select id="density-select">
+                  <option value="comfortable">Comfortable</option>
+                  <option value="compact">Compact</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset id="source-color-group" class="settings-group">
+              <legend>Source tags</legend>
+              <div id="source-color-legend" class="source-color-legend">
+                <p class="empty-state">Load a file to view.</p>
+              </div>
+              <div class="source-color-actions">
+                <button id="source-color-randomise" class="button button-secondary" type="button" disabled>
+                  Randomise palette
+                </button>
+              </div>
+              <p id="source-color-status" class="muted settings-note" aria-live="polite"></p>
+            </fieldset>
+          </section>
+          <section id="settings-category-configuration" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-configuration" data-settings-panel="configuration" hidden>
+            <fieldset class="settings-group">
+              <legend>Configuration file</legend>
+              <div class="configuration-actions">
+                <button id="configuration-export" class="button button-secondary" type="button">Export settings</button>
+                <button id="configuration-import-button" class="button button-secondary" type="button">Import settings</button>
+                <input id="configuration-import-file" type="file" accept=".json,application/json" hidden>
+              </div>
+              <p id="configuration-status" class="muted settings-note" aria-live="polite"></p>
+            </fieldset>
+          </section>
+          <p id="settings-status" class="muted" aria-live="polite">Settings are saved automatically in this browser when changed.</p>
+        </div>
+      </section>
+      <!-- About -->
+      <section id="panel-about" class="tab-panel" aria-label="About LOCALMAN">
+        <div class="workspace settings-panel">
+          <div class="panel-heading">
+            <h2>About LOCALMAN</h2>
+            <p>LOCALMAN is a browser-based localisation manager for The Coffin of Andy and Leyley, created by <a href="https://steamcommunity.com/id/6dot9/">@6dot9</a> for the <a href="https://discord.gg/K46HFNX6t7"><i>Comunidad Hispana de TCOAAL</i></a> translation project.</p>
+          </div>
+          <div class="settings-tabs about-tabs" role="tablist" aria-label="About sections">
+            <button type="button" class="settings-tab is-active" id="about-tab-overview"
+              role="tab" aria-selected="true" aria-controls="about-panel-overview" tabindex="0"
+              data-about-tab="overview">About</button>
+            <button type="button" class="settings-tab" id="about-tab-offline"
+              role="tab" aria-selected="false" aria-controls="about-panel-offline" tabindex="-1"
+              data-about-tab="offline">Installation (Offline)</button>
+            <button type="button" class="settings-tab" id="about-tab-changelog"
+              role="tab" aria-selected="false" aria-controls="about-panel-changelog" tabindex="-1"
+              data-about-tab="changelog">Changelog</button>
+          </div>
+          <section id="about-panel-overview" class="about-tab-panel" role="tabpanel"
+            aria-labelledby="about-tab-overview" data-about-panel="overview">
+          <div class="about-content">
+            <section class="about-how-to">
+              <h3>How to use</h3>
+              <ol>
+                <li>Choose <strong>Open</strong> to load a localisation CSV. <strong>Save</strong> overwrites the opened file when supported; <strong>Export</strong> always saves a separate copy.</li>
+                <li>Review translation progress, maps, Source tags and target-language word usage in <strong>Dashboard</strong>.</li>
+                <li>Use <strong>Editor</strong> to select a section, search or filter entries, edit translations, and import or export a section.</li>
+                <li>Open <strong>Compare</strong> and select a target CSV to view changed fields, extra current entries and entries missing from the current file side by side.</li>
+                <li>Use <strong>QA</strong> to filter, search and track validation issues by map; import or export review state as JSON.</li>
+                <li>Use <strong>Maps</strong> to browse episodes, routes and descriptions, and <strong>Terminology</strong> to search defined terms and inspect their map occurrences.</li>
+                <li>Adjust language, validation, dictionary, appearance and configuration settings in <strong>Settings</strong>.</li>
+              </ol>
+            </section>
+            <section class="about-features">
+              <h3>Features</h3>
+              <div class="about-feature-grid">
+                <article class="about-feature-card">
+                  <h4>File management</h4>
+                  <p>Edit localisation CSVs while preserving supported encodings. Save changes to the opened file when available, or export a separate copy or section.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>File comparison</h4>
+                  <p>Compare the current file with a target file. Changed fields are highlighted side by side, with extra and missing entries identified by section and ID.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Quality assurance</h4>
+                  <p>Review spelling, sentence-length and glossary issues by map, track resolved items, and exchange issue records as JSON.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Progress dashboard</h4>
+                  <p>Review translation statistics, section progress, map complexity, Source-tag usage and target-language word frequency.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Map catalogue</h4>
+                  <p>Search and filter the game's maps by episode and route, with descriptions and confidence notes.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Editing and validation</h4>
+                  <p>Search and filter entries, find and replace editable text, use translation suggestions, and review spelling or glossary issues.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Terminology</h4>
+                  <p>Search glossary terms, inspect translations and descriptions, and navigate to related map occurrences.</p>
+                </article>
+                <article class="about-feature-card">
+                  <h4>Local settings</h4>
+                  <p>Configure dictionaries, exclusions, validation and table density. Randomise Source-tag colours and import or export settings as JSON.</p>
+                </article>
+              </div>
+              <p class="muted">Dictionary checks use bundled local Hunspell data. The application does not send files or settings to external services.</p>
+            </section>
+          </div>
+          </section>
+          <section id="about-panel-offline" class="about-tab-panel" role="tabpanel"
+            aria-labelledby="about-tab-offline" data-about-panel="offline" hidden>
+            <div class="about-content">
+              <section class="about-how-to">
+                <h3>Install LOCALMAN for offline use</h3>
+                <ol>
+                  <li>Run <code>python launch.py</code> from the LOCALMAN project folder. Python starts a local server at <code>http://127.0.0.1:8000</code>.</li>
+                  <li>Open that address in Microsoft Edge, Google Chrome or another browser that supports PWA installation.</li>
+                  <li>Wait for the status below to say offline support is ready. This first visit caches the app, map catalogue and bundled dictionaries; no internet connection is required.</li>
+                  <li>Choose the install icon in the address bar, or use the browser menu (in Edge, <strong>Apps → Install this site as an app</strong>).</li>
+                  <li>Open LOCALMAN from your desktop or application menu. Its installed copy remains available without an internet connection or the local server.</li>
+                </ol>
+                <p id="offline-support-status" class="offline-support-status" role="status" aria-live="polite">
+                  Offline support is being prepared…
+                </p>
+                <p class="muted">Localisation files stay on your device and are never uploaded. To update the installed copy, start the server again at the same address while online or on your local network, then reopen LOCALMAN.</p>
+              </section>
+            </div>
+          </section>
+          <section id="about-panel-changelog" class="about-tab-panel" role="tabpanel"
+            aria-labelledby="about-tab-changelog" data-about-panel="changelog" hidden>
+            <div class="about-content">
+              <section>
+                <h3>Project highlights</h3>
+                <ul class="about-changelog">
+                  <li><strong>7–9 November:</strong> Migrated the editor to a local-first browser application with CSV editing, validation, settings and a progress dashboard.</li>
+                  <li><strong>11 November:</strong> Separated the core document, parser, application services and browser file/storage adapters.</li>
+                  <li><strong>12–14 November:</strong> Added encoding preservation, responsive interface refinements, file comparison, terminology and the searchable map catalogue.</li>
+                  <li><strong>15 November:</strong> Connected navigation across views and expanded map, dictionary, section export and dashboard workflows.</li>
+                  <li><strong>16 November:</strong> Completed QA review, persisted issue resolutions, map issue ranking and cross-view issue synchronisation.</li>
+                  <li><strong>18 November:</strong> Added installable PWA support with offline access to the application, maps and bundled dictionaries.</li>
+                </ul>
+              </section>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Dialogues -->
+      <dialog id="occurrences-dialog" aria-labelledby="occurrences-title" data-modal-title="Occurrences" data-modal-close-id="occurrences-close">
+        <div class="ui-table-body table-scroll"><table><thead><tr><th scope="col">Section</th><th scope="col">Entry</th><th scope="col">Text</th></tr></thead><tbody id="occurrences-rows"></tbody></table></div>
+        <footer class="ui-table-footer" hidden></footer>
+      </dialog>
+      <dialog id="source-details-dialog" aria-labelledby="source-details-title" data-modal-title="Source tag details" data-modal-close-id="source-details-close">
+        <div class="source-details-identity">
+          <p>Original name: <strong id="source-details-original"></strong></p>
+          <p>Translated name: <strong id="source-details-translation"></strong></p>
+        </div>
+        <button id="source-details-terminology-button" type="button" class="button button-primary">
+          Open in Terminology
+        </button>
+        <div class="source-details-grid">
+          <section class="source-details-panel ui-table-component" aria-label="Maps containing this Source tag">
+            <header class="ui-table-header">
+              <div class="ui-table-heading">
+                <h3 class="ui-table-title">Maps</h3>
+                <p id="source-details-map-summary" class="ui-table-context"></p>
+              </div>
+              <div class="ui-table-controls ui-table-controls--right">
+                <nav id="source-details-map-pagination" class="source-details-pagination" aria-label="Source-tag map pages">
+                  <button type="button" class="button button-secondary" data-source-detail-page="maps-previous">Previous</button>
+                  <span id="source-details-map-page" aria-live="polite"></span>
+                  <button type="button" class="button button-secondary" data-source-detail-page="maps-next">Next</button>
+                </nav>
+              </div>
+            </header>
+            <div class="ui-table-body table-scroll">
+              <table>
+                <thead><tr><th scope="col">Map</th><th scope="col">Entries</th><th scope="col">Map frequency</th></tr></thead>
+                <tbody id="source-details-map-rows"></tbody>
+              </table>
+            </div>
+            <footer class="ui-table-footer" hidden></footer>
+          </section>
+          <section class="source-details-panel ui-table-component" aria-label="Entries with this Source tag">
+            <header class="ui-table-header">
+              <div class="ui-table-heading">
+                <h3 class="ui-table-title">Entries</h3>
+                <p id="source-details-entry-summary" class="ui-table-context"></p>
+              </div>
+              <div class="ui-table-controls ui-table-controls--right">
+                <nav id="source-details-entry-pagination" class="source-details-pagination" aria-label="Source-tag entry pages">
+                  <button type="button" class="button button-secondary" data-source-detail-page="entries-previous">Previous</button>
+                  <span id="source-details-entry-page" aria-live="polite"></span>
+                  <button type="button" class="button button-secondary" data-source-detail-page="entries-next">Next</button>
+                </nav>
+              </div>
+            </header>
+            <div class="ui-table-body table-scroll">
+              <table>
+                <thead><tr><th scope="col">Map</th><th scope="col">Original text</th><th scope="col">Translated text</th></tr></thead>
+                <tbody id="source-details-entry-rows"></tbody>
+              </table>
+            </div>
+            <footer class="ui-table-footer" hidden></footer>
+          </section>
+        </div>
+      </dialog>
+      <dialog id="map-details-dialog" aria-labelledby="map-details-title" data-modal-title="Other maps" data-modal-close-id="map-details-close">
+        <div class="ui-table-body table-scroll">
+          <table>
+            <thead><tr id="map-details-headers"><th scope="col">Map</th><th scope="col">Details</th></tr></thead>
+            <tbody id="map-details-results"></tbody>
+          </table>
+        </div>
+        <footer class="ui-table-footer" hidden></footer>
+      </dialog>
+      <dialog id="suggestions-dialog" aria-labelledby="suggestions-title" data-modal-title="Translation suggestions" data-modal-close-id="suggestions-close">
+        <div id="suggestions-results" class="dialog-results"></div>
+      </dialog>
+      <dialog id="text-escape-codes-dialog" aria-labelledby="text-escape-codes-title"
+        data-modal-title="Message Core (YEP) text escape codes"
+        data-modal-close-id="text-escape-codes-close">
+        <div class="text-escape-codes-content">
+          <section>
+            <h3>Codes used in the game script</h3>
+            <ul>
+              <li><code>\C[n]</code> changes text colour (<em>n</em> from 1 to 7). It usually follows <code>\FR</code> and restores the speaker's colour. <code>\C[1]</code> is Andrew/Andy, <code>\C[2]</code> is Ashley/Leyley and <code>\C[6]</code> is Mom, Julia, the cultists and Mrs. Kent. <code>\C[3]</code>, <code>\C[4]</code> and <code>\C[7]</code> are minor characters such as the Warden, Dad, the TV, Kid, Leader and Grandpa. <code>\C[5]</code> is almost entirely the Entity.</li>
+              <li><code>\FI</code> toggles italic and <code>\FB</code> toggles bold; both are closed with <code>\FR</code>, which resets font changes.</li>
+              <li><code>\{</code> and <code>\}</code> increase and decrease text size; they wrap shouted lines such as <code>\{ FUUUCK!! \}</code>.</li>
+              <li><code>\n&lt;Name&gt;</code> creates a left-aligned name box.</li>
+            </ul>
+          </section>
+          <p><a href="https://www.yanfly.moe/wiki/Message_Core_(YEP)" target="_blank" rel="noopener noreferrer">
+            Read the Message Core (YEP) reference
+          </a></p>
+        </div>
+      </dialog>
+      <dialog id="map-endings-dialog" aria-labelledby="map-endings-title"
+        data-modal-title="Game endings" data-modal-close-id="map-endings-close">
+        <div id="map-endings-list" class="map-endings-list"></div>
+      </dialog>
+      <dialog id="section-export-dialog" aria-labelledby="section-export-title" data-modal-title="Export section" data-modal-close-id="section-export-close">
+        <p id="section-export-file-name" class="section-export-file-name"></p>
+        <label class="section-export-label" for="section-export-preview">
+          <span>Exported CSV text</span>
+          <textarea id="section-export-preview" class="section-export-preview" rows="24" readonly spellcheck="false"></textarea>
+        </label>
+        <div class="section-export-actions">
+          <button id="section-export-download-button" type="button" class="button button-primary">Download CSV</button>
+        </div>
+      </dialog>
+      <dialog id="file-required-dialog" aria-labelledby="file-required-title" data-modal-title="Load a localisation file" data-modal-close-id="file-required-close">
+        <p class="dialog-message">Load a valid localisation file first to use this tab.</p>
+      </dialog>
+      <dialog id="row-issues-dialog" aria-labelledby="row-issues-title" data-modal-title="Entry issues" data-modal-close-id="row-issues-close">
+        <div class="ui-table-body table-scroll"><table><thead><tr><th scope="col">Type</th><th scope="col">Issue</th></tr></thead><tbody id="row-issues-rows"></tbody></table></div>
+        <footer class="ui-table-footer" hidden></footer>
+      </dialog>
+      <dialog id="error-dialog" aria-labelledby="error-title" data-modal-title="An error occurred" data-modal-close-id="error-close">
+        <p id="error-message" class="dialog-message" role="alert"></p>
+      </dialog>
+
+    </main>
+  </body>
+
+</html>

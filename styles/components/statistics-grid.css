@@ -1,0 +1,65 @@
+.ui-statistics-grid {
+  display: block;
+  margin: 4px 0 22px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+}
+
+.statistics-grid-row {
+  display: grid;
+  grid-template-columns: repeat(var(--statistics-grid-count), minmax(0, 1fr));
+  min-width: 0;
+}
+
+.statistics-grid-row + .statistics-grid-row {
+  border-top: 1px solid var(--theme-border-subtle);
+}
+
+.statistics-grid-cell {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 5px;
+  padding: 14px 18px;
+}
+
+.statistics-grid-cell + .statistics-grid-cell {
+  border-left: 1px solid var(--theme-border-subtle);
+}
+
+.statistics-grid-title {
+  color: var(--theme-muted);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.statistics-grid-cell strong {
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-lg);
+}
+
+.statistics-grid-description {
+  color: var(--theme-muted);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 700px) {
+  .statistics-grid-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statistics-grid-row[data-count="1"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .statistics-grid-cell:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .statistics-grid-cell:nth-child(n + 3) {
+    border-top: 1px solid var(--theme-border-subtle);
+  }
+}

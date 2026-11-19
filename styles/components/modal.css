@@ -1,0 +1,28 @@
+.ui-modal {
+  width: min(1000px, 95vw);
+  max-height: 85vh;
+  padding: 0;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+}
+
+.ui-modal::backdrop {
+  background: var(--theme-backdrop);
+}
+
+.ui-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid var(--theme-border-subtle);
+  background: var(--theme-surface-raised);
+}
+
+.ui-modal-header h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}

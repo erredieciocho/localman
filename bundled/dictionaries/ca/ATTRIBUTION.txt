@@ -1,0 +1,9 @@
+Catalan Hunspell dictionary
+
+Source: https://github.com/Softcatala/catalan-dict-tools
+Packaged Hunspell data: https://github.com/wooorm/dictionaries/tree/8cfea406b505e4d7df52d5a19bce525df98c54ab/dictionaries/ca
+Upstream project: Softcatalà.
+
+The dictionary and affix files are dual-licensed under GPL-2.0-or-later or
+LGPL-2.1-or-later. This distribution uses the LGPL 2.1 option; the complete
+license text is in LICENSE-LGPL-2.1.txt.

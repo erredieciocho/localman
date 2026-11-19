@@ -1,0 +1,151 @@
+.treemap {
+  display: grid;
+  height: 225px;
+  min-height: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 10px;
+}
+
+.treemap > .empty-state {
+  grid-column: 1 / -1;
+}
+
+.treemap-item {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  overflow: hidden;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--theme-treemap-normal);
+  color: var(--theme-treemap-text);
+  cursor: pointer;
+  text-align: left;
+  transition: filter 0.15s;
+}
+
+.treemap-item-action-wrapper {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.treemap-item-action-wrapper > .treemap-item {
+  width: 100%;
+  height: 100%;
+}
+
+.treemap-item-action {
+  position: absolute;
+  z-index: 1;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: inherit;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.treemap-item-action-wrapper:hover .treemap-item-action,
+.treemap-item-action-wrapper:focus-within .treemap-item-action {
+  opacity: 1;
+}
+
+.treemap-item:hover {
+  filter: brightness(1.18);
+}
+
+.treemap-item:focus-visible {
+  outline: 3px solid var(--theme-treemap-text);
+  outline-offset: -5px;
+}
+
+.treemap--has-other-items > .treemap-item--primary {
+  grid-column: span 2;
+  grid-row: span 2;
+  background: var(--theme-treemap-primary);
+}
+
+.treemap--has-other-items > .treemap-item-action-wrapper.treemap-item--primary {
+  grid-column: span 2;
+  grid-row: span 2;
+  background: var(--theme-treemap-primary);
+}
+
+.treemap--has-other-items > .treemap-item:nth-child(2) {
+  grid-column: span 3;
+}
+
+.treemap--has-other-items > .treemap-item-action-wrapper:nth-child(2) {
+  grid-column: span 3;
+}
+
+.treemap-item--secondary {
+  background: var(--theme-treemap-secondary);
+}
+
+.treemap-item--tertiary {
+  background: var(--theme-treemap-tertiary);
+}
+
+.treemap-item--other {
+  background: var(--theme-treemap-other);
+}
+
+.treemap-name {
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.treemap-value {
+  font-size: var(--font-size-xs);
+  opacity: 0.82;
+}
+
+@media (max-width: 600px) {
+  .treemap {
+    height: 195px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .treemap--has-other-items > .treemap-item--primary {
+    grid-row: span 1;
+  }
+
+  .treemap--has-other-items > .treemap-item-action-wrapper.treemap-item--primary {
+    grid-row: span 1;
+  }
+
+  .treemap--has-other-items > .treemap-item:nth-child(2) {
+    grid-column: span 2;
+  }
+
+  .treemap--has-other-items > .treemap-item-action-wrapper:nth-child(2) {
+    grid-column: span 2;
+  }
+}
+
+@media (hover: none) {
+  .treemap-item-action {
+    opacity: 1;
+  }
+}

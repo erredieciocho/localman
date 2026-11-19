@@ -1,0 +1,20 @@
+{
+  "dictionaries": [
+    {
+      "id": "es",
+      "name": "Spanish (Spain)",
+      "language": "es",
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/es/index.aff",
+      "dic": "../../../bundled/dictionaries/es/index.dic"
+    },
+    {
+      "id": "ca",
+      "name": "Catalan",
+      "language": "ca",
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/ca/index.aff",
+      "dic": "../../../bundled/dictionaries/ca/index.dic"
+    }
+  ]
+}

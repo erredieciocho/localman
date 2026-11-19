@@ -1,0 +1,1772 @@
+{
+  "count": 194,
+  "maps": [
+    {
+      "map": "CommonEvents",
+      "episode": "No episode",
+      "route": "Shared",
+      "description": "Common events.",
+      "summary": "Shared event scripts that fire in many places rather than a single location. They include Ashley's dizzy spell after overexertion, with Andrew scolding her, and a TV newscast announcing that supply shortages in quarantined households are \"taken care of\" while warning people not to enter contaminated apartments (with a threat of bullets for anyone who tries to help). A banter exchange over call-girl ads on a wall, where Ashley jokes about leaving her number and Andrew threatens to backhand her, is also here. The longest event is the Entity's encounter over a \"human relic\" controller: Ashley swaps in her own batteries, the Entity admits there was no real deal, but lets her use its Vision Room, which unlocks the Vision Room accessible only from the Main Menu.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map001",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The opening scene and Ashley's room-escape puzzle at the start of Episode 1. Andrew is knocked out cold after trying to kill Ashley, and she locks him in a room before returning his soul. The Entity notes his soul looks like a \"Tar Soul-to-be\". When Andrew wakes he demands to be let out and Ashley tells him he is grounded. The main puzzle is getting past a makeshift concoction blocking the door: Ashley breaks the window with a decoration, swings a bottle out to knock it down, and handles odds and ends like the shower, a pillow and a hanging light. Later she breaks down and sleeps, and the Entity questions whether her plan will work.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map002",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A flashback sequence of phone calls and a nurse visit early in the quarantine. Mom announces she and Dad are leaving for a hotel, insisting she hasn't drunk anything contaminated, and a nurse draws blood from Ashley and Andrew, saying results arrive tomorrow. In a later call Ashley begs for help while Mom refuses to believe the talk of starving, blames the new apartment's renovation, asks her not to call again, and apologises. The scene ends on a repeating \"Call again\" choice, underlining Ashley's abandonment.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map003",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The living room and front door during the lockdown. The TV shows only white noise and the remote is dead, so Ashley and Andrew bicker about batteries. A warden calls through the front door to check they are alive, while Andrew and Ashley discuss deliveries that never arrive, and the unpaid water and electricity bills likely to be cut off. It conveys months of confinement, hunger, black humour about the balcony, and the TV's cheerful propaganda.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map004",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "Andrew and Ashley's bedroom and kitchen routine during the starvation days. Ashley shows off the last Tomato Can that Andrew had hidden in the trash, and after protest he agrees to eat it, \"screwing our future selves\". Further interactions cover an old drawing in a drawer, Andrew's despair, Ashley's bedtime \"I love you, Andy\" and their dark jokes about the balcony. The day ends with Ashley's body absorbing nutrients and feeling better.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map005",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A utility area with a cleaning closet, washing machine and bathroom supplies. Ashley collects Detergent, Plastic Bags and a Mop, and runs laundry. Her narration complains that the people in charge first brought the wrong supplies and then nothing at all, leaving only inedible, vanilla-scented shampoo. It reads as a chore-based mini-puzzle that gathers items for later.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map006",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The parents' bedroom, a tidy-up and item-collection map. Ashley notes the bed's history, cleans up fallen books after Andrew's shelves collapse, and picks up a Wooden Plank. She wonders how many days she has been locked in the apartment and where Andrew finds the energy to make so much noise. Returning all the books to the shelf completes the chore.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map007",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The cultist neighbour's apartment, the longest and most important Episode 1 interior. A cultist pleads with demons for help and keeps failing at a ritual. Ashley and Andrew find a large amount of meat and joke about eating it, then plan the grim disposal of remains in plastic bags and the freezer. They also find a wallet with 666.66, a hiding closet, a gun and a key to the second floor. Ashley redraws the ritual circles, and the Entity appears, the cultist's ritual leading to her gaining a gun and Andrew's soul being described as viscous and black. A failed-escape branch here triggers the \"Warden Wins\" ending, in which the warden catches Ashley and the siblings are dragged back and their crimes discovered, with an option to retry.",
+      "ending": [
+        "Warden Wins"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map008",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The stairwell and elevator hub between the upper floors. The elevator is out of order, the staircase door is blocked by a wooden board, and floor-selection menus let the siblings go between the 2nd, 3rd and 4th floors. Notes taped to doors list blood-type supply orders such as \"2 x AB\". Andrew is mortified that a simple board kept them in.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map009",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The fourth-floor corridor and balcony next to the satanic neighbour. Ashley finds an ashtray, a blunt object for bashing things, and sets a Wooden Plank across to the neighbour's balcony, with Andrew stopping her from jumping. They watch residents screaming from their windows that they are starving as an ambulance takes someone away. They decide to burgle the neighbour's apartment looking for food.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map010",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "Inside the neighbour's apartment, mostly investigation. Ashley finds a surveillance camera, the 4th Floor Key and a Key to Room 302, plus documents. A fridge note says AB blood types will not be given supplies except important people, hinting that the starvation was not standard practice. An opened letter warns that HQ and the Surgeon are furious and planning a cover-up, adding to the sense the facility is being shut down.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map011",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The third-floor landing and the door of Room 302. A woman inside screams \"Get lost!\" while door notes list supply orders. Ashley and Andrew argue over why she gets food while they do not, and Ashley is hurt that Andrew finds the woman pretty. They plan to finish the ritual and consider using the woman as a soul to offer, since they cannot simply leave a witness.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map012",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "Room 302, where they meet the woman, who does not want to leave because she gets free food and games and hopes the quarantine never ends. Andrew uses his cleaver and a nail gun appears, and the encounter becomes violent. Afterwards Ashley and Andrew argue about their codependence, then reconcile. Ashley ends with the warden's gun and the second-floor keys.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map013",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The second floor and its open window, the route out of the building. They use a nail gun to fix a carpet to the wall as a climbing rope, with Ashley going first. Another warden with a walkie-talkie and a cultist's-room key complicates matters. A Carpet is collected and a plan is made to anchor it.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map014",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "Outside the apartment building after the escape. The siblings improvise a plan: skip town, find a buffet, steal an identity and live quietly. Ashley laughs through the despair and Andrew insists she is not climbing back up for anything she forgot.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map015",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A very short childhood flashback. Young Andy and Leyley argue, with Leyley insisting Andy go to a classmate and ask her to come with him, because \"Mom said you'd help me with anything\". Andy is reluctant, worried about getting in trouble.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map016",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A longer childhood flashback ending in the present. Leyley's school friend likes Andy, so Leyley wants to lock her in a crate in an old warehouse as a lesson. Andy objects but is pressured. It returns to the present, where Ashley and Andrew board a bus out of town, and the scene closes with \"END OF EPISODE 1\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map017",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A childhood flashback at the old warehouse. Young Andy and Leyley, with a girl from Leyley's school (her name is censored in the dialogue), look for a way in. They discover a nailed-over metal sheet, and Andy collects a Hammer to pull out the nails and finds a steel mallet. Leyley privately fantasises about hurting the girl, while Andy senses something is off and deflects. Leyley then turns up to \"hang out\" and asks the girl if her mother knows where she is, learning she lied and said she was studying with Julia.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map018",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The childhood warehouse hide-and-seek that goes wrong. Leyley rigs a crate so the girl cannot get out, and Andy tries to tone down the \"lock-in\" with a stick between the rings. The girl, who coughs and begs to be let out, ends up trapped in a crate, and when Leyley says \"Oops\" it is clear she has died. Andy panics at Leyley's casual attitude, and the scene covers moving and hiding the body (Nina's corpse is wrapped in a tarp and carried away), establishing the siblings' first cover-up and Andy's complicity.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map019",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A tiny utility map: a save-game prompt with the options \"Save Game.\" or a rude refusal.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map020",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The motel and street early in Episode 2. A week after the escape, Ashley and Andrew pass time with a newspaper, worried they are almost out of money because Andrew cannot use his bank without revealing where he is. They bicker about ID checks at hotels, the motel's noise and Ashley's carefree attitude, and Ashley realises she has left her gun in the room. Ambient shop, street and bystander lines set up the grubby town setting.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map021",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "Night in town as Ashley takes the lead on a plan to deal with a hitman. They pass an ad about euthanasia, a vending machine selling Caramelized Apple & Cinnamon Soda, and the hitman's locked car. Ashley recognises him as the man who slit their throats in her dream, while Andrew mutters about how stupid it all is. They trade banter about past mistakes such as fireworks indoors and being at the mercy of each other's whims.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map022",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "The motel, its room and the streets. Andrew obsessively checks newspapers for news of the fire, the TV says everybody died, and the siblings argue over who gets to watch. Ashley keeps the warden's gun, jokes about a hitman who cuts people up, and prepares to leave after asking whether to save the game. They decide to cut through the park to scout for the killer. A failed encounter here triggers \"The Hitman Wins\" ending, in which the hitman kills both siblings, with an option to retry.",
+      "ending": [
+        "The Hitman Wins"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map023",
+      "episode": "Episode 1 — The Coffin",
+      "route": "Shared",
+      "description": "Apartment opening, lockdown, neighbours, household exploration and escape-related events.",
+      "summary": "A tiny chore map: Ashley throws laundry in the washer and gets Washed Laundry.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map024",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The back of a building housing an unemployment office and \"Club 6FU\". Andrew and Ashley attempt to sneak into a cultist gathering, find a locked staff door, a passcode keypad, a recycling area and an elevator that leaves without them. A key hidden under the cigarette jar gives them an Employee Key. Andrew wonders whether these cultists can really summon demons, but the attempt fails, so they return to the motel and Ashley's plan.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map025",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "A confrontation with cultists at a private event. Andrew uses dialogue choices, such as claiming he got lost or asking about a \"sex and demons party\", to talk his way out. The bouncers insist it is only a demon summoning and boot him. He rummages through left-behind items hoping for ID, finds a signed Demon Summoning for Dummies vol. 666, and he and Ashley joke about the unreadable signature.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map026",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The motel exterior and alley where they wait for the hitman. Andrew chain-smokes while Ashley insists the killer will show up, and a cultist stumbles on them instead. They hide, bicker and finally decide to carry on with a plan to sneak in and pretend to have forgotten something. Details include a robe shop, a bar and a nasty soda.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map027",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The park hide-and-seek with the hitman. Andrew finds Ashley hiding in a bush, and the pair decide on a plan to lure the killer out. A choice to save or shoot leads to Ashley reclaiming her gun and the hitman being dealt with. Andrew takes the Car Keys, and the siblings argue about Ashley's \"genius\" plan.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map028",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The hitman's car. They find a letter addressed to \"Mr. Washing Machine\" thanking him for his \"laundry services\", realising they are the laundry. After a choice to take the car, Andrew drives despite not having driven in over two years, while Ashley gives him the silent treatment and falls asleep. Dialogue about fingerprints, robbing someone and where to go fills in the character interplay.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map029",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The car interior the next morning. Ashley wakes after Andrew worried she would not wake at all, a book \"Meditate Mindlessly\" and newspaper cuttings about their old apartment's tainted water, fire and a chemical leak lie in the car. It is about ten in the morning, and Andrew says Mom and Dad should be at work. He announces the episode title \"Andrew and Ashley and the Home Sweet Home Invasion\", and they set off.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map030",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "Ashley's solo dream-vision in the Decay, and her first extended talk with the Entity. In a world of red flowers and doors decorated with flowers or eyes, she picks up Red Flowers and meets the demon, who says it summoned her via its talisman. It asks whether the trinket's gift of foresight was useful, says it is out of energy, and offers a deal for human souls, not hers. She hesitates, wanting to return to Andrew.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map031",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "A cultist headquarters upper floor. Andrew wraps himself in a curtain and hides in a cake cart, which a cultist wheels into the elevator, joking it weighs \"the weight of my sins\". They sneak around, drinking black coffee, and Andrew pretends to be from the catering company when questioned. It feels like a stealth gag scene.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map032",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Town, motel, club, hitman and early Episode 2 exploration.",
+      "summary": "The cultists' ritual gathering. Hidden among the cake carts, Andrew watches the leader lead a chant for \"Lord Unknown\" that produces nothing, and he privately notes that Ashley once summoned something on her first try. He is asked why he has no robe and bluffs his way through small talk with a cultist who learned of the event from an occult magazine ad. The scene is largely comic, with free coffee, off-key singing and amateur cultists, and it also lets Andrew leave and rejoin Ashley.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map034",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "The first stretch of Ashley's solo red-flower vision in the Decay. She uses Red Flowers to bridge gaps in a dreamlike field, feeling both asleep and wide awake. A garbled voice from the Entity calls out to her \"tar soul\", but she gets no answer to her questions about where she is.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map035",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "A second section of the red-flower vision. Ashley panics because everything looks the same and the Entity's voice is too muffled to understand. She decides to focus on finding her way out rather than listening.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map036",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "A further stretch of the vision, where Ashley bridges more gaps and finds a present containing a lemon muffin disguised as a birthday cake. It stirs nostalgia and she reflects on \"the good ol' bad times\", tying into Leyley's birthday memory.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map037",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "An unfinished-looking area where the Entity tells Ashley she is in the \"realm in between\", not on the path home. It warns that entering a realm without being summoned means death, and insists she return and bring the souls it expects. Ashley complains about being kept out of the demon world, and there is no door back.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map038",
+      "episode": "Episode 2 — The Graves",
+      "route": "Decay",
+      "description": "Red-flower dream/vision and encounters with the Entity; the Episode 2 location reference identifies Ashley's solo vision as Decay-route content.",
+      "summary": "The end of the vision's maze. Ashley screams in frustration at the flowers, hears Andrew trying to wake her and begs for help. She is bounced to yet another area and rants about being sick of the flowers.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map040",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "Parking area and park near the parents' new home. Andrew drives them to free parking at a national park, since Mom and Dad live down the slope and they have little time before the parents return from work. A flimsy grocery bag rips and Ashley has to pick things up while Andrew snaps at her to hurry.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map041",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A childhood flashback in a supermarket on Leyley's birthday. Andy scouts frozen cakes but cannot afford them, so he proposes a muffin value pack with whipped cream. Leyley bargains that he must watch an age-restricted horror movie with her. It highlights their poverty and Andy's care for her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map042",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A childhood flashback at home on Leyley's birthday. Leyley is gloomy that her friends never come, and Andy buys her the lemon muffins as a \"cake\". They watch gory TV and promise to keep celebrating, while the TV news (no dead girls reported) reassures Andy that their secret is safe. He stays at home afterwards.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map043",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The street outside the parents' new home. Ashley and Andrew check nameplates and knock, wondering whether their parents changed surnames to avoid them. Later, in trash bins, Andrew disposes of the leftover Human Soup and gathers bones in plastic bags, thinking about what to do with them.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map044",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The garden and window break-in at the parents' house. They place a wooden plank to reach the window, unhook the latch, and Ashley climbs through. In the garden they harvest onions, carrots, potatoes and rocks, and the flowerpot key gag pays off with nothing.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map045",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The bathroom. There is no water in the taps or toilet because of renovations, and Ashley notes that the \"new apartment\" is actually a house. Andrew guesses Mom lied to avoid explaining where the money came from.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map046",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The ground floor and living areas of the parents' house, a major exploration map. Ashley and Andrew look at the lack of family photos, a fireplace and the signs of money, and they confront their parents. Later they plan a ritual and a visit from Mom, discuss cleaning the basement and what to do next. Ashley says she offered two souls and so expects at least two visions, and Andrew wonders whether the soup is ready.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map047",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The bedroom and study. Andrew finds a locked dresser and the key, with compensation paperwork and the death certificates of Ashley and Andrew, which explains why Mom told Ashley not to call. They argue about their parents' \"hobbies\", Andrew's wish for a proper family and Ashley's disgust at the pretence. Night falls and they sleep, and the demon seems to be messing with them.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map048",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The kitchen. Ashley and Andrew use a cookbook to find a Simple Soup Recipe (Meat, Carrots, Potatoes, Onions) and make human soup as part of disposing of their parents' remains. They argue about the bones, the documents and what they will do about money and the trinket, and Ashley pours things down the drain. Baking Soda is found for the plumbing.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map049",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "The basement, the largest map in Episode 2's house section. They find tools, a Screwdriver, Christmas lights, candles and a Dresser Key. Andrew butchers the bodies and Ashley guides blood into the floor drain, which clogs and floods. A confrontation with Mom, who tells them to \"just take the money and go\", leads to the collection of a Credit Card, teeth and a toothless skull, and they plan how to get rid of everything.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map050",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A childhood flashback of burying Nina's body. Andy and Leyley use wooden planks as shovels, struggle to dig a deep enough grave and cover it with foliage. Andy panics about police dogs, while Leyley insists they simply stop thinking about it and warns him not to talk or she will tell everyone what he did.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map051",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A childhood flashback days after the burial. Andy cannot eat and Leyley asks for his ice cream. They discuss that officers and a teacher have asked classmates questions, and that Julia had no idea about the visit. Leyley makes him swear he will never leave her, and Ashley's present voice supplies bitter commentary. A \"Vision Unlocked\" message points to the Vision Room.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map052",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A haunted kitchen and freezer scene with a cultist ghost speaking archaic English. Andrew collects limbs and places them in the freezer, and the ghost mocks his descent into mutilation and cannibalism. Interleaved are a flashback of Leyley cheerily telling Nina to \"rise and shine\", and the ghost's comments on how its remains were left in the dwelling and later burned.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map053",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A string of memories and visions in the Graves house. Andrew's girlfriend Julia hesitantly tells him that she and her sister think Ashley should learn some independence, and that he should stay over more often instead of cancelling on her. Interleaved are Leyley's birthday candles, Ashley's jealous mockery and a \"Vision Unlocked\" message about Julia's cherished photos. Back in the present, Ashley picks up a Severed Limb and the cultist ghost greets \"young Graves\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map054",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Park/car-park, Graves house, parents, dinner/ritual preparation and related shared events.",
+      "summary": "A seaside scene where Andrew and Ashley dump the bag of bones and rocks into the ocean. Ashley wants to say some words for closure, and Andrew grudgingly delivers a sarcastic \"prayer\" to Mom and Dad. They talk about insomnia and nightmares, whether living in the car is an option, and what to do next. Andrew wants to leave before the corpses float up, and Ashley privately hopes they are safe now.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map055",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "A Burial-route shared-dream puzzle room with pedestals, a trash can and locked containers. Andrew and Ashley juggle a Knife and Flowers between pedestals, and cards read \"Enamored Evening\". It is a symbolic item-placement puzzle with little spoken dialogue.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map056",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "A branching path in the Burial vision where the narrator warns the route is a questionable idea. Choices involve Sunshine, Heart and Broken Heart items, and the narrator insists the player is a monster for continuing. The sequence ends with cards reading \"Once Upon a Lousy Life...\" and \"THE END\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map057",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "A caged-plushie puzzle with words like Siblings, Parents, Family, Classmates, Soulmates and Friends on display. Ashley collects a Green Plushie and a Key. The scene closes with flirtatious, guilty-conscience banter between Andrew and Ashley, including Andrew calling the experience \"mortifying\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map059",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "A Burial-route room with a TV showing only static and a drawing desk. Ashley collects a Pink Plushie and crayons, with the narrator titling this episode \"Leyley and Leyley Alone\". The wall of drawings is dismissed as garbage.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map060",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "A plushie-arrangement puzzle themed on a family dinner. The player seats Pink, Green and other plushies at a table, handles a Mother, Father (Dad) and Yellow and Purple plushies, a cage, a stool and a locked chest. The narrator quips that the soup is missing sustenance, and the plushies end up looking happy together.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map061",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "Andrew's attempt to call up the Entity. After a failed summons, he reaches it and is addressed as a Grime Soul. The Entity says he must bring souls next time, or it will assume he is offering his own. He draws a blood circle and tries sun, moon and star stones, realising he got played.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map062",
+      "episode": "Episode 2 — The Graves",
+      "route": "Burial",
+      "description": "Shared dream, pedestals, plushies/vision puzzle and Burial continuation notice.",
+      "summary": "The Burial's end-of-content stop. A notice says the game has multiple routes, that more can be played once Episode 3: Burial updates, and offers advice on how to enter the Decay. The map ends with \"END OF EPISODE 2\" and a save prompt.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map076",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A chase-themed dream puzzle with Ashley. She finds an Axe and chops wood, kicks a road sign into the void and barricades a door while something pursues her. Someone knocks at the door and she decides it would be wiser not to linger.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map078",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "Andrew summons the Entity in a dream. Needing a soul, he bottles a random one (a Bottled Soul), notes the fading runes and places the Sun, Moon and Star Stones. The Entity first mistakes him for someone else, and a Vision Unlocked message plays.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map079",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A tiny void area. Andrew collects a Bottle and the narrator says he cannot levitate across the void, leaving it to more ethereal beings.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map080",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "Andrew's internal reflection and talk with the Entity. He wonders whether being everything to Ashley as a child twisted her, and apologises silently. The Entity recalls him as the \"deceptive young Grime Soul\" from a decade ago, disappointed he hasn't hatched, and tells Andrew he wants to be known, which unlocks something.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map081",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A mechanical puzzle with a chain and a handle that can be turned clockwise, counter-clockwise or neither. Andrew collects a Tassel and finds missing parts, with coloured flowers (blue, purple, pink) serving as hints.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map082",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A tiny puzzle map in which Andrew collects a Tassel and finds something that will not budge.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map083",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A small puzzle with empty slots and Stars. Andrew collects a Tassel and five Stars, filling the slots.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map086",
+      "episode": "No episode",
+      "route": "Vision Room",
+      "description": "Selectable unlocked visions.",
+      "summary": "The Vision Room gallery. The Entity welcomes wandering souls and lists yellow visions of the past, gray visions of a different world plagued by brain tumours, and visions of the future. Selectable visions include a distraught woman on the phone, a mother's intuition, a woman's realisation, something stupid, a killing and a manifestation of a complex.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map090",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A key-and-plank platforming puzzle in Ashley's dream. She notices a locked door with the key in sight, uses flowers and a Wooden Plank to cross gaps and collects two Keys.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map091",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "Ashley picks up a White Key and finds a locked door. The Entity appears and she asks what it is doing there. She cuts down a tiny tree with an axe.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map092",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A climactic vision confrontation between Andrew and Ashley. Ashley tries to appease Andrew, who plays tag and announces the episode title \"Andy and Leyley and the Final Finale, Finally\". She can draw her gun, and the vision shows a violent end in which she ends up killing him. The Entity says the future has changed and the deal is not with Andrew, and Ashley decides to take him to the Demon Realm.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map093",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "A multi-part dream puzzle. Ashley uses sticks, a watering can, a key and a rope ladder, bottles several different spirits and meets the Entity. She jokes about bottling it, and several bottled spirits are catalogued with sarcastic descriptions.",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map094",
+      "episode": "Episode 2 — The Graves",
+      "route": "Dream",
+      "description": "Andrew's dream / solo-dream and related puzzle/vision material.",
+      "summary": "Ashley's nightmare vision of being chased, interrupted by the Entity. It explains this is a vision of itself, that her soul is darker than a Tar Soul-to-be, and that it is seeing why she used its talisman again. Ashley asks what is chasing her and gets \"we shall see\", notes the little souls look cute, and the Entity asks \"tasty?\".",
+      "ending": [],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map095",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The start of the Decay's Episode 3 material in the cultist club. A cultist worries about missing cakes while Ashley and Andrew help him prepare a ritual, with Andrew cutting a finger with his cleaver for the blood. They summon Lord Unknown but cannot hear it properly, and it departs. The tone mixes comedy and menace.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map096",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A childhood flashback in which Dad greets Andy and the conversation turns into a misunderstanding. Andy thinks Dad might jump, but Dad has just been fired and heads to the unemployment office, calling his son \"Anders\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map097",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A very short exchange. Ashley tells Andrew she loves him, and Andrew sadly answers \"I wish you did\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map098",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A school-lunch flashback. Andy's friends are playing a fantasy card game while Leyley complains about food and is in trouble with Mrs. Kent after insulting a teacher. Andy admits he is bad at the game, asks Leyley to sit with other kids, and has to return her backpack. It shows how Leyley's behaviour isolates both of them and how Andy is made responsible for her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map099",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The school office and hall, continuing the flashback. Mrs. Kent complains that she cannot reach their parents, scolds Andy about the nickname \"Leyley\", and says she will send a written notice. Leyley smirks as Andy retrieves her backpack, and Julia approaches Andrew, who then asks her to meet after school, an early beat in their relationship.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map100",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback at home before the trip to the grandparents. Mom, with a headache, orders Andy to fetch Leyley and warns them not to cause scenes. Leyley blurts out that \"we killed her\", but Mom brushes it off because Dad has just lost his job and eviction looms. Leyley screams that she hates her mother.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map101",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The apartment stairwell, where Andy tries to get Leyley to put on her shoes. They trade insults, and she declares she is not friends with him anymore.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map102",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A stairwell chase in which Andy corners Leyley, who laughs as he catches her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map103",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A memory-erasing puzzle area in the Entity's dream world. The player is repeatedly asked whether to use the eraser on a series of scenes.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map104",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short continuation of the same area, where everything \"looks vaguely familiar\" and the eraser prompt returns.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map105",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A dream-diner puzzle in which Andrew deals with coloured ghosts (Lime, Lilac, Pink, Green) who have table rules: Lime won't sit next to Pink, Lilac won't sit on the left, Pink only near Grime Soul. Andrew sets a clock to six, gathers groceries and money, and finds a family portrait of lime mother, lilac father, green son and pink daughter. The Entity comments that it is now curious about him.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map106",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A memory sequence in the Entity's realm. The Entity proposes a \"friendship\", marks Andrew's soul and gives him promised vegetables. Scenes include Andrew's birth (\"It's a boy\"), his first full marks at school, and Mom yelling about how hard she works and how he cannot watch his sister. He collects Knowledge.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map108",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A very short scene where the Entity says it did not expect a Grime Soul, wonders how the ritual worked, and tells Andrew to surprise it.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map109",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The apartment hallway before the trip to the grandparents. A nosy neighbour scolds Andy and Leyley for noise, Leyley refuses to go because Grandpa is mean, and Andy negotiates with her. A shoe-hiding mini-game makes Leyley wear her shoes, and Andy makes her promise to keep a secret.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map110",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The grandparents' garden. A rope swing evokes Andy's old memory of Grandpa hitting him after Leyley fell. Mom and Grandpa argue over debt and careers, and Andy and Leyley are sent off to do chores such as getting a Trowel, a Watering Can and Sprouts.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map111",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The grandparents' house interior. Grandma gives the children a cup to pick blueberries, and Andy overhears Grandpa's cruel plans for the two. After Leyley goes missing during hide and seek, Mom blames Andy and orders him to plant every sprout in the garden as punishment.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map112",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short scene in which Leyley wants to be pulled up to a window but Andy is too weak, so he goes off to fetch spare clothes.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map113",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The grandparents' upstairs. Andy studies while Leyley wants to play hide and seek, then vanishes. Andy searches and ends up scolded by Mom for failing to watch her, and Ashley's present-day commentary shows resentment. A save prompt follows.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map114",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The garden and woods. Andy digs up a time capsule with a photo and two letters (a love letter and a pregnancy letter signed Douglas), solves a combination lock using numbers carved on three trees (8, 5, 3), and picks blueberries with Leyley.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map115",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The car ride to the grandparents. Dad warns the kids not to mess up the borrowed car, Mom makes them lie about money, and Leyley draws a cartoon on Andy's notes.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map116",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An abandoned house the siblings explore. Andy knocks boards loose with a rusty hammer, they find an ashtray and lighter, and discuss smoking, rockstars and Leyley's plan to marry Andy. He pushes a bookshelf off the balcony.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map117",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A dark abandoned-house flashback. Andy searches for Leyley in the gloom, bargains with an unseen voice that answers \"Deal\", then blacks out. When he wakes Leyley is excitedly exploring the strange blood-stained ritual space and flower-like stains, while Andy feels lightheaded and wants to leave. He removes a nailed metal sheet from a vent.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map118",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A woods flashback while the children pick blueberries. Andy declines Leyley's idea of exploring the swamp and they joke about how adults might welcome their disappearance. Leyley gets stuck in a tree with spiders after a branch snaps, and Andy builds a makeshift platform to reach her, worrying Mom will be furious.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map120",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A shop in the present day, where Andrew buys shampoo and food while Ashley dawdles. Narration rates how much trouble he is in, since the two are officially dead and caught on cameras. A bathroom key mix-up and a police presence make them slink away, with Ashley saying it went well and Andrew saying it went terribly.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map121",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The car at night, a tense argument. Ashley says she still loves Andrew and pressures him to say it back. He says it as \"Leyley\", then refuses to play along, and she gives him the silent treatment. Ashley comments on his vision, being chopped up and dying in it, and apologises, but Andrew rejects her promises.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map122",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A roadside stop where Andrew wants food, bodywash and a newspaper. They park sloppily at a gas station, joke about gasoline and lighters, and Andrew insists they not get in the car until the police have left.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map123",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A memory-eraser puzzle area. The player is repeatedly asked whether to use the eraser.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map125",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A second memory-eraser area with repeated \"Use the eraser?\" prompts.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map128",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A two-line exchange where Ashley complains about the poor path Andrew chose, and he tells her to be quiet.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map129",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Andrew finds a small box with an engagement ring engraved \"Edgar + Natalie = 4ever!\". Ashley tries it on, they joke about pawning it, and Andrew says he'd engrave \"The biggest mistake of my life\" on theirs.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map130",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "At the camping area while waiting for officers to leave. Andrew despairs internally about having no plan, and he and Ashley argue over the trinket and her clinginess, with Ashley telling him to play along as \"Andy\". They return to an overnight-parking campsite.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map131",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The campsite and a series of phone calls. A kid locks himself in a car and screams that he called the police. Andrew phones Julia and Jane and is told off, and Ashley snipes at him. He breaks the car window with a rock and the child runs off. There is a skip option for the segment.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map138",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The forest, where Andrew's poor sense of direction has them lost. They prepare ritual spots among blue, pink and orange flowers, meet friendly campers who suspect they are a couple, and Ashley jokes about armed robbery. A fire gets put out, and there is a skip option.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map142",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The big ritual scene. Andrew builds a campfire while Ashley draws the circle, and he insists they must not kill the campers or leave signs of struggle. The Entity offers to take them to its realm in exchange for additional souls as the authorities approach. A fail ending, \"The Happy End\", shows the siblings shot dead as a mocking happy end, with options to retry.",
+      "ending": [
+        "The Happy End"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map143",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A skippable segment in which the Entity tells Andrew to leave because souls like his come here to die. Andrew realises he is stuck in a vision, recalling how Ashley and his parents once could not be woken, and the Entity says it needs no Grime Soul.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map144",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A one-prompt map offering to skip a segment. No story content.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map145",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Another one-prompt skip option with no story content.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map146",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A puzzle in the demonic dreamland. Andrew finds a Wooden Plank, places Green and Pink plushies, uses a Shovel to dig up a \"Beloved\" grave, and picks up a Key and severed limbs. He tells himself this is a vision, and a voice cries \"Mine!\".",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map147",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short scene where Ashley, unable to reach Andrew, shouts at him to wake up because he used her trinket, and he cannot hear her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map148",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Wandering the forest in circles, where Ashley offers to try and Andrew finds a map and small footprints belonging to a child. A skip option is available.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map152",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Andrew confronts a child hiding in a crevice, who accuses him of killing his parents. Andrew lies about it being a game, and privately decides that the child must die before he can get away.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map154",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A four-line scene in which Andrew finds the child and tries to coax him back, only to realise the child will not cooperate.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map158",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A campsite puzzle with a fire pit, Sun Stone, Flower Seeds, Bucket and water. Andrew and Ashley argue fiercely over sacrifices, as she began grilling a victim before Andrew botched things. Andrew yells, Ashley apologises sarcastically, and they resume the search for the demon.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map159",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A scene in Ashley's vision location with a plank, flowers and firewood. Ashley recalls the vision in which Andrew chases her, and pleads for a compromise, asking what she can give so he won't kill her. Andrew refuses any more \"compromises\" because her promises mean nothing. She insists on keeping an axe for the tiny trees, and the narrator notes Andrew does not have it in him to act.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map160",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short fragment where Ashley leads Andrew out of the flower area, points to the door \"where the killing happened\" in her vision, and asks if he'll try anything. Andrew says he won't, and the player keeps running out of flowers.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map161",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A shouting match during the chase. Ashley insists she is not afraid and still loves him, while Andrew threatens her with dark affection. They exchange insults about death and sex, and Ashley collects a Moon Stone and a Star Stone.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map162",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The confrontation in the demon's limbo. Ashley argues the demon has helped them escape being caught, while Andrew blames her for everything, saying the problem has always been her. The scene turns violent, the Entity questions why Ashley did not shoot and says their deal stands even if Andrew's soul returns, and a Vision Unlocked message plays. A fail branch here triggers the \"Andrew Wins at Tag\" ending, in which the player character dies, followed by a retry option.",
+      "ending": [
+        "Andrew Wins at Tag"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map163",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback of Andrew with Julia and her sister Jane. Julia describes harassing calls and letters the police won't act on, and Jane suspects Ashley and urges her to dump Andrew. Andrew reassures Julia, who wants to know where she stands, and they agree to be official, though the narrator notes Ashley did not come around.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map164",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A first tour of the Entity's home. The Entity tells Ashley to bring a soul, explains that souls are attracted to containers and must be kept active, and rejects the warden's soul as worthless. It lets Ashley and Andrew stay, mentions a ritual chamber and gives access to a hub where Andrew collects Candles and finds a remote-controlled car.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map165",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback in which Renee (Mom) asks Andrew for money, then snoops in his room for condom wrappers and bickers with Ashley. She learns he has a girlfriend and he is staying at Julia's, and she tells Ashley to get a job and move out.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map166",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Renee questions Andrew about sleeping in the same bed as Ashley, and he deflects by talking about a TV show. She tries to reassure herself they were fully dressed, and a bad feeling lingers until she gets home to silence.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map167",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A memory-labelling puzzle in the Entity's realm. A coffin reads \"Andrew Graves\", and Andrew must assign labels (Murderer, Student, Good Person, Brother, Lovesick), gather documents and answer a phone quiz. The narrator mocks his flattering answers, and the Entity admits it does not remember him.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map168",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A visit to the souls' area. The Entity tells Ashley she is greedy and calls the souls \"cattle\" kept for food and shelter. Andrew suspects his parents' souls are among them, and the siblings briefly argue about how he has treated her since the sacrifice. Ashley's hand passes through souls, but they can touch her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map169",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A talk between Ashley and the Entity, with a vignette of schoolgirls playing at summoning demons. The Entity questions why she keeps a Grime Soul brother near, and she says it is her business and plans to out-sneak him in the Human Realm by not sleeping or hugging him. Andrew goes to bed, and Ashley fumes that he wouldn't kiss her in the Human Realm.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map170",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The siblings' room in the Entity's realm. Ashley is thrilled with their new home and mop, while Andrew worries about the vague deal to \"cooperate\" and wants a way out. They argue over trust and their relationship, he weeps, and Ashley's happiness comes at his cost.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map171",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A symbolic puzzle about Andrew's self-deceptions regarding love. It includes a TV, a wedding cake, a cage, accessories (bandages, choker) and a narrator mocking the idea of childhood sweethearts after the crate death. It also mocks his ex's gentleness and the bittersweet first love.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map172",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A monologue of Mom's guilt-tripping Andrew. She insists he take care of his sister, calls him selfish, tells him not to embarrass her and says he is all Ashley has.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map173",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A mannequin-dressing puzzle with a Douchebag Mannequin, a Player Mannequin and Ashley. The poems describe a liar, a playful sidekick, a judgmental jerk and an obnoxious protégé, and the player places hats and cards to match them.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map174",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An \"identify the real Ashley\" puzzle with several Ashley variants offering contradictory lines such as ones about microbiology, always prioritising his happiness or being rude. Andrew has to decide which is the true Ashley and runs out of choices.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map175",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short scene in which the Entity meets another summoner. A cheerful girl is amazed to meet a real demon and offers a signed T-shirt in exchange for the numbers she wants.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map176",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A demon-lock puzzle in the Entity's realm. Andrew complains it is horseshit while Ashley insists it is how the demon locks its doors and likes it.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map177",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A summoning scene in the human realm. Ashley uses blood to draw a circle, calls the Entity and offers two souls outside plus a cultist in exchange for free housing in its realm, and it agrees. She declines to offer a man who needs to look after his guinea pig. A nervous cultist asks for help on a sociology test, learning that seeing a specific vision is costly. Ashley and the Entity discuss its inability to leave the circle, and the scene ends with two soulless husks on the sidewalk and a passerby pretending not to notice.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map179",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A very short exchange in which Ashley tries to cheer Andrew up while an object will not turn.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map180",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A school flashback. Andrew declines a weekend invitation because he is working part-time, and he helps Ashley who is blocked from a vending machine. He overhears classmates gossiping that he and his sister are \"pre-eeetty close\", and he is unsure if Ashley is being bullied again.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map181",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A teenage flashback centred on jealousy. Andrew wonders who would want to date Ashley, while a classmate buys her flowers and Ashley mocks the idea of \"romance\". Andrew tells Ashley about visiting Nina's grave but omits declaring his love for Julia, and she lashes out about marriage and his girlfriend. He later checks her study table and gets a Pen.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map182",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback with Ashley and her disastrous date. She boasts about attracting boys but admits she stood him up out of annoyance. The scene then turns to a family argument in which Ashley insists \"it's Andy and Leyley and no one else forever\", Mom tells Andrew he can do better, and a TV parody of bad statistics plays.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map183",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A school hallway flashback. Andrew tries to separate from Ashley, girls giggle about gossip he thinks may be about him, and a teacher urges him to apply himself so he can provide for his family. He worries about relying on Grandpa's company for work.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map184",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A school flashback in which classmates taunt Andrew about a rumour that he is sleeping with his sister. He insists it is untrue and is shunned. A friend explains the story originated with a bully, and the narrator notes the rumour reduces his relationship with Ashley to someone else's fantasy.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map185",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny map where Andrew picks up a Yellow Plushie, with the narrator warning he shouldn't be seen with it and joking about spectators.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map187",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short hallway scene of students repeating the rumour about Andrew and his sister, with some defending him by pointing to his girlfriend.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map188",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback with Julia, who asks whether she and Andrew are an item. Andrew does not want Ashley to find out through a confrontation and asks Julia not to tell her, promising he will do it. He agrees they are together but delays announcing it, while students keep gossiping.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map189",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A short scene in which Andrew laughs at something that turned into Ashley, then falls quiet. A door unlocks somewhere.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map190",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An apartment scene after Ashley wrecked a room. Andrew finds pieces of her torn drawing, brings her gifts and tries to reconcile. Ashley is hurt that he dates Julia and asks if he loves her more, and he insists he barely knows her. They end with a shaky truce and a demand that someone clean up.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map191",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A shopping errand where Andrew buys tape, chocolate and a gift to appease Ashley and fix her drawing. He frets about what she wants, and a shopkeeper forces a dog-finding quest before he can leave. The shopkeeper reveals he was watching on camera and demands payment.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map192",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A one-line map: the drawing is fixed.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map193",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A garden puzzle with a bucket, well water, Sunflower Seeds and plants that need water. A flash to the present shows Ashley waking Andrew after a nightmare, a sunflower blooming, and a bloodstained tarp.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map196",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A memory-probing scene in which a different Entity-like voice asks about the \"little lady who became a Tar Soul\" (Ashley). Andrew says he has not seen her in years and the voice forces open his memories, learning about his guilt toward his girlfriend. He admits it did not ease his guilt enough to be worth it.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map197",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A dream-like scene with Julia and Ashley. Andrew says he hoped Julia would show up, and Ashley demands to know who he likes best. He wakes screaming from a nightmare with Ashley beside him, then takes a shower, and a Vision Unlocked message plays.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map198",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An arms-from-the-ground puzzle in the demon realm. Andrew collects a Nail Gun, Gun, limbs, a Cap and a Head, and the arms demand objects. He answers questions about whether he is a normal person, reflecting that some deaths were survival, and ends by getting the Car Keys.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map199",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Andrew's bedroom and surrounding area during a nightly shut-out. A reasonable request is made that he get lost while Ashley is busy, and the player can choose to look inside, with the narrator noting the temptation. He collects rain water, a Heart, a Watering Can and Sunflower Seeds, and hides a Heart under the carpet to find a Pink Button that completes a mechanism.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map201",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The church grounds and grave visit with Julia. Andrew uses a Rake to open a stuck door and then breaks it, with the narrator joking he stole a rake from God. Julia visits Nina's grave and asks him to bring purple flowers, saying Nina liked purple. Andrew's discomfort shows while Julia says she loves him and does not want him to leave.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map202",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny storage area where Andrew pulls loose a Plank and notes the stairs are out of reach.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map203",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback in which Julia says it is the anniversary of Nina's death, a friend of hers and Ashley's, and asks Andrew to visit the grave with her. Andrew privately reflects on Ashley pulling away and his own conflicted feelings, Julia suggests getting an apartment together, and Ashley snaps at him that morning.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map204",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A nightmare or vision in which Julia greets Andrew with breakfast and a hostile voice screams at him to choose between two women. Andrew wonders if sleeping beside Julia makes things worse.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map205",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flower-pot puzzle in which the player places Yellow or Pink Flowers.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map206",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A \"No backtracking allowed\" puzzle map with comedic skip choices and more flower-pot placement.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map207",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Ashley examines an Entity lock and a remote-control car controller, learning it secures a room she has no business in. She uses the potted plant to keep Andrew locked up, tells him to reflect, and he screams for her to open the door.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map208",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A hub of wandering souls. A half-formed Entity emanates confusion, a soul resembles a milder Ashley, and Andrew meets one that seems to be his mother (\"Hi Mom\") who does not remember him. The tone is melancholy.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map209",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A scene around the Entity's orb. Ashley places trinkets on it, the Entity infuses them with energy and shrinks slightly, and Ashley figures out it must keep eating souls or disappear. She makes trinkets and misses Andrew, and he and a \"soul army\" escape through a giant window.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map211",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An escape-situation scene in which Andrew holds a woman at blade-point while waiting for Ashley. She tries to bargain, offering to use the guards' trust, and he stalls, thinking it through. The woman ends up dead, and he reasons that they cannot leave witnesses. Ashley returns and asks what happened.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map213",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The Entity catches Andrew stealing souls and calls his punishment death. Ashley pleads for his life, and the Entity refuses to house him any longer and says she must dispose of him. Ashley takes him to the Human Realm, and a mock \"LEYLEY WINS\" ending appears with a joke \"you've cleared the game\" before sending the player back to the decision.",
+      "ending": [
+        "Leyley Wins"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map214",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The very large Decay-route apartment sequence in the human realm. Andrew gets Mail with bills for Carl Cultman, realises they are in their home city, and officers pressure Ashley to open the door. The map covers drinks, cover stories, a body and Andrew's worries that he cannot chop it up, and ends with Ashley urging them to go look at apartments. A jump choice here triggers the \"Deadest of Dead-Ends\" ending, which is followed by an \"Any regrets?\" prompt.",
+      "ending": [
+        "Deadest of Dead-Ends"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map215",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Carl's closet safe in the apartment. Andrew finds savings and Carl's ID, plans to fake Carl's disappearance into a cult, and agonises over whether Ashley is a problem. Dialogue turns to intimacy and affection, with the narrator saying he finds it easier to carry on than to fix anything. He steals the Trinket and a Gun.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map216",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The apartment bathroom and cleanup. Andrew uses toilet water to wash away a blood circle before Julia arrives, and the pair debate how to dispose of Carl's body via the demon. A stage-managed drunk-ghost cover story is given to an officer, and a shower scene leaves Andrew guilty. He notices a talisman hanging from a nail. A failed cover-up here triggers the \"Graves in Graves\" ending, in which the officers arrest the siblings and it ends with trials, prison and death row.",
+      "ending": [
+        "Graves in Graves"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map218",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback phone call. Renee's mother asks her for help with a kidney transplant for Renee's little sister Connie, and Renee refuses, bitter about being kicked out at fifteen. She talks with Douglas, a news report says a missing child's body has been found in Warehouse District Park, and Andrew nervously asks whether the killer was caught.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map220",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback argument over Ashley's job. Andrew offers to get her one and tries to figure out what she is punishing him for, Ashley accuses him of running to Julia, and Dad intervenes. Andrew offers money to make her drop it, and they end in an awkward hug.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map221",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The closing sequence of Episode 3's Decay. A hungry Leyley is told dinner is ready, protests raw food, and Andrew tells her to grow up, while rants and a title card hint at a disturbed mental state. He converses with an unnamed voice about whether he can help it, and the scene ends with a save prompt and a notice that play continues once Episode 4 has updated.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map222",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny fridge map with options to reset items or close the fridge.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map223",
+      "episode": "Episode 2 — The Graves",
+      "route": "Shared",
+      "description": "Parents' olive-branch decision; the choice determines the route.",
+      "summary": "The Episode 2 basement decision where the parents offer an olive branch. Choosing \"Accept\" triggers a mocking bad ending in which Andrew trusts them, Ashley charges at him and the situation ends fatally, and the narrator lists the \"Stupidity Killed the Twat\" and \"The Parents Live\" endings. This choice is the route split between Burial and Decay.",
+      "ending": [
+        "Stupidity Killed the Twat",
+        "The Parents Live"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map224",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "An adult-life flashback in which Andrew meets Julia at a coffee shop, returns money for a bolt cutter and tries to explain a \"prank\". Julia advises him to report the friend who locked someone up, and he asks to get back together but she declines. A letter says she doesn't know if he is dead or alive and will not mourn him, and Andrew reflects that she is better off.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map225",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny garden-pot map where the player finds Sunflower Seeds and a Watering Can and the pots are empty.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map226",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny trash-bin map with the recurring joke \"You can't put too much Carl in one trash\", about disposing of Carl's remains.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map227",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A study or storeroom in the Entity's realm. They use an Eye Token on a chest, discover labelled objects marked \"Possibly a Tar Soul\", and Andrew argues they should go home while Ashley wants to stay and learn about the quarantine conspiracy. Andrew mentions the hitman's letter pointing to the water company and hospitals. Ashley tends a plant and finds Black Flowers, though the Entity says they are not what is needed to cross.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map228",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny exit prompt with a hint that the Entity left a reminder in the room.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map229",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A bar conversation between a surgeon and a soda company owner. The soda owner's product is causing organ failure, and the surgeon, whose business is growing, proposes arranging water accidents and quarantining apartments to supply organ donors, suggesting the name \"Deadly Delight\". The soda man agrees, which reveals the origin of the quarantine scheme.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map230",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A flashback with Mr. and Mrs. Graves in the Surgeon's office. The Surgeon insists on blood samples and mentions Brown Water Co., while Mom focuses on compensation and shrugs off danger to her children. Dad goes along, saying bigger forces are at play and that it's the children's own fault for not moving out. The paperwork is signed.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map231",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "Andrew apologises to Ashley for taking things out on her. He argues the Entity is not their friend, she snaps that he has no plans and refuses to hear more, and he sarcastically gives in with \"Gotcha, Leyley\". The area has empty slots and steps.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map232",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The Realm Between after the portal. Andrew asks if the Entity abandoned them to die, and they argue about whether Ashley should have sacrificed the officers. She says she has been here in a dream, jokes about \"kiss and make out\", and they cross a bridge that drops again. Andrew jokes about killing themselves.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map233",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A star-and-handle puzzle. They find handles and a missing Pink Star for a chain, argue about stairs and flowers, and Ashley recognises it may not be what she dreamed. It turns out to be a dead end.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map234",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A puzzle with a missing handle, a moon out of reach and bricks. They fix a handle, use \"human logic\" to reach the moon and trade quips. Ashley asks Andrew for a hug and worries he did not kiss her hair.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map235",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A puzzle with stairs out of reach, bricks and pressure plates showing moon phases. They move a plate and Ashley says she kind of likes the place, while Andrew hates it.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map236",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A window map showing views of a moon, planet, clouds and stars. Ashley jokes about being a genius despite dropping out of school.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map237",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny line where Ashley celebrates \"another victory\" and Andrew congratulates her.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map238",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A rest scene in the Realm Between. Ashley suggests living here, and Andrew raises practical objections about food, washing, demons and health. Their conversation turns to her saying sex could keep him from killing her, which he rejects, and they find tiny star slots and Found tiny Stars.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map239",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny exit prompt map.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map240",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny map where Andrew gets a Sun Stone, Moon Stone and Star Stone.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map241",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A childhood-to-teen flashback. Leyley brings home a two-day school suspension notice, and Andy decides to sign it himself instead of telling Mom. He forges the signature, cooks, and sees a TV report about a missing girl. The scene shows Andy shielding Leyley from their parents while burdened by secrets.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map242",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A tiny scene about closing a notebook. The narrator remarks that no thanks were expected, and homework is done.",
+      "ending": [],
+      "confidence": "High"
+    },
+    {
+      "map": "Map243",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The Decay's apartment hub in the human realm, tied to a \"Shots and Such\" ending. There is no human meat in the fridge, though Ashley sometimes pushes her luck, and narration recalls an intimate encounter that Ashley later melted down over and Andrew has tried to recreate. A dented wall, a broken bathroom lock and a Vision Unlocked message show their strained domestic life. Ashley brings back a stranger's driver's licence, the closet holds wallets, IDs and watches taken from her victims, and the map ends with the thought that he might make soup today.",
+      "ending": [
+        "Shots and Such"
+      ],
+      "confidence": "High"
+    },
+    {
+      "map": "Map261",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "The final \"Truest of True Ends\" scene in a car. Ashley senses Andrew is detached and suspects he is brooding because she won't repeat the intimacy from the vision. Andrew asks whether that is final and she says it is never happening. He starts the car, ignores her screams and drives it into the ocean, and the narrator announces the car sinks and nothing can save them.",
+      "ending": [
+        "Truest of True Ends"
+      ],
+      "confidence": "Medium"
+    },
+    {
+      "map": "Map273",
+      "episode": "Episode 3 — Decay (Part 1)",
+      "route": "Decay",
+      "description": "Episode 3 Decay scenes, flashbacks, forest/camping, Entity's realm, route outcomes and related puzzles.",
+      "summary": "A late Decay-route scene in the apartment. Ashley returns to find Andrew drinking again with apple-pie-flavoured liquor, and they banter about his daily complaints and his hangover. The conversation sours into an argument about what their earlier encounter meant, with Ashley dismissing it and Andrew angrily mocking her. It ends with her shouting for him to eat shit and die.",
+      "ending": [],
+      "confidence": "Medium"
+    }
+  ]
+}

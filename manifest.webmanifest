@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "LOCALMAN — Localisation Editor",
+  "short_name": "LOCALMAN",
+  "description": "A local-first editor and analysis tool for TCOAAL game localisation files.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#171717",
+  "theme_color": "#821c2a",
+  "icons": [
+    {
+      "src": "./assets/localman.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
