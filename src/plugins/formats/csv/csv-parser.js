@@ -68,7 +68,7 @@ export function parseCsvRecords(text, { delimiter = ",", quote = '"' } = {}) {
       if (character === delimiter) {
         raw += character;
         finishField();
-      } else if (character === " " || character === "\t") {
+      } else if (isHorizontalWhitespace(character)) {
         raw += character;
         field += character;
       } else if (character === "\n" || character === "\r") {
@@ -115,6 +115,10 @@ export function parseCsvRecords(text, { delimiter = ",", quote = '"' } = {}) {
   }
 
   return records;
+}
+
+function isHorizontalWhitespace(character) {
+  return /[\t\v\f \u00a0\u1680\u2000-\u200a\u202f\u205f\u3000\ufeff]/u.test(character);
 }
 
 export function serializeCsvRecord(fields, { delimiter = ",", quote = '"' } = {}) {

@@ -23,6 +23,7 @@ export function setupEditor(root, {
   const replaceInput = root.querySelector("#editor-replace-input");
   const findStatus = root.querySelector("#editor-find-status");
   const findNextButton = root.querySelector("#editor-find-next");
+  const findAllButton = root.querySelector("#editor-find-all");
   const replaceCurrentButton = root.querySelector("#editor-replace-current");
   const replaceAllButton = root.querySelector("#editor-replace-all");
   const sectionExportButton = root.querySelector("#section-export-button");
@@ -52,6 +53,7 @@ export function setupEditor(root, {
   let currentMatch = null;
   let focusedMatch = null;
   let findMatches = [];
+  let highlightedMatches = [];
   let findMatchIndex = -1;
   let autocompleteMode = autocompleteSelect.value;
 
@@ -67,6 +69,7 @@ export function setupEditor(root, {
     rowIndexes = undefined;
     currentMatch = null;
     focusedMatch = null;
+    highlightedMatches = [];
     onSectionChange(index);
     renderEntriesForSection();
     updateFindControls();
@@ -89,11 +92,18 @@ export function setupEditor(root, {
   findInput.addEventListener("input", () => {
     currentMatch = null;
     focusedMatch = null;
+    highlightedMatches = [];
     findStatus.textContent = "";
     updateFindControls();
     renderEntriesForSection();
   });
+  findInput.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    findNext();
+  });
   findNextButton.addEventListener("click", findNext);
+  findAllButton.addEventListener("click", findAll);
   replaceCurrentButton.addEventListener("click", replaceCurrent);
   replaceAllButton.addEventListener("click", replaceAll);
   sectionExportButton.addEventListener("click", () => {
@@ -157,6 +167,7 @@ export function setupEditor(root, {
       rowIndexes,
       sort: sort ? { column: sort, direction: sortDirection } : null,
       focusedMatch,
+      findMatches: highlightedMatches,
       issuesByRow: indexIssuesByRow(issues),
       root,
       getSourceColor,
@@ -205,6 +216,7 @@ export function setupEditor(root, {
   }
 
   function findNext() {
+    highlightedMatches = [];
     findMatches = collectFindMatches();
     if (!findInput.value) {
       findStatus.textContent = "Enter text to find.";
@@ -238,6 +250,38 @@ export function setupEditor(root, {
     updateSectionActions();
   }
 
+  function findAll() {
+    findMatches = collectFindMatches();
+    if (!findInput.value) {
+      findStatus.textContent = "Enter text to find.";
+      highlightedMatches = [];
+      updateFindControls();
+      return;
+    }
+    if (!findMatches.length) {
+      findStatus.textContent = "No matches found in the selected section.";
+      highlightedMatches = [];
+      updateFindControls();
+      renderEntriesForSection();
+      return;
+    }
+    highlightedMatches = findMatches;
+    currentMatch = null;
+    focusedMatch = null;
+    query = "";
+    status = "";
+    rowIndexes = undefined;
+    searchInput.value = "";
+    statusFilter.value = "";
+    onSectionChange(sectionIndex);
+    renderEntriesForSection();
+    renderWarnings();
+    focusMatch(findMatches[0]);
+    findStatus.textContent = `Found ${findMatches.length} ${findMatches.length === 1 ? "match" : "matches"}.`;
+    updateFindControls();
+    updateSectionActions();
+  }
+
   function replaceCurrent() {
     const matches = collectFindMatches();
     const match = matches.find((item) => sameMatch(item, currentMatch));
@@ -254,6 +298,7 @@ export function setupEditor(root, {
     onEdit(match.section, match.row, match.columnName, nextValue);
     currentMatch = null;
     focusedMatch = null;
+    highlightedMatches = [];
     renderEntriesForSection();
     findStatus.textContent = "Replaced 1 occurrence.";
     updateFindControls();
@@ -298,29 +343,35 @@ export function setupEditor(root, {
     }
     currentMatch = null;
     focusedMatch = null;
+    highlightedMatches = [];
     rowIndexes = undefined;
     renderEntriesForSection();
     findStatus.textContent = `Replaced ${matches.length} ${matches.length === 1 ? "occurrence" : "occurrences"}.`;
     updateFindControls();
   }
 
-  function focusCurrentMatch() {
+  function focusMatch(match) {
     const row = [...root.querySelectorAll("#table-rows tr")].find((item) =>
-      Number(item.dataset.sectionIndex) === currentMatch.section.index
-      && Number(item.dataset.rowIndex) === currentMatch.row.index);
-    const cell = [...(row?.cells ?? [])].find((item) => item.dataset.columnName === currentMatch.columnName);
+      Number(item.dataset.sectionIndex) === match.section.index
+      && Number(item.dataset.rowIndex) === match.row.index);
+    const cell = [...(row?.cells ?? [])].find((item) => item.dataset.columnName === match.columnName);
     if (!cell) return;
     cell.scrollIntoView({ block: "nearest", inline: "nearest" });
     const input = cell.querySelector("textarea, input");
     if (input) {
       input.focus();
-      input.setSelectionRange(currentMatch.start, currentMatch.start + currentMatch.length);
+      input.setSelectionRange(match.start, match.start + match.length);
     }
+  }
+
+  function focusCurrentMatch() {
+    focusMatch(currentMatch);
   }
 
   function updateFindControls() {
     const hasSection = getFindSections().length > 0;
     findNextButton.disabled = !localisation || !hasSection || !findInput.value;
+    findAllButton.disabled = !localisation || !hasSection || !findInput.value;
     replaceCurrentButton.disabled = !currentMatch || !hasSection;
     replaceAllButton.disabled = !localisation || !hasSection || !findInput.value;
   }
@@ -356,6 +407,7 @@ export function setupEditor(root, {
     findScope = targetSectionIndex;
     currentMatch = null;
     focusedMatch = null;
+    highlightedMatches = [];
     query = "";
     status = targetStatus;
     rowIndexes = rowIndex === undefined ? undefined : Array.isArray(rowIndex) ? rowIndex : [rowIndex];

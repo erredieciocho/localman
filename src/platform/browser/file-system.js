@@ -1,16 +1,22 @@
+import { createFileHandleStore } from "./file-handle-store.js";
+
 export function createBrowserFileSystem(appWindow, {
   download,
   openFilePicker,
+  openFilesPicker,
   saveFilePicker,
+  fileHandleStore,
 } = {}) {
   appWindow ??= globalThis.window;
   const openPicker = openFilePicker ?? appWindow?.showOpenFilePicker?.bind(appWindow);
+  const openFiles = openFilesPicker ?? appWindow?.showOpenFilePicker?.bind(appWindow);
   const savePicker = saveFilePicker ?? (download
     ? null
     : appWindow?.showSaveFilePicker?.bind(appWindow));
   const downloadFile = download ?? ((contents, fileName, contentType) =>
     downloadBlob(contents, fileName, appWindow, contentType));
   const TextDecoderClass = appWindow?.TextDecoder ?? globalThis.TextDecoder;
+  const storedHandles = fileHandleStore ?? createFileHandleStore(appWindow?.indexedDB);
 
   async function writeFile(handle, contents) {
     const writable = await handle.createWritable();
@@ -32,12 +38,49 @@ export function createBrowserFileSystem(appWindow, {
 
   return Object.freeze({
     supportsOpenPicker: Boolean(openPicker),
+    supportsPersistentHandles: Boolean(appWindow?.indexedDB ?? globalThis.indexedDB),
     async openFile() {
       if (!openPicker) return null;
       const [handle] = await openPicker({
         types: [{ description: "Localisation CSV", accept: { "text/csv": [".csv"] } }],
       });
       return handle ? { file: await handle.getFile(), handle } : null;
+    },
+    async openDictionaryFiles() {
+      if (!openFiles) return null;
+      const handles = await openFiles({
+        multiple: true,
+        types: [{
+          description: "Hunspell dictionary files",
+          accept: { "application/octet-stream": [".aff", ".dic", ".oxt", ".xpi", ".zip"] },
+        }],
+      });
+      return Promise.all(handles.map(async (handle) => ({ file: await handle.getFile(), handle })));
+    },
+    saveFileHandleData(key, value) {
+      return storedHandles.set(key, value);
+    },
+    getFileHandleData(key) {
+      return storedHandles.get(key);
+    },
+    removeFileHandleData(key) {
+      return storedHandles.delete(key);
+    },
+    async readFileHandle(handle, { requestPermission = false } = {}) {
+      if (!handle || typeof handle.getFile !== "function") {
+        throw new TypeError("The saved file handle is invalid.");
+      }
+      if (typeof handle.queryPermission === "function") {
+        const permission = requestPermission && typeof handle.requestPermission === "function"
+          ? await handle.requestPermission({ mode: "read" })
+          : await handle.queryPermission({ mode: "read" });
+        if (permission !== "granted") {
+          const error = new Error(`Read access to "${handle.name || "the saved file"}" has not been granted.`);
+          error.name = "FileHandlePermissionError";
+          throw error;
+        }
+      }
+      return handle.getFile();
     },
     async readFile(file) {
       if (typeof file?.arrayBuffer === "function") {

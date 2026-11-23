@@ -3,19 +3,36 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     throw new TypeError("A parser registry and file-system adapter are required.");
   }
   let fileHandle = null;
+  let restoreHandle = null;
   let hasUnsavedChanges = false;
 
   async function loadFile(file, options = {}, selectedFileHandle = null) {
     const document = await readDocument(file, options);
     fileHandle = selectedFileHandle;
+    restoreHandle = selectedFileHandle;
     hasUnsavedChanges = false;
+    const persistenceError = await persistFileHandle(selectedFileHandle);
     return {
       document,
       fileName: file.name,
       encoding: document.encoding,
       hasByteOrderMark: document.hasByteOrderMark,
       canSave: Boolean(fileHandle),
+      persistenceError,
     };
+  }
+
+  async function persistFileHandle(handle) {
+    try {
+      const persist = handle
+        ? fileSystem.saveFileHandleData?.("localisation", handle)
+        : fileSystem.removeFileHandleData?.("localisation");
+      if (!persist) return null;
+      await persist;
+      return null;
+    } catch (error) {
+      return error;
+    }
   }
 
   async function readDocument(file, options = {}) {
@@ -62,6 +79,15 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     async openFile(options) {
       const selected = await fileSystem.openFile();
       return selected ? loadFile(selected.file, options, selected.handle) : null;
+    },
+    async restoreFile(options, { requestPermission = false } = {}) {
+      if (!fileSystem.supportsPersistentHandles
+        || typeof fileSystem.getFileHandleData !== "function") return null;
+      const handle = restoreHandle ?? await fileSystem.getFileHandleData("localisation");
+      if (!handle) return null;
+      restoreHandle = handle;
+      const file = await fileSystem.readFileHandle(handle, { requestPermission });
+      return loadFile(file, options, handle);
     },
     loadFile(file, options) {
       return loadFile(file, options);

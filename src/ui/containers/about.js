@@ -1,6 +1,12 @@
-export function setupAbout(root) {
+export function setupAbout(root, { location = root.ownerDocument?.defaultView?.location } = {}) {
   const tabs = [...root.querySelectorAll("[data-about-tab]")];
   if (!tabs.length) throw new Error("The About panel must contain at least one About tab.");
+  const hostedLink = root.querySelector('a[href="https://erredieciocho.github.io/localman/"]');
+  if (hostedLink && location) {
+    const hostedUrl = new URL(hostedLink.href, location.href);
+    hostedLink.hidden = location.hostname === hostedUrl.hostname
+      && location.pathname.startsWith(hostedUrl.pathname);
+  }
 
   const selectTab = (selectedTab) => {
     for (const tab of tabs) {

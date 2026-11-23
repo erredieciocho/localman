@@ -36,6 +36,19 @@ It is intended to provide a high-level overview of the project history.
 
 ## Current Development (07/11/2026 - Today)
 
+### Persistent file handles and editor search (23/11/2026)
+- Stored localisation and custom-dictionary file handles in IndexedDB where supported, restored saved files on startup, and reported inaccessible handles through notifications; Compare targets are not retained.
+- Added Find All highlighting and Enter-triggered Find Next, hid the hosted-site link on GitHub Pages, removed the inert dictionary placeholder, and aligned the Offline status strip with the About tabs.
+- Verified all 34 Core tests and all 51 UI workflow tests in Chromium on desktop and mobile emulation.
+
+### Saved-file permission handling (23/11/2026)
+- Startup restoration now checks saved-handle read permission without calling `requestPermission`, which requires a user activation; when approval is needed, a "Restore last file" action requests permission directly from the user's click.
+- Verified all 35 Core tests and 52 UI workflow tests in Chromium on desktop and mobile emulation.
+
+### CSV parser interoperability follow-up (23/11/2026)
+- Preserved Unicode horizontal whitespace after quoted fields, including a non-breaking space, without changing the source record.
+- Verified the line-15087 parser regression in the Core harness. iOS/Safari and Brave on iOS were not available for physical-device verification.
+
 ### Notification toasts (23/11/2026)
 - Replaced message-oriented error and file-required dialogs with accessible bottom-right notifications; success and warning toasts auto-dismiss, while errors and confirmations remain until dismissed.
 - Routed file, settings, QA, configuration and Source-tag feedback through toasts while preserving detail and selection dialogs and the unsaved-changes safeguard.

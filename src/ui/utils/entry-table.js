@@ -36,6 +36,7 @@ export function renderEntries({
   rowIndexes,
   sort,
   focusedMatch,
+  findMatches = [],
   issuesByRow = new Map(),
   root,
   getSourceColor = () => "",
@@ -50,6 +51,10 @@ export function renderEntries({
     : sectionIndex === null
       ? []
       : [localisation.sections[sectionIndex]].filter(Boolean);
+  const matchedRows = new Set(findMatches.map(({ section, row }) =>
+    `${section.index}:${row.index}`));
+  const matchedCells = new Set(findMatches.map(({ section, row, columnName }) =>
+    `${section.index}:${row.index}:${columnName}`));
   const table = root.querySelector("#entry-table");
   const tableComponent = createTableComponent(table);
   const headerRow = tableComponent.head.rows[0] ?? tableComponent.head.insertRow();
@@ -110,6 +115,8 @@ export function renderEntries({
   const matches = selectedSections.flatMap((section) =>
     localisation.searchRows({ sectionIndex: section.index, query, status })
       .filter(({ row }) => rowIndexes === undefined || rowIndexes.includes(row.index))
+      .filter(({ row, section: matchedSection }) => !matchedRows.size
+        || matchedRows.has(`${matchedSection.index}:${row.index}`))
       .filter(({ row, section: matchedSection }) => !focusedMatch
         || (focusedMatch.section.index === matchedSection.index && focusedMatch.row.index === row.index))
       .map(({ row }) => ({ section, entry: row })));
@@ -177,10 +184,11 @@ export function renderEntries({
         tableRow.append(cell);
         continue;
       }
-      if (focusedMatch
+      if ((focusedMatch
         && focusedMatch.section.index === section.index
         && focusedMatch.row.index === entry.index
-        && focusedMatch.columnName === name) {
+        && focusedMatch.columnName === name)
+        || matchedCells.has(`${section.index}:${entry.index}:${name}`)) {
         cell.classList.add("find-replace-match");
       }
       const value = entry.fields[columnIndex] ?? "";

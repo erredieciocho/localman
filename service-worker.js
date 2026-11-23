@@ -30,6 +30,7 @@ const APP_SHELL_URLS = [
   "./src/core/validation/index.js",
   "./src/core/validation/validation.js",
   "./src/platform/browser/dictionary.js",
+  "./src/platform/browser/file-handle-store.js",
   "./src/platform/browser/file-system.js",
   "./src/platform/browser/storage.js",
   "./src/plugins/formats/csv/csv-document.js",

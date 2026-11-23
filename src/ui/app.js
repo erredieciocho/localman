@@ -119,7 +119,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     state.validationDirty = true;
     refreshIssues();
     renderDashboard();
-  }, showError);
+  }, showError, fileSystem);
   dictionary.renderStatus();
   const navigate = (sectionIndex, rowIndex, untranslated = false) => {
     ensureEditor().setSelection(sectionIndex, rowIndex, untranslated ? "untranslated" : "");
@@ -152,8 +152,13 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     supportsOpenPicker: application.supportsOpenPicker,
     onOpenFile: () => application.openFile({ sectionIds: state.preferences.sectionIds }),
     onLoadFile: (file) => application.loadFile(file, { sectionIds: state.preferences.sectionIds }),
+    onRestoreFile: ({ requestPermission = false } = {}) => application.restoreFile(
+      { sectionIds: state.preferences.sectionIds },
+      { requestPermission },
+    ),
     download: fileSystem.downloadFile,
     notify: (message) => notifications.success(message),
+    notifyWarning: (message) => notifications.warning(message),
     onLoad(loaded) {
       qa.reset();
       state.localisation = loaded.document;
@@ -852,6 +857,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   }
 
   activateTab("about");
+  void fileControls.restoreLastFile();
   return {
     get document() {
       return state.localisation;

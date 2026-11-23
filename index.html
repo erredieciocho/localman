@@ -35,6 +35,8 @@
           <!-- File actions -->
           <button id="open-button" class="button button-secondary" type="button"
             title="Open a localisation file">Open</button>
+          <button id="restore-file-button" class="button button-secondary" type="button" hidden
+            title="Grant access and reload the previously opened localisation file">Restore last file</button>
           <input id="file-input" class="visually-hidden" type="file" accept=".csv,text/csv"
             aria-label="Open a localisation file">
           <button id="save-button" class="button button-secondary" type="button" disabled
@@ -321,6 +323,7 @@
               <input id="editor-replace-input" type="text" placeholder="Replacement text">
             </label>
             <button id="editor-find-next" class="button button-secondary" type="button" disabled>Find next</button>
+            <button id="editor-find-all" class="button button-secondary" type="button" disabled>Find all</button>
             <button id="editor-replace-current" class="button button-secondary" type="button" disabled>Replace</button>
             <button id="editor-replace-all" class="button button-secondary" type="button" disabled>Replace all</button>
             <p id="editor-find-status" class="muted" aria-live="polite"></p>

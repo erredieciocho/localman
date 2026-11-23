@@ -7,7 +7,7 @@ import {
 
 const CUSTOM_DICTIONARY_ACTION = "__import_custom_dictionary__";
 
-export function setupDictionary(root, getPreferences, onChange, onError) {
+export function setupDictionary(root, getPreferences, onChange, onError, fileSystem = {}) {
   const dictionaries = new Map();
   const customLanguages = new Map();
   const status = root.querySelector("#dictionary-status-dot");
@@ -19,7 +19,11 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
   select.addEventListener("change", () => {
     if (select.value === CUSTOM_DICTIONARY_ACTION) {
       select.value = selectedValue;
-      customInput.click();
+      if (fileSystem.supportsOpenPicker && fileSystem.openDictionaryFiles) {
+        void chooseCustomDictionaryFiles();
+      } else {
+        customInput.click();
+      }
       return;
     }
     if ([...customLanguages.values()].some(({ id }) => id === select.value)) {
@@ -54,8 +58,7 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
     setStatus(false, "Loading bundled dictionaries.");
     try {
       catalog = await loadBundledDictionaryCatalog();
-      select.replaceChildren(new Option("Select a dictionary…", ""));
-      select.add(new Option("Import custom dictionary…", CUSTOM_DICTIONARY_ACTION));
+      select.replaceChildren(new Option("Import custom dictionary…", CUSTOM_DICTIONARY_ACTION));
       for (const entry of catalog) {
         select.add(new Option(`${entry.name} (${entry.language})`, entry.id));
       }
@@ -65,6 +68,8 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
       select.replaceChildren(new Option("Dictionary list unavailable", ""));
       setStatus(false, "Dictionary list unavailable.");
       onError(new Error(`Could not load bundled dictionaries: ${error.message ?? String(error)}`));
+    } finally {
+      void restoreCustomDictionary();
     }
   }
 
@@ -97,6 +102,7 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
       if (files.length === 1 && /\.(?:oxt|xpi|zip)$/iu.test(files[0].name)) {
         await loadCustomDictionary(
           () => loadPackagedDictionary(files[0], getPreferences().targetLanguage),
+          [],
         );
       } else if (files.length === 2) {
         const aff = files.find((file) => /\.aff$/iu.test(file.name));
@@ -110,6 +116,7 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
         }
         await loadCustomDictionary(
           () => loadDictionary(aff, dic, getPreferences().targetLanguage),
+          [],
         );
       } else {
         throw new Error("Select one OXT, XPI or ZIP package, or a matching .aff and .dic pair.");
@@ -121,7 +128,37 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
     }
   }
 
-  async function loadCustomDictionary(load) {
+  async function chooseCustomDictionaryFiles() {
+    try {
+      const selected = await fileSystem.openDictionaryFiles();
+      if (!selected) return;
+      const files = selected.map(({ file }) => file);
+      const handles = selected.map(({ handle }) => handle);
+      if (files.length === 1 && /\.(?:oxt|xpi|zip)$/iu.test(files[0].name)) {
+        await loadCustomDictionary(
+          () => loadPackagedDictionary(files[0], getPreferences().targetLanguage),
+          handles,
+        );
+      } else if (files.length === 2) {
+        const aff = files.find((file) => /\.aff$/iu.test(file.name));
+        const dic = files.find((file) => /\.dic$/iu.test(file.name));
+        if (!aff || !dic || aff.name.replace(/\.aff$/iu, "").toLocaleLowerCase()
+          !== dic.name.replace(/\.dic$/iu, "").toLocaleLowerCase()) {
+          throw new Error("Select a matching .aff and .dic file pair.");
+        }
+        await loadCustomDictionary(
+          () => loadDictionary(aff, dic, getPreferences().targetLanguage),
+          handles,
+        );
+      } else {
+        throw new Error("Select one OXT, XPI or ZIP package, or a matching .aff and .dic pair.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") onError(error);
+    }
+  }
+
+  async function loadCustomDictionary(load, handles) {
     const language = getPreferences().targetLanguage;
     const currentRequest = ++request;
     setStatus(false, `Loading custom ${language} dictionary.`);
@@ -129,6 +166,17 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
       const dictionary = await load();
       if (currentRequest !== request || language !== getPreferences().targetLanguage) return;
       dictionaries.set(language, dictionary);
+      if (typeof fileSystem.saveFileHandleData === "function") {
+        try {
+          if (handles.length) {
+            await fileSystem.saveFileHandleData("custom-dictionary", { language, handles });
+          } else {
+            await fileSystem.removeFileHandleData?.("custom-dictionary");
+          }
+        } catch (error) {
+          onError(new Error(`Custom dictionary loaded, but its file handle could not be remembered: ${error.message ?? String(error)}`));
+        }
+      }
       const id = `custom-${language}`;
       const option = select.querySelector(`option[value="${id}"]`)
         ?? new Option(`Custom dictionary (${language}, this session)`, id);
@@ -143,6 +191,32 @@ export function setupDictionary(root, getPreferences, onChange, onError) {
       if (currentRequest !== request) return;
       setStatus(false, `Could not load custom dictionary for ${language}.`);
       onError(new Error(`Could not load custom dictionary: ${error.message ?? String(error)}`));
+    }
+  }
+
+  async function restoreCustomDictionary() {
+    if (!fileSystem.supportsPersistentHandles
+      || typeof fileSystem.getFileHandleData !== "function") return;
+    try {
+      const saved = await fileSystem.getFileHandleData("custom-dictionary");
+      if (!saved || saved.language !== getPreferences().targetLanguage
+        || !Array.isArray(saved.handles) || !saved.handles.length) return;
+      const files = await Promise.all(saved.handles.map((handle) => fileSystem.readFileHandle(handle)));
+      const byName = new Map(files.map((file) => [file.name.toLocaleLowerCase(), file]));
+      let load;
+      if (files.length === 1 && /\.(?:oxt|xpi|zip)$/iu.test(files[0].name)) {
+        load = () => loadPackagedDictionary(files[0], saved.language);
+      } else {
+        const aff = files.find((file) => /\.aff$/iu.test(file.name));
+        const dic = files.find((file) => /\.dic$/iu.test(file.name));
+        if (!aff || !dic || !byName.has(aff.name.replace(/\.aff$/iu, ".dic").toLocaleLowerCase())) {
+          throw new Error("The saved custom dictionary files are missing or do not match.");
+        }
+        load = () => loadDictionary(aff, dic, saved.language);
+      }
+      await loadCustomDictionary(load, saved.handles);
+    } catch (error) {
+      onError(new Error(`Could not reload the saved custom dictionary: ${error.message ?? String(error)}`));
     }
   }
 

@@ -3,13 +3,16 @@ export function setupFileControls(root, {
   onOpenFile,
   onLoadFile,
   onLoad,
+  onRestoreFile,
   onSave,
   onExport,
   download,
   onError,
   notify = () => {},
+  notifyWarning = notify,
 }) {
   const openButton = root.querySelector("#open-button");
+  const restoreButton = root.querySelector("#restore-file-button");
   const fileInput = root.querySelector("#file-input");
   const saveButton = root.querySelector("#save-button");
   const exportButton = root.querySelector("#export-button");
@@ -17,11 +20,29 @@ export function setupFileControls(root, {
   let hasDocument = false;
   let fileName = "";
   let canSave = false;
+  let loadOperation = 0;
 
   fileInput.addEventListener("change", async () => {
     const file = fileInput.files?.[0];
     fileInput.value = "";
     if (file) await loadFile(file);
+  });
+
+  restoreButton?.addEventListener("click", async () => {
+    restoreButton.disabled = true;
+    const operation = ++loadOperation;
+    try {
+      const loaded = await onRestoreFile({ requestPermission: true });
+      if (operation !== loadOperation) return;
+      if (loaded) await showLoadedFile(loaded);
+      restoreButton.hidden = true;
+    } catch (error) {
+      if (operation !== loadOperation) return;
+      const details = error instanceof Error ? error.message : String(error);
+      notifyWarning(`Could not restore the previously opened localisation file: ${details}`);
+    } finally {
+      restoreButton.disabled = false;
+    }
   });
 
   openButton.addEventListener("click", async () => {
@@ -31,7 +52,10 @@ export function setupFileControls(root, {
     }
     try {
       const loaded = await onOpenFile();
-      if (loaded) await showLoadedFile(loaded);
+      if (loaded) {
+        loadOperation += 1;
+        await showLoadedFile(loaded);
+      }
     } catch (error) {
       if (error?.name !== "AbortError") {
         fileStatus.textContent = hasDocument ? `${fileName} loaded` : "No file loaded";
@@ -70,6 +94,7 @@ export function setupFileControls(root, {
   });
 
   async function loadFile(file) {
+    loadOperation += 1;
     fileStatus.textContent = `Reading ${file.name}…`;
     try {
       await showLoadedFile(await onLoadFile(file));
@@ -90,7 +115,33 @@ export function setupFileControls(root, {
       : "Save requires a browser file picker; use Export to save a separate copy";
     exportButton.disabled = false;
     fileStatus.textContent = `${fileName} loaded`;
+    if (restoreButton) restoreButton.hidden = true;
     notify(`Loaded ${fileName}.`);
+    if (loaded.persistenceError) {
+      const details = loaded.persistenceError instanceof Error
+        ? loaded.persistenceError.message
+        : String(loaded.persistenceError);
+      notifyWarning(`Loaded ${fileName}, but its file handle could not be remembered: ${details}`);
+    }
+  }
+
+  async function restoreLastFile() {
+    if (typeof onRestoreFile !== "function") return;
+    const operation = loadOperation;
+    try {
+      const loaded = await onRestoreFile();
+      if (operation !== loadOperation) return;
+      if (loaded) await showLoadedFile(loaded);
+    } catch (error) {
+      if (operation !== loadOperation) return;
+      const details = error instanceof Error ? error.message : String(error);
+      if (error?.name === "FileHandlePermissionError" && restoreButton) {
+        restoreButton.hidden = false;
+        notifyWarning("The previously opened localisation file needs read access. Select Restore last file to grant access.");
+        return;
+      }
+      notifyWarning(`Could not reload the previously opened localisation file: ${details}`);
+    }
   }
 
   function showError(error) {
@@ -99,6 +150,7 @@ export function setupFileControls(root, {
 
   return {
     showError,
+    restoreLastFile,
     download(contents, outputName) {
       download(contents, outputName);
     },
