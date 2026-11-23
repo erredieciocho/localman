@@ -7,13 +7,13 @@ export function setupFileControls(root, {
   onExport,
   download,
   onError,
+  notify = () => {},
 }) {
   const openButton = root.querySelector("#open-button");
   const fileInput = root.querySelector("#file-input");
   const saveButton = root.querySelector("#save-button");
   const exportButton = root.querySelector("#export-button");
   const fileStatus = root.querySelector("#file-status");
-  const saveStatus = root.querySelector("#save-status");
   let hasDocument = false;
   let fileName = "";
   let canSave = false;
@@ -42,22 +42,15 @@ export function setupFileControls(root, {
 
   saveButton.addEventListener("click", async () => {
     if (!hasDocument || !canSave) return;
-    saveStatus.hidden = true;
-    saveStatus.textContent = "";
     try {
       const savedName = await onSave();
       const name = savedName || fileName;
       fileStatus.textContent = `Saved ${name}`;
-      saveStatus.dataset.state = "success";
-      saveStatus.textContent = `Saved ${name} successfully.`;
-      saveStatus.hidden = false;
+      notify(`Saved ${name} successfully.`);
     } catch (error) {
-      const details = error instanceof Error ? error.message : String(error);
       fileStatus.textContent = `Could not save ${fileName}`;
-      saveStatus.dataset.state = "error";
-      saveStatus.textContent = `Could not save ${fileName}: ${details}`;
-      saveStatus.hidden = false;
-      showError(error);
+      const details = error instanceof Error ? error.message : String(error);
+      showError(new Error(`Could not save ${fileName}: ${details}`, { cause: error }));
     }
   });
 
@@ -70,6 +63,7 @@ export function setupFileControls(root, {
       const outputName = await onExport(suggestedName);
       if (!outputName) return;
       fileStatus.textContent = `Exported ${outputName}`;
+      notify(`Exported ${outputName}.`);
     } catch (error) {
       if (error?.name !== "AbortError") showError(error);
     }
@@ -90,14 +84,13 @@ export function setupFileControls(root, {
     hasDocument = true;
     fileName = loaded.fileName;
     canSave = loaded.canSave;
-    saveStatus.hidden = true;
-    saveStatus.textContent = "";
     saveButton.disabled = !canSave;
     saveButton.title = canSave
       ? "Overwrite the currently open localisation file"
       : "Save requires a browser file picker; use Export to save a separate copy";
     exportButton.disabled = false;
     fileStatus.textContent = `${fileName} loaded`;
+    notify(`Loaded ${fileName}.`);
   }
 
   function showError(error) {

@@ -1,6 +1,5 @@
 import { createParserRegistry } from "../core/parser/index.js";
 import { getGroupedRows } from "../core/glossary/index.js";
-import { getTranslationStatistics } from "../core/statistics/index.js";
 import { collectValidationIssues, isWordExcluded } from "../core/validation/index.js";
 import { createLocalisationService } from "../application/index.js";
 import { csvFormat } from "../plugins/formats/csv/index.js";
@@ -20,12 +19,11 @@ import {
   renderTerminology,
   selectTerminologyEntry,
 } from "./containers/terminology.js";
-import { createModalComponent, setupModalComponents } from "./components/modal.js";
-import { createStatisticsGridComponent } from "./components/statistics-grid.js";
+import { setupModalComponents } from "./components/modal.js";
+import { setupNotifications } from "./components/notifications.js";
 import { setupTableComponents } from "./components/table.js";
 import { setupDictionary } from "./utils/dictionary.js";
 import { getSectionExportFileName, setupFileControls } from "./utils/file-controls.js";
-import { setupRowIssuesDialog } from "./utils/issues.js";
 import { setupOccurrences } from "./utils/occurrences.js";
 import {
   createSourceColorStore,
@@ -53,11 +51,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   setupModalComponents(root);
   setupTableComponents(root);
   setupAbout(root);
-  const errorModal = createModalComponent(root.querySelector("#error-dialog"));
+  const notifications = setupNotifications(root);
   const showError = (error) => {
-    root.querySelector("#error-message").textContent =
-      error instanceof Error ? error.message : String(error);
-    errorModal.show();
+    notifications.error(error instanceof Error ? error.message : String(error));
   };
   const searchTerms = root.querySelector("#term-search");
   const termTypeFilter = root.querySelector("#term-type-filter");
@@ -111,8 +107,13 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   const settingsStorage = createBrowserStorage(appWindow);
   const sourceColors = createSourceColorStore(settingsStorage);
   let lastSourceColorError = "";
-  const settings = createSettingsController(root, { onError: showError, storage: settingsStorage });
+  const settings = createSettingsController(root, {
+    onError: showError,
+    notify: (type, message) => notifications.show(type, message),
+    storage: settingsStorage,
+  });
   state.preferences = settings.preferences;
+  renderDictionaryExclusionsPreview();
   const theme = setupThemeToggle(root, appWindow, showError, settingsStorage);
   const dictionary = setupDictionary(root, () => state.preferences, () => {
     state.validationDirty = true;
@@ -129,18 +130,21 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     (sectionIndex) => navigateMapOrEditor(sectionIndex),
     (sectionIndex, rowIndex) => navigate(sectionIndex, rowIndex),
   );
-  const showRowIssues = setupRowIssuesDialog(root);
   setupSelectWheelNavigation(root);
-  const fileRequiredModal = createModalComponent(root.querySelector("#file-required-dialog"));
   const qa = setupQA(root, {
     onError: showError,
+    notify: (message) => notifications.success(message),
     onOpenSection: (sectionIndex) => navigateMapOrEditor(sectionIndex),
     onOpenEntry: (sectionIndex, rowIndex) => navigate(sectionIndex, rowIndex),
     download: fileSystem.downloadFile,
     storage: settingsStorage,
-    onChange: () => {
-      dashboard?.updateIssueCounts(qa.getUnresolvedIssueCounts());
-      editor?.updateIssues(qa.getUnresolvedIssues(), dictionary.dictionary);
+    onChange: ({ updateEditor = true } = {}) => {
+      if (!root.querySelector("#panel-dashboard").hidden) {
+        dashboard?.updateIssueCounts(qa.getUnresolvedIssueCounts());
+      }
+      if (updateEditor) {
+        editor?.updateIssues(qa.getUnresolvedIssues(), dictionary.dictionary);
+      }
     },
   });
 
@@ -149,6 +153,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     onOpenFile: () => application.openFile({ sectionIds: state.preferences.sectionIds }),
     onLoadFile: (file) => application.loadFile(file, { sectionIds: state.preferences.sectionIds }),
     download: fileSystem.downloadFile,
+    notify: (message) => notifications.success(message),
     onLoad(loaded) {
       qa.reset();
       state.localisation = loaded.document;
@@ -187,20 +192,35 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     const [file] = exclusionsInput.files ?? [];
     if (!file) return;
     try {
-      const exclusions = [...new Set((await file.text()).split(/\r\n?|\n/u)
-        .map((word) => word.trim())
-        .filter(Boolean)
-        .filter((word, index, words) => words.findIndex((candidate) =>
-          candidate.toLocaleLowerCase() === word.toLocaleLowerCase()) === index))];
-      settings.update({ dictionaryExclusions: exclusions });
+      const exclusions = [...settings.preferences.dictionaryExclusions];
+      const seen = new Set(exclusions.map((word) => word.toLocaleLowerCase()));
+      let added = 0;
+      for (const word of (await file.text()).split(/\r\n?|\n/u).map((value) => value.trim()).filter(Boolean)) {
+        const key = word.toLocaleLowerCase();
+        if (seen.has(key)) continue;
+        exclusions.push(word);
+        seen.add(key);
+        added += 1;
+      }
+      settings.update({ dictionaryExclusions: exclusions }, { notify: false });
       applyPreferences(settings.preferences);
       root.querySelector("#dictionary-exclusions-status").textContent =
-        `Imported ${exclusions.length.toLocaleString()} excluded ${exclusions.length === 1 ? "word" : "words"}; the previous list was replaced.`;
+        `Added ${added.toLocaleString()} ${added === 1 ? "word" : "words"}; duplicates were skipped.`;
       settings.setStatus("Dictionary exclusions imported and saved.");
     } catch (error) {
       showError(error);
     } finally {
       exclusionsInput.value = "";
+    }
+  });
+  root.querySelector("#dictionary-exclusions-clear-button").addEventListener("click", () => {
+    try {
+      settings.update({ dictionaryExclusions: [] }, { notify: false });
+      applyPreferences(settings.preferences);
+      root.querySelector("#dictionary-exclusions-status").textContent = "Dictionary exclusion list cleared.";
+      settings.setStatus("Dictionary exclusion list cleared.", "confirmation");
+    } catch (error) {
+      showError(error);
     }
   });
   root.querySelector("#dictionary-exclusions-export-button").addEventListener("click", () => {
@@ -229,6 +249,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         "application/json",
       );
       root.querySelector("#configuration-status").textContent = "Configuration exported.";
+      notifications.success("Configuration exported.");
     } catch (error) {
       showError(error);
     }
@@ -249,6 +270,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         theme.setTheme(configuration.theme, { persist: false });
         settings.applyImportedPreferences(configuration.preferences);
         state.preferences = settings.preferences;
+        renderDictionaryExclusionsPreview();
         renderSourceColorSettings();
       } catch (error) {
         try {
@@ -281,6 +303,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     }
     renderSourceColorSettings();
     root.querySelector("#source-color-status").textContent = "Source tag palette randomised and saved.";
+    notifications.success("Source tag palette randomised and saved.");
   });
 
   function applyPreferences(preferences) {
@@ -308,6 +331,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     }
 
     state.preferences = preferences;
+    renderDictionaryExclusionsPreview();
     dictionary.renderStatus();
     if (languageChanged) dictionary.selectForLanguage(preferences.targetLanguage);
     if (previousPreferences.targetLanguage !== preferences.targetLanguage
@@ -338,6 +362,12 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       renderDashboard();
     }
     if (state.localisation && state.validationDirty) refreshIssues();
+  }
+
+  function renderDictionaryExclusionsPreview() {
+    const preview = root.querySelector("#dictionary-exclusions-preview");
+    const exclusions = state.preferences.dictionaryExclusions;
+    preview.textContent = exclusions.length ? exclusions.join("\n") : "No excluded words.";
   }
 
   function renderLoadedDocument() {
@@ -437,10 +467,18 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         onAddWordExclusion(word) {
           const preferences = settings.preferences;
           if (isWordExcluded(word, preferences.dictionaryExclusions)) return;
+          if (state.validationDirty) refreshIssues();
           settings.update({
             dictionaryExclusions: [...preferences.dictionaryExclusions, word],
-          });
-          applyPreferences(settings.preferences);
+          }, { notify: false });
+          state.preferences = settings.preferences;
+          renderDictionaryExclusionsPreview();
+          const excludedWord = word.trim().toLocaleLowerCase();
+          state.validationIssues = state.validationIssues.filter((issue) =>
+            issue.kind !== "spelling" || issue.word?.trim().toLocaleLowerCase() !== excludedWord);
+          state.validationDirty = false;
+          dashboard?.updateWordExclusion(word, state.preferences);
+          qa.excludeSpellingWord(word);
           settings.setStatus(`Added "${word}" to the dictionary exclusion list.`);
         },
         onLengthChange: updateWordLengths,
@@ -473,6 +511,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         onDownloadSection(exportData) {
           fileControls.download(exportData.contents, exportData.fileName);
           fileControls.setStatus(`Downloaded ${exportData.fileName}`);
+          notifications.success(`Downloaded ${exportData.fileName}.`);
           return exportData.fileName;
         },
         onImportSection: importSection,
@@ -480,11 +519,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         onSourceClick: openSourceDetails,
         onError: showError,
         onRowIssues(section, row) {
-          showRowIssues(
-            section,
-            row,
-            qa.getUnresolvedIssues().filter((issue) => issue.section === section && issue.row === row),
-          );
+          activateTab("qa");
+          qa.openIssue(section.index, row.index);
         },
       });
     }
@@ -560,6 +596,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   }
 
   function renderSourceColorSettings() {
+    const hasLocalisation = Boolean(state.localisation);
+    root.querySelector("#source-color-group").disabled = !hasLocalisation;
+    root.querySelector("#source-color-unavailable").hidden = hasLocalisation;
     const sourceValues = state.localisation ? [...new Set(state.localisation.sections.flatMap((section) => {
       const sourceIndex = section.columns.indexOf("Source");
       return sourceIndex < 0 ? [] : section.rows.map((row) => row.fields[sourceIndex] ?? "");
@@ -586,6 +625,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       renderSourceColorSettings();
       if (!sourceColors.storageError && saved) {
         root.querySelector("#source-color-status").textContent = "Source tag colour saved.";
+        notifications.success("Source tag colour saved.");
       }
     }, openSourceDetails);
   }
@@ -629,8 +669,15 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       const nextTranslation = row.fields[translationIndex] ?? "";
       const nextStatus = state.localisation.getRowStatus(section, row);
       if (columnName === "Translation") {
-        dashboard?.updateRow(section, row, previousTranslation, nextTranslation, previousStatus, nextStatus);
-        if (dashboard) renderStatistics(root, state.localisation);
+        dashboard?.updateRow(
+          section,
+          row,
+          previousTranslation,
+          nextTranslation,
+          previousStatus,
+          nextStatus,
+          state.localisation,
+        );
         if (state.activeTab === "dashboard") renderDashboard();
         state.validationDirty = true;
         if (state.activeTab === "editor" || state.activeTab === "qa") refreshIssues();
@@ -658,6 +705,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     state.terminologyDirty = true;
     renderLoadedDocument();
     fileControls.setUnsavedStatus(`Imported ${fileName} into ${imported.sectionName}`);
+    notifications.success(`Imported ${fileName} into ${imported.sectionName}.`);
     return imported.sectionName;
   }
 
@@ -737,7 +785,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     const button = root.querySelector(`[data-tab="${tabName}"]`);
     if (!button) return;
     if (button.getAttribute("aria-disabled") === "true") {
-      fileRequiredModal.show();
+      notifications.warning("Load a valid localisation file first to use this tab.");
       return;
     }
     state.activeTab = tabName;
@@ -877,15 +925,6 @@ function setupThemeToggle(root, appWindow, onError, storage) {
     },
     setTheme,
   };
-}
-
-function renderStatistics(root, localisation) {
-  const stats = getTranslationStatistics(localisation);
-  const grid = createStatisticsGridComponent(root.querySelector('[aria-label="Translation statistics"]'));
-  grid.setValue("stat-translated", stats.translated);
-  grid.setValue("stat-untranslated", stats.untranslated);
-  grid.setValue("stat-untranslatable", stats.untranslatable);
-  grid.setValue("stat-percentage", `${stats.percentage}%`);
 }
 
 function isMapReferenceName(name) {

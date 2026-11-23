@@ -1,4 +1,13 @@
-const status = document.querySelector("#offline-support-status");
+const status = document.querySelector("#offline-installation-status");
+const displayMode = window.matchMedia("(display-mode: standalone)");
+let offlineReady = false;
+let offlineFailed = false;
+let installPromptAvailable = false;
+let installedEventObserved = false;
+
+function notify(type, message) {
+  window.dispatchEvent(new CustomEvent("app-notification", { detail: { type, message } }));
+}
 
 function waitForActivation(worker) {
   if (worker.state === "activated") return Promise.resolve();
@@ -17,6 +26,53 @@ function waitForActivation(worker) {
   });
 }
 
+function isInstalled() {
+  return displayMode.matches || navigator.standalone === true || installedEventObserved;
+}
+
+function updateStatus() {
+  let message;
+  let statusClass;
+  if (isInstalled()) {
+    message = offlineReady
+      ? "LOCALMAN is installed and ready to open offline."
+      : offlineFailed
+        ? "LOCALMAN is installed, but offline support could not be enabled."
+        : "LOCALMAN is installed; offline support is still being checked.";
+    statusClass = offlineReady ? "is-ready" : offlineFailed ? "is-error" : "is-warning";
+  } else if (!window.isSecureContext || !("serviceWorker" in navigator)) {
+    message = "Offline app installation is not supported from this browser or origin.";
+    statusClass = "is-error";
+  } else if (offlineFailed) {
+    message = "Offline support is not ready. Open LOCALMAN from localhost or HTTPS and try again.";
+    statusClass = "is-error";
+  } else if (!offlineReady) {
+    message = "Offline support is not ready yet. Keep this page open while the app is prepared.";
+    statusClass = "is-warning";
+  } else if (installPromptAvailable) {
+    message = "Offline support is ready, and this browser reports that LOCALMAN can be installed.";
+    statusClass = "is-ready";
+  } else {
+    message = "Offline support is ready. This browser has not confirmed installation availability; follow the platform instructions below.";
+    statusClass = "is-warning";
+  }
+  status.textContent = message;
+  status.classList.remove("is-ready", "is-warning", "is-error");
+  status.classList.add(statusClass);
+}
+
+window.addEventListener("beforeinstallprompt", () => {
+  installPromptAvailable = true;
+  updateStatus();
+});
+window.addEventListener("appinstalled", () => {
+  installedEventObserved = true;
+  updateStatus();
+});
+if (displayMode.addEventListener) displayMode.addEventListener("change", updateStatus);
+else displayMode.addListener(updateStatus);
+updateStatus();
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js")
     .then(async (registration) => {
@@ -24,16 +80,20 @@ if ("serviceWorker" in navigator) {
       const worker = registration.active ?? readyRegistration.active;
       if (!worker) throw new Error("The offline service worker has no active worker.");
       await waitForActivation(worker);
-      status.textContent = "Offline support is ready. This app can open without an internet connection.";
-      status.classList.add("is-ready");
+      offlineReady = true;
+      updateStatus();
     })
     .catch((error) => {
-      status.textContent = `Offline support could not be enabled: ${error.message}`;
-      status.classList.add("is-error");
+      const message = `Offline support could not be enabled: ${error.message}`;
+      offlineFailed = true;
+      updateStatus();
+      notify("error", message);
       console.error("Offline support could not be registered.", error);
     });
 } else {
-  status.textContent = "Offline support is unavailable in this browser or origin.";
-  status.classList.add("is-error");
+  const message = "Offline support is unavailable in this browser or origin.";
+  offlineFailed = true;
+  updateStatus();
+  notify("warning", message);
   console.error("Offline support is unavailable in this browser or origin.");
 }

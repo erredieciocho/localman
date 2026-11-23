@@ -350,10 +350,20 @@ function getEndingSummaryExcerpt(ending, summary) {
     sentence.toLocaleLowerCase().includes(ending.toLocaleLowerCase()));
   if (mentionIndex < 0) return sentences[0] ?? summary;
 
-  const mentionedSentence = sentences[mentionIndex];
+  let mentionedSentence = sentences[mentionIndex];
+  let nextSentence = mentionIndex + 1;
+  while (nextSentence < sentences.length
+    && /^["'“‘([{]*\s*[a-z]/u.test(sentences[nextSentence])) {
+    const continuation = sentences[nextSentence];
+    const closingQuote = /^["'”’]/u.exec(continuation)?.[0] ?? "";
+    mentionedSentence += closingQuote
+      ? `${closingQuote} ${continuation.slice(closingQuote.length).trimStart()}`
+      : ` ${continuation}`;
+    nextSentence += 1;
+  }
   if (/\b(?:tied to|scene)\b/iu.test(mentionedSentence) && sentences.length > 1) {
     const finalSentence = sentences.at(-1);
-    if (finalSentence !== mentionedSentence) return `${mentionedSentence} ${finalSentence}`;
+    if (!mentionedSentence.endsWith(finalSentence)) return `${mentionedSentence} ${finalSentence}`;
   }
   return mentionedSentence;
 }

@@ -21,6 +21,10 @@ const WORD_TREEMAP_PAGE_SIZE = 50;
 const SOURCE_TAG_ROWS = 3;
 const SOURCE_TAG_COLUMNS = Object.freeze({ wide: 5, narrow: 3 });
 
+export function getProgressTone(percentage) {
+  return percentage < 25 ? "low" : percentage < 75 ? "medium" : "high";
+}
+
 export function setupDashboard(root, {
   onSection,
   onMap = onSection,
@@ -54,9 +58,8 @@ export function setupDashboard(root, {
   const mapDetailsModal = createModalComponent(root.querySelector("#map-details-dialog"));
   const fileMetadataGrid = createStatisticsGridComponent(root.querySelector("#dashboard-file-meta"));
   const translationStatisticsGrid = createStatisticsGridComponent(
-    root.querySelector('[aria-label="Translation statistics"]'),
+    root.querySelector("#dashboard-translation-statistics"),
   );
-  const overviewGrid = createStatisticsGridComponent(root.querySelector('[aria-label="Localisation overview"]'));
   fileMetadataGrid.render([
     [
       { id: "dashboard-file-name", title: "File", value: "—", description: "Loaded localisation file" },
@@ -66,23 +69,29 @@ export function setupDashboard(root, {
     ],
     [{ id: "dashboard-credits", title: "Credits", value: "—", description: "Credits supplied by the localisation file" }],
   ]);
-  translationStatisticsGrid.render([[
-    { id: "stat-translated", title: "Translated", value: "—", description: "Entries with a translation" },
-    { id: "stat-untranslated", title: "Remaining", value: "—", description: "Entries awaiting translation" },
-    { id: "stat-untranslatable", title: "Untranslatable", value: "—", description: "Entries excluded from translation progress" },
-    { id: "stat-percentage", title: "Progress", value: "—", description: "Completion across translatable entries" },
-  ]]);
-  overviewGrid.render([[
-    { id: "dashboard-map-count", title: "Total maps", value: "—", description: "Named translatable sections" },
-    { id: "dashboard-entry-count", title: "Total entries", value: "—", description: "Across all maps" },
-    { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "In target translations" },
-    { id: "dashboard-source-count", title: "Source tags", value: "—", description: "Distinct tags across maps" },
-  ]]);
+  translationStatisticsGrid.render([
+    [
+      { id: "stat-translated", title: "Translated", value: "—", description: "Entries with a translation" },
+      { id: "stat-untranslated", title: "Remaining", value: "—", description: "Entries awaiting translation" },
+      { id: "stat-untranslatable", title: "Untranslatable", value: "—", description: "Entries excluded from translation progress" },
+      { id: "stat-percentage", title: "Progress", value: "—", description: "Completion across translatable entries" },
+    ],
+    [
+      { id: "dashboard-map-count", title: "Total maps", value: "—", description: "Named translatable sections" },
+      { id: "dashboard-entry-count", title: "Total entries", value: "—", description: "Across all maps" },
+      { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "In target translations" },
+      { id: "dashboard-source-count", title: "Source tags", value: "—", description: "Distinct tags across maps" },
+    ],
+  ]);
   const progressTable = createTableComponent(root.querySelector("#dashboard-rows").closest("table"));
   const wordsTreemap = createTreemapComponent(root.querySelector("#word-usage-grid"), {
     sortButton: root.querySelector("#word-usage-sort-toggle"),
     sortLabel: "word frequency",
   });
+  const wordSortOptions = {
+    getName: ({ word }) => word,
+    getValue: ({ frequency }) => frequency,
+  };
   const mapTreemap = createTreemapComponent(root.querySelector("#map-distribution-grid"), {
     sortButton: root.querySelector("#map-sort-toggle"),
     sortLabel: "map",
@@ -248,7 +257,7 @@ export function setupDashboard(root, {
     renderMapDistribution();
   }
 
-  function updateRow(section, row, previousTranslation, nextTranslation, previousStatus, nextStatus) {
+  function updateRow(section, row, previousTranslation, nextTranslation, previousStatus, nextStatus, localisation) {
     updateTranslationWordUsageIndex(wordUsageIndex, section, row, previousTranslation, nextTranslation);
     if (previousTranslation !== nextTranslation) {
       wordsDirty = true;
@@ -267,6 +276,7 @@ export function setupDashboard(root, {
       progress.progress = progress.total ? Math.round(progress.translated / progress.total * 1000) / 10 : 0;
       progressDirty = true;
     }
+    if (localisation) renderStatistics(localisation);
   }
 
   function renderFileMetadata(localisation, fileName) {
@@ -313,14 +323,16 @@ export function setupDashboard(root, {
       translated: overall.translated, untranslated: overall.untranslated,
       untranslatable: overall.untranslatable, percentage: `${overall.percentage}%`,
     })) translationStatisticsGrid.setValue(`stat-${id}`, value);
+    root.querySelector("#stat-percentage").dataset.progressTone = getProgressTone(overall.percentage);
   }
 
   function renderEmptyStatistics() {
     for (const id of ["translated", "untranslated", "untranslatable", "percentage"]) {
       translationStatisticsGrid.setValue(`stat-${id}`, "—");
+      if (id === "percentage") delete root.querySelector("#stat-percentage").dataset.progressTone;
     }
     for (const id of ["map-count", "entry-count", "unique-word-count", "source-count"]) {
-      overviewGrid.setValue(`dashboard-${id}`, "—");
+      translationStatisticsGrid.setValue(`dashboard-${id}`, "—");
     }
     renderMapDistribution();
   }
@@ -476,11 +488,11 @@ export function setupDashboard(root, {
 
   function renderSummaryMetrics() {
     const sections = progressRecords;
-    overviewGrid.setValue("dashboard-map-count", sections.length.toLocaleString());
-    overviewGrid.setValue("dashboard-entry-count", sections
+    translationStatisticsGrid.setValue("dashboard-map-count", sections.length.toLocaleString());
+    translationStatisticsGrid.setValue("dashboard-entry-count", sections
       .reduce((total, { section }) => total + section.rows.length, 0).toLocaleString());
-    overviewGrid.setValue("dashboard-unique-word-count", (wordUsageIndex?.words.size ?? 0).toLocaleString());
-    overviewGrid.setValue("dashboard-source-count", sourceStatistics.size.toLocaleString());
+    translationStatisticsGrid.setValue("dashboard-unique-word-count", (wordUsageIndex?.words.size ?? 0).toLocaleString());
+    translationStatisticsGrid.setValue("dashboard-source-count", sourceStatistics.size.toLocaleString());
   }
 
   function renderMapDistribution() {
@@ -546,9 +558,7 @@ export function setupDashboard(root, {
       detailsTitle = "Other maps by complexity";
       detailColumns = ["Map", "Complexity score"];
       getDetails = (record) => [record.complexity.toFixed(2)];
-      // Commented out; do not restore.
-      // getDisplayValue = (record) => record.complexity.toFixed(2);
-      // getOtherDisplayValue = (records) => records.length.toLocaleString();
+      getOtherDisplayValue = (records) => `${records.length.toLocaleString()} maps`;
     }
     root.querySelector("#map-distribution-title").textContent = heading;
     mapTreemap.render({
@@ -710,22 +720,51 @@ export function setupDashboard(root, {
       const maxOccurrences = currentPreferences?.dashboardMaximumWordOccurrences ?? Infinity;
       visibleWords = currentDocument && maxLength >= minLength
         ? [...wordUsageIndex.words.values()]
-          .filter(({ word }) => {
-            const length = [...word].length;
-            return length >= minLength && length <= maxLength
-              && wordUsageIndex.words.get(word).frequency >= minOccurrences
-              && wordUsageIndex.words.get(word).frequency <= maxOccurrences
-              && isWordSpellcheckVisible(word);
-          })
-          .map((word) => ({
-            ...word,
-            percentage: wordUsageIndex.totalEntries
-              ? word.occurrences.length / wordUsageIndex.totalEntries * 100
-              : 0,
-          }))
+          .filter(wordMatchesFilters)
+          .map(createVisibleWord)
         : [];
+      sortVisibleWords();
     }
     renderWordWindow();
+  }
+
+  function wordMatchesFilters({ word, frequency }) {
+    const minLength = currentPreferences?.minimumWordLength ?? 3;
+    const maxLength = currentPreferences?.dashboardMaximumWordLength ?? Infinity;
+    const minOccurrences = currentPreferences?.minimumWordOccurrences ?? 1;
+    const maxOccurrences = currentPreferences?.dashboardMaximumWordOccurrences ?? Infinity;
+    const length = [...word].length;
+    return maxLength >= minLength
+      && length >= minLength && length <= maxLength
+      && frequency >= minOccurrences && frequency <= maxOccurrences
+      && isWordSpellcheckVisible(word);
+  }
+
+  function createVisibleWord(word) {
+    return {
+      ...word,
+      percentage: wordUsageIndex.totalEntries
+        ? word.occurrences.length / wordUsageIndex.totalEntries * 100
+        : 0,
+    };
+  }
+
+  function sortVisibleWords() {
+    visibleWords = wordsTreemap.sortItems(visibleWords, wordSortOptions);
+  }
+
+  function insertVisibleWord(word) {
+    let low = 0;
+    let high = visibleWords.length;
+    while (low < high) {
+      const middle = Math.floor((low + high) / 2);
+      const existing = visibleWords[middle];
+      const order = wordsTreemap.sortDirection * (word.frequency - existing.frequency)
+        || existing.word.localeCompare(word.word);
+      if (order < 0) low = middle + 1;
+      else high = middle;
+    }
+    visibleWords.splice(low, 0, word);
   }
 
   function renderWordTotals() {
@@ -747,12 +786,7 @@ export function setupDashboard(root, {
     const pageCount = Math.max(1, Math.ceil(visibleWords.length / WORD_TREEMAP_PAGE_SIZE));
     wordPage = Math.max(0, Math.min(wordPage, pageCount - 1));
     const start = wordPage * WORD_TREEMAP_PAGE_SIZE;
-    const wordSortOptions = {
-      getName: ({ word }) => word,
-      getValue: ({ frequency }) => frequency,
-    };
-    const pageWords = wordsTreemap.sortItems(visibleWords, wordSortOptions)
-      .slice(start, start + WORD_TREEMAP_PAGE_SIZE);
+    const pageWords = visibleWords.slice(start, start + WORD_TREEMAP_PAGE_SIZE);
     wordsTreemap.render({
       items: pageWords,
       ...wordSortOptions,
@@ -764,7 +798,10 @@ export function setupDashboard(root, {
       getItemClassName: ({ word }) => `treemap-item--${getSpellcheckInfo(word).className}`,
       onItem: ({ word, occurrences }) => onOccurrences(`Target word: ${word}`, occurrences),
       onItemAction: ({ word }) => onAddWordExclusion(word),
-      onSortChange: renderWordWindow,
+      onSortChange() {
+        sortVisibleWords();
+        renderWordWindow();
+      },
       emptyMessage: currentDocument
         ? "No target-language words meet the current filters."
         : "Load a file to view target-language word usage.",
@@ -797,10 +834,29 @@ export function setupDashboard(root, {
 
   return {
     render,
+    updateWordExclusion(word, preferences) {
+      currentPreferences = preferences;
+      const entry = wordUsageIndex?.words.get(word);
+      if (!entry) {
+        wordsDirty = true;
+        renderWords();
+        return;
+      }
+      const visibleIndex = visibleWords.findIndex((visible) => visible.word === word);
+      if (wordMatchesFilters(entry)) {
+        const visible = createVisibleWord(entry);
+        if (visibleIndex < 0) insertVisibleWord(visible);
+        else visibleWords[visibleIndex] = visible;
+      } else if (visibleIndex >= 0) {
+        visibleWords.splice(visibleIndex, 1);
+      }
+      wordsDirty = false;
+      renderWordWindow();
+    },
     updateRow,
     updateIssueCounts(issueCounts) {
       currentIssueCounts = issueCounts;
-      renderMapDistribution();
+      if (mapDistributionMode === "issues") renderMapDistribution();
     },
     showSourceDetails,
     updateSourceStatistics() {

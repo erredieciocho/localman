@@ -68,6 +68,9 @@ export function parseCsvRecords(text, { delimiter = ",", quote = '"' } = {}) {
       if (character === delimiter) {
         raw += character;
         finishField();
+      } else if (character === " " || character === "\t") {
+        raw += character;
+        field += character;
       } else if (character === "\n" || character === "\r") {
         const lineEnding = character === "\r" && text[index + 1] === "\n" ? "\r\n" : character;
         if (lineEnding === "\r\n") {

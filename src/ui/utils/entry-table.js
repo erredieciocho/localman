@@ -20,7 +20,7 @@ export function updateEntryWarnings(root, issuesByRow) {
     const issues = issuesByRow.get(`${row.dataset.sectionIndex}:${row.dataset.rowIndex}`) ?? [];
     warning.hidden = issues.length === 0;
     warning.textContent = "⚠";
-    warning.title = `Show ${issues.length} ${issues.length === 1 ? "issue" : "issues"} for this entry`;
+    warning.title = `Review ${issues.length} ${issues.length === 1 ? "issue" : "issues"} in QA`;
     warning.setAttribute("aria-label", warning.title);
   }
 }

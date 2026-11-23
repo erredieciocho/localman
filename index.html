@@ -61,8 +61,6 @@
         </div>
       </header>
 
-      <p id="save-status" class="save-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-
       <!-- File state -->
       <section class="file-state visually-hidden" aria-live="polite" aria-atomic="true">
         <span id="file-status">No file loaded</span>
@@ -100,8 +98,8 @@
       <!-- Dashboard -->
       <section id="panel-dashboard" class="tab-panel" aria-label="Translation dashboard" hidden>
         <section id="dashboard-file-meta" class="statistics dashboard-file-meta" aria-label="Loaded localisation file metadata"></section>
-        <section class="statistics" aria-label="Translation statistics"></section>
-        <section class="statistics" aria-label="Localisation overview"></section>
+        <section id="dashboard-translation-statistics" class="statistics"
+          aria-label="Translation statistics and localisation overview"></section>
 
         <!-- Treemap -->
         <section class="workspace dashboard-workspace map-distribution-panel" aria-label="Map distribution">
@@ -336,24 +334,6 @@
         </div>
           <footer class="ui-table-footer" hidden></footer>
         </div>
-        <details id="issues-panel" class="workspace dashboard-workspace issues-panel ui-table-component">
-          <summary class="ui-table-header">
-            <div class="ui-table-heading">
-              <h2 class="ui-table-title">Issues</h2>
-              <p class="ui-table-context">Issues for the selected editor section.</p>
-            </div>
-            <div class="ui-table-controls ui-table-controls--right">
-              <strong id="validation-count" aria-live="polite">0 / 0 issues (0.00%)</strong>
-            </div>
-          </summary>
-          <div class="ui-table-body table-scroll">
-            <table>
-              <thead><tr><th scope="col">Section</th><th scope="col">Entry</th><th scope="col">Check</th></tr></thead>
-              <tbody id="validation-rows"><tr><td class="empty-state" colspan="3">Load a file to run configured checks.</td></tr></tbody>
-            </table>
-          </div>
-          <footer class="ui-table-footer" hidden></footer>
-        </details>
       </section>
       <!-- Compare -->
       <section id="panel-compare" class="tab-panel" aria-label="Compare localisation files" hidden>
@@ -396,14 +376,23 @@
               <h2>Quality assurance</h2>
               <p>Review validation issues by map, track resolved items and move directly to the affected entry.</p>
             </div>
-            <section id="qa-count" aria-label="Issue counts"></section>
           </header>
-          <section class="qa-legend" aria-label="Issue type legend">
-            <h3>Issue types</h3>
+          <section class="qa-legend" aria-label="QA summary and issue type filters">
+            <h3>Summary</h3>
+            <section id="qa-count" class="qa-count" aria-label="Issue counts"></section>
             <dl>
-              <div><dt>Spelling <span class="qa-legend-count" data-qa-type-count="spelling">—</span></dt><dd>A translated word is not recognised by the loaded dictionary.</dd></div>
-              <div><dt>Sentence length <span class="qa-legend-count" data-qa-type-count="sentence-length">—</span></dt><dd>A translation is outside the configured character limits.</dd></div>
-              <div><dt>Terminology <span class="qa-legend-count" data-qa-type-count="terminology">—</span></dt><dd>A defined glossary term is missing from the translation.</dd></div>
+              <div>
+                <dt><label class="qa-type-filter"><input type="checkbox" data-qa-type-filter="spelling" checked><span>Spelling</span></label><span class="qa-legend-count" data-qa-type-count="spelling">—</span></dt>
+                <dd>A translated word is not recognised by the loaded dictionary.</dd>
+              </div>
+              <div>
+                <dt><label class="qa-type-filter"><input type="checkbox" data-qa-type-filter="sentence-length" checked><span>Sentence length</span></label><span class="qa-legend-count" data-qa-type-count="sentence-length">—</span></dt>
+                <dd>A translation is outside the configured character limits.</dd>
+              </div>
+              <div>
+                <dt><label class="qa-type-filter"><input type="checkbox" data-qa-type-filter="terminology" checked><span>Terminology</span></label><span class="qa-legend-count" data-qa-type-count="terminology">—</span></dt>
+                <dd>A defined glossary term is missing from the translation.</dd>
+              </div>
             </dl>
           </section>
           <div class="qa-controls">
@@ -637,6 +626,9 @@
             <button type="button" class="settings-tab is-active" id="settings-tab-general"
               role="tab" aria-selected="true" aria-controls="settings-category-general"
               data-settings-tab="general">General</button>
+            <button type="button" class="settings-tab" id="settings-tab-editor"
+              role="tab" aria-selected="false" aria-controls="settings-category-editor"
+              data-settings-tab="editor">Editor</button>
             <button type="button" class="settings-tab" id="settings-tab-validation"
               role="tab" aria-selected="false" aria-controls="settings-category-validation"
               data-settings-tab="validation">Validation</button>
@@ -674,6 +666,18 @@
               </fieldset>
             </div>
           </section>
+          <section id="settings-category-editor" class="settings-category" role="tabpanel"
+            aria-labelledby="settings-tab-editor" data-settings-panel="editor" hidden>
+            <fieldset class="settings-group">
+              <legend>Browser spellcheck</legend>
+              <label class="check-control">
+                <input id="spellcheck-enabled" type="checkbox">
+                <span>Use the browser's built-in spellcheck for translation fields</span>
+              </label>
+              <p class="muted settings-note">Spellchecking depends on the browser and installed dictionaries. No external services are used.</p>
+              <p id="spellcheck-support" class="muted settings-note" hidden>Spellchecking is not supported by this browser.</p>
+            </fieldset>
+          </section>
           <section id="settings-category-validation" class="settings-category" role="tabpanel"
             aria-labelledby="settings-tab-validation" data-settings-panel="validation" hidden>
             <div class="settings-groups">
@@ -704,42 +708,42 @@
             aria-labelledby="settings-tab-dictionary" data-settings-panel="dictionary" hidden>
             <div class="settings-groups">
               <fieldset class="settings-group">
-                <legend>Dictionary validation</legend>
+                <legend>Dictionary</legend>
                 <label class="check-control">
                   <input id="dictionary-validation" type="checkbox">
-                  <span>Check translated text with a bundled Hunspell dictionary</span>
+                  <span>Check translated text with a Hunspell dictionary</span>
                 </label>
                 <label class="settings-control" for="dictionary-select">
-                  <span class="dictionary-label">Bundled dictionary
+                  <span class="dictionary-label">Dictionary
                     <span id="dictionary-status-dot" class="dictionary-status-dot" data-loaded="false"
                       role="status" aria-label="Loading bundled dictionaries." title="Loading bundled dictionaries."></span>
                   </span>
                   <select id="dictionary-select" disabled>
                     <option value="">Loading available dictionaries...</option>
                   </select>
-                  <small>Hunspell AFF+DIC pairs and packaged OXT, XPI, or ZIP dictionaries are supported.</small>
+                  <input id="dictionary-custom-import" type="file"
+                    accept=".aff,.dic,.oxt,.xpi,.zip" multiple hidden>
+                  <small>Select a bundled dictionary or choose “Import custom dictionary…” to load a supported format for this session. Custom dictionaries must be imported again in a new session.</small>
                 </label>
-                <div class="settings-control">
-                  <span>Dictionary exclusions</span>
-                  <input id="dictionary-exclusions-import" type="file" accept=".txt,text/plain" hidden>
+              </fieldset>
+              <fieldset class="settings-group">
+                <legend>Dictionary exclusions</legend>
+                <input id="dictionary-exclusions-import" type="file" accept=".txt,text/plain" hidden>
+                <div class="dictionary-exclusion-actions">
                   <button id="dictionary-exclusions-import-button" class="button button-secondary" type="button">
                     Import exclusion list
                   </button>
                   <button id="dictionary-exclusions-export-button" class="button button-secondary" type="button">
                     Export exclusion list
                   </button>
-                  <small>Choose a line-separated text file. Import replaces the current list.</small>
+                  <button id="dictionary-exclusions-clear-button" class="button button-secondary" type="button">
+                    Clear exclusion list
+                  </button>
                 </div>
+                <small>Import a line-separated text file to add words; duplicates are skipped.</small>
+                <pre id="dictionary-exclusions-preview" class="dictionary-exclusions-preview"
+                  aria-label="Dictionary exclusion list" role="region" tabindex="0">No excluded words.</pre>
                 <p id="dictionary-exclusions-status" class="muted settings-note" aria-live="polite"></p>
-              </fieldset>
-              <fieldset class="settings-group">
-                <legend>Browser spellcheck</legend>
-                <label class="check-control">
-                  <input id="spellcheck-enabled" type="checkbox">
-                  <span>Use the browser's built-in spellcheck for translation fields</span>
-                </label>
-                <p class="muted settings-note">Spellchecking depends on the browser and installed dictionaries. No external services are used.</p>
-                <p id="spellcheck-support" class="muted settings-note" hidden>Spellchecking is not supported by this browser.</p>
               </fieldset>
             </div>
           </section>
@@ -755,9 +759,12 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset id="source-color-group" class="settings-group">
+            <p id="source-color-unavailable" class="muted settings-note">
+              Load a localisation file to configure Source-tag colours.
+            </p>
+            <fieldset id="source-color-group" class="settings-group" disabled>
               <legend>Source tags</legend>
-              <div id="source-color-legend" class="source-color-legend">
+              <div id="source-color-legend" class="source-color-legend source-color-legend--empty">
                 <p class="empty-state">Load a file to view.</p>
               </div>
               <div class="source-color-actions">
@@ -790,20 +797,35 @@
             <h2>About LOCALMAN</h2>
             <p>LOCALMAN is a browser-based localisation manager for The Coffin of Andy and Leyley, created by <a href="https://steamcommunity.com/id/6dot9/">@6dot9</a> for the <a href="https://discord.gg/K46HFNX6t7"><i>Comunidad Hispana de TCOAAL</i></a> translation project.</p>
           </div>
-          <div class="settings-tabs about-tabs" role="tablist" aria-label="About sections">
-            <button type="button" class="settings-tab is-active" id="about-tab-overview"
-              role="tab" aria-selected="true" aria-controls="about-panel-overview" tabindex="0"
-              data-about-tab="overview">About</button>
-            <button type="button" class="settings-tab" id="about-tab-offline"
-              role="tab" aria-selected="false" aria-controls="about-panel-offline" tabindex="-1"
-              data-about-tab="offline">Installation (Offline)</button>
-            <button type="button" class="settings-tab" id="about-tab-changelog"
-              role="tab" aria-selected="false" aria-controls="about-panel-changelog" tabindex="-1"
-              data-about-tab="changelog">Changelog</button>
+          <div class="about-tab-navigation">
+            <div class="settings-tabs" role="tablist" aria-label="About sections">
+              <button type="button" class="settings-tab is-active" id="about-tab-overview"
+                role="tab" aria-selected="true" aria-controls="about-panel-overview" tabindex="0"
+                data-about-tab="overview">About</button>
+              <button type="button" class="settings-tab" id="about-tab-offline"
+                role="tab" aria-selected="false" aria-controls="about-panel-offline" tabindex="-1"
+                data-about-tab="offline">Offline</button>
+            </div>
+            <a id="about-changelog-link" class="settings-tab about-changelog-link"
+              href="./docs/changelog.md" target="_blank" rel="noopener noreferrer">
+              Changelog
+            </a>
           </div>
           <section id="about-panel-overview" class="about-tab-panel" role="tabpanel"
             aria-labelledby="about-tab-overview" data-about-panel="overview">
           <div class="about-content">
+            <nav class="about-social-links" aria-label="Project links">
+              <a class="about-social-link" href="https://github.com/erredieciocho/localman"
+                target="_blank" rel="noopener noreferrer" aria-label="GitHub repository">
+                <span class="about-social-icon" aria-hidden="true">GH</span>
+                <span>GitHub</span>
+              </a>
+              <a class="about-social-link" href="https://erredieciocho.github.io/localman/"
+                target="_blank" rel="noopener noreferrer">
+                <span class="about-social-icon" aria-hidden="true">↗</span>
+                <span>Hosted on GitHub Pages</span>
+              </a>
+            </nav>
             <section class="about-how-to">
               <h3>How to use</h3>
               <ol>
@@ -858,36 +880,27 @@
           </section>
           <section id="about-panel-offline" class="about-tab-panel" role="tabpanel"
             aria-labelledby="about-tab-offline" data-about-panel="offline" hidden>
+            <p id="offline-installation-status" class="offline-support-status is-warning"
+              role="status" aria-live="polite">
+              Checking offline support and installation availability…
+            </p>
             <div class="about-content">
               <section class="about-how-to">
-                <h3>Install LOCALMAN for offline use</h3>
+                <h3>Install LOCALMAN</h3>
                 <ol>
-                  <li>Run <code>python launch.py</code> from the LOCALMAN project folder. Python starts a local server at <code>http://127.0.0.1:8000</code>.</li>
-                  <li>Open that address in Microsoft Edge, Google Chrome or another browser that supports PWA installation.</li>
-                  <li>Wait for the status below to say offline support is ready. This first visit caches the app, map catalogue and bundled dictionaries; no internet connection is required.</li>
-                  <li>Choose the install icon in the address bar, or use the browser menu (in Edge, <strong>Apps → Install this site as an app</strong>).</li>
-                  <li>Open LOCALMAN from your desktop or application menu. Its installed copy remains available without an internet connection or the local server.</li>
+                  <li><strong>Desktop (Edge or Chrome):</strong> Open LOCALMAN and choose the install icon in the address bar or <strong>Install this site as an app</strong> from the browser menu.</li>
+                  <li><strong>Android (Chrome):</strong> Open LOCALMAN, open the browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+                  <li><strong>iOS (Safari):</strong> Open LOCALMAN in Safari, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</li>
                 </ol>
-                <p id="offline-support-status" class="offline-support-status" role="status" aria-live="polite">
-                  Offline support is being prepared…
-                </p>
-                <p class="muted">Localisation files stay on your device and are never uploaded. To update the installed copy, start the server again at the same address while online or on your local network, then reopen LOCALMAN.</p>
+                <p class="muted">The first visit prepares the offline copy. Localisation files stay on your device and are never uploaded. To update LOCALMAN, open it while connected to the same server again.</p>
               </section>
-            </div>
-          </section>
-          <section id="about-panel-changelog" class="about-tab-panel" role="tabpanel"
-            aria-labelledby="about-tab-changelog" data-about-panel="changelog" hidden>
-            <div class="about-content">
               <section>
-                <h3>Project highlights</h3>
-                <ul class="about-changelog">
-                  <li><strong>7–9 November:</strong> Migrated the editor to a local-first browser application with CSV editing, validation, settings and a progress dashboard.</li>
-                  <li><strong>11 November:</strong> Separated the core document, parser, application services and browser file/storage adapters.</li>
-                  <li><strong>12–14 November:</strong> Added encoding preservation, responsive interface refinements, file comparison, terminology and the searchable map catalogue.</li>
-                  <li><strong>15 November:</strong> Connected navigation across views and expanded map, dictionary, section export and dashboard workflows.</li>
-                  <li><strong>16 November:</strong> Completed QA review, persisted issue resolutions, map issue ranking and cross-view issue synchronisation.</li>
-                  <li><strong>18 November:</strong> Added installable PWA support with offline access to the application, maps and bundled dictionaries.</li>
-                </ul>
+                <h3>Use the Python server instead</h3>
+                <ol>
+                  <li>Run <code>python launch.py</code> from the LOCALMAN project folder.</li>
+                  <li>Open the displayed address (normally <code>http://127.0.0.1:8000</code>) in your browser and leave the server running while you work.</li>
+                </ol>
+                <p class="muted">The local server does not require an internet connection. Once the app has loaded, its cached files can also be opened offline in the same browser.</p>
               </section>
             </div>
           </section>
@@ -998,16 +1011,7 @@
           <button id="section-export-download-button" type="button" class="button button-primary">Download CSV</button>
         </div>
       </dialog>
-      <dialog id="file-required-dialog" aria-labelledby="file-required-title" data-modal-title="Load a localisation file" data-modal-close-id="file-required-close">
-        <p class="dialog-message">Load a valid localisation file first to use this tab.</p>
-      </dialog>
-      <dialog id="row-issues-dialog" aria-labelledby="row-issues-title" data-modal-title="Entry issues" data-modal-close-id="row-issues-close">
-        <div class="ui-table-body table-scroll"><table><thead><tr><th scope="col">Type</th><th scope="col">Issue</th></tr></thead><tbody id="row-issues-rows"></tbody></table></div>
-        <footer class="ui-table-footer" hidden></footer>
-      </dialog>
-      <dialog id="error-dialog" aria-labelledby="error-title" data-modal-title="An error occurred" data-modal-close-id="error-close">
-        <p id="error-message" class="dialog-message" role="alert"></p>
-      </dialog>
+      <div id="notification-toasts" class="notification-toasts" aria-label="Notifications"></div>
 
     </main>
   </body>

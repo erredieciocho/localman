@@ -1,7 +1,6 @@
 import { findTranslationSuggestions } from "../../core/translation/index.js";
 import { isEditableColumn, renderEntries, updateEntryWarnings } from "../utils/entry-table.js";
 import { renderSections } from "../utils/section-list.js";
-import { renderIssues } from "../utils/issues.js";
 import { createModalComponent } from "../components/modal.js";
 
 export function setupEditor(root, {
@@ -232,7 +231,7 @@ export function setupEditor(root, {
     statusFilter.value = "";
     onSectionChange(sectionIndex);
     renderEntriesForSection();
-    renderIssueList();
+    renderWarnings();
     focusCurrentMatch();
     findStatus.textContent = `Match ${findMatchIndex + 1} of ${findMatches.length}.`;
     updateFindControls();
@@ -326,17 +325,7 @@ export function setupEditor(root, {
     replaceAllButton.disabled = !localisation || !hasSection || !findInput.value;
   }
 
-  function renderIssueList() {
-    renderIssues(
-      root,
-      localisation,
-      preferences,
-      sectionIndex,
-      (targetSectionIndex) => onNavigate(targetSectionIndex),
-      (targetSectionIndex, rowIndex) => onNavigate(targetSectionIndex, rowIndex),
-      dictionary,
-      issues,
-    );
+  function renderWarnings() {
     updateEntryWarnings(root, indexIssuesByRow(issues));
   }
 
@@ -357,7 +346,7 @@ export function setupEditor(root, {
     searchInput.disabled = false;
     statusFilter.disabled = false;
     renderEntriesForSection();
-    renderIssueList();
+    renderWarnings();
     updateFindControls();
     updateSectionActions();
   }
@@ -374,7 +363,7 @@ export function setupEditor(root, {
     statusFilter.value = status;
     sectionSelect.value = sectionIndex === null ? "" : String(sectionIndex);
     renderEntriesForSection();
-    renderIssueList();
+    renderWarnings();
     updateFindControls();
     updateSectionActions();
   }
@@ -388,7 +377,7 @@ export function setupEditor(root, {
   function updateIssues(validationIssues, activeDictionary = dictionary) {
     issues = validationIssues;
     dictionary = activeDictionary;
-    renderIssueList();
+    renderWarnings();
   }
 
   function showSuggestions(section, entry, input, onApply) {

@@ -1,5 +1,5 @@
 import { extractWords, getGroupedRows, getTermDefinitions } from "../glossary/index.js";
-import { spellingWords } from "../spellcheck/index.js";
+import { spellingVariants, spellingWords } from "../spellcheck/index.js";
 
 const spellingCache = new WeakMap();
 
@@ -10,9 +10,12 @@ export function getSpellingResult(dictionary, word) {
     cache = new Map();
     spellingCache.set(dictionary, cache);
   }
-  const cacheKey = word.toLocaleLowerCase();
-  if (!cache.has(cacheKey)) cache.set(cacheKey, dictionary.check(word));
-  return cache.get(cacheKey);
+  for (const variant of spellingVariants(word)) {
+    const cacheKey = variant.toLocaleLowerCase();
+    if (!cache.has(cacheKey)) cache.set(cacheKey, dictionary.check(variant));
+    if (cache.get(cacheKey)) return true;
+  }
+  return false;
 }
 
 export function isWordExcluded(word, exclusions = []) {
@@ -47,7 +50,13 @@ export function collectValidationIssues(localisation, {
         for (const word of words) {
           if (exclusions.has(word.toLocaleLowerCase())) continue;
           if (!getSpellingResult(dictionary, word)) {
-            issues.push({ kind: "spelling", message: `Possible spelling error: "${word}".`, section, row });
+            issues.push({
+              kind: "spelling",
+              word,
+              message: `Possible spelling error: "${word}".`,
+              section,
+              row,
+            });
           }
         }
       }

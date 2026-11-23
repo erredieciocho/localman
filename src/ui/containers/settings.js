@@ -26,6 +26,7 @@ export function createSettingsController(root, {
   spellcheckSupported = "spellcheck" in document.createElement("textarea"),
   storage,
   onError,
+  notify = () => {},
 } = {}) {
   let preferences;
   let loadError = "";
@@ -86,9 +87,11 @@ export function createSettingsController(root, {
         preferences = copyPreferences(next);
         applyDensity(root, preferences.density, preferences.editorDensity);
         onApply(copyPreferences(preferences));
-        setStatus(savePreferences(next, storage)
+        const saved = savePreferences(next, storage);
+        setStatus(saved
           ? "Settings saved automatically and applied."
-          : "Settings applied for this session, but browser storage is unavailable.");
+          : "Settings applied for this session, but browser storage is unavailable.",
+        saved ? "success" : "warning");
       } catch (error) {
         onError(error);
       }
@@ -109,9 +112,10 @@ export function createSettingsController(root, {
     controls.maxSentenceLength.value = String(preferences.maxSentenceLength);
   }
 
-  function setStatus(message) {
+  function setStatus(message, type = "success", { notifyUser = true } = {}) {
     statusMessage = message;
     if (status) status.textContent = message;
+    if (notifyUser) notify(type, message);
   }
 
   return {
@@ -119,13 +123,15 @@ export function createSettingsController(root, {
     get preferences() {
       return copyPreferences(preferences);
     },
-    update(patch) {
+    update(patch, { notify: notifyUser = true } = {}) {
       const next = { ...preferences, ...patch };
       validatePreferences(next);
       preferences = copyPreferences(next);
-      setStatus(savePreferences(next, storage)
+      const saved = savePreferences(next, storage);
+      setStatus(saved
         ? "Preference saved automatically in this browser."
-        : "Preference applied for this session, but browser storage is unavailable.");
+        : "Preference applied for this session, but browser storage is unavailable.",
+      saved ? "success" : "warning", { notifyUser });
     },
     applyImportedPreferences(next) {
       validateImportedPreferences(next);

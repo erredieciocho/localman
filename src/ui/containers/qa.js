@@ -17,6 +17,7 @@ export function setupQA(root, {
   onOpenEntry,
   download,
   storage,
+  notify = () => {},
   onChange = () => {},
 } = {}) {
   const statusFilter = root.querySelector("#qa-status-filter");
@@ -26,6 +27,7 @@ export function setupQA(root, {
   const importInput = root.querySelector("#qa-import-input");
   const importButton = root.querySelector("#qa-import-button");
   const exportButton = root.querySelector("#qa-export-button");
+  const typeFilters = [...root.querySelectorAll("[data-qa-type-filter]")];
   const countGrid = createStatisticsGridComponent(count);
   let localisation = null;
   let currentIssues = [];
@@ -64,6 +66,12 @@ export function setupQA(root, {
     currentPage = 0;
     render();
   });
+  for (const typeFilter of typeFilters) {
+    typeFilter.addEventListener("change", () => {
+      currentPage = 0;
+      render();
+    });
+  }
   importButton.addEventListener("click", () => importInput.click());
   importInput.addEventListener("change", importFile);
   exportButton.addEventListener("click", exportFile);
@@ -186,6 +194,7 @@ export function setupQA(root, {
       }
       issueRecords = nextRecords;
       setIssues(currentIssues, localisation);
+      notify(`Imported ${imported.length.toLocaleString()} QA ${imported.length === 1 ? "issue" : "issues"}.`);
     } catch (error) {
       onError(error);
     } finally {
@@ -208,6 +217,7 @@ export function setupQA(root, {
         })),
       };
       download(`${JSON.stringify(data, null, 2)}\n`, "tcoaal-qa-issues.json", "application/json");
+      notify("QA issues exported.");
     } catch (error) {
       onError(error);
     }
@@ -243,7 +253,11 @@ export function setupQA(root, {
     countGrid.setValue("qa-total-count", records.length.toLocaleString());
     const query = search.value.trim().toLocaleLowerCase();
     const filter = statusFilter.value;
+    const activeTypes = new Set(typeFilters
+      .filter((typeFilter) => typeFilter.checked)
+      .map((typeFilter) => typeFilter.dataset.qaTypeFilter));
     const visible = records.filter((record) => {
+      if (!activeTypes.has(record.kind)) return false;
       if (filter === "resolved" && !record.resolved) return false;
       if (filter === "unresolved" && record.resolved) return false;
       if (!query) return true;
@@ -412,7 +426,56 @@ export function setupQA(root, {
     });
   }
 
-  return { setIssues, reset, getUnresolvedIssueCounts, getUnresolvedIssues };
+  function excludeSpellingWord(word) {
+    const excludedWord = word.trim().toLocaleLowerCase();
+    const matches = (issue) => issue.kind === "spelling"
+      && issue.word?.trim().toLocaleLowerCase() === excludedWord;
+    currentIssues = currentIssues.filter((issue) => !matches(issue));
+    let removed = false;
+    for (const [id, record] of issueRecords) {
+      if (!record.imported && matches(record)) {
+        issueRecords.delete(id);
+        removed = true;
+      }
+    }
+    if (!removed) return false;
+    if (!root.querySelector("#panel-qa").hidden) render();
+    onChange({ updateEditor: false });
+    return true;
+  }
+
+  function openIssue(sectionIndex, rowIndex) {
+    statusFilter.value = "unresolved";
+    const targetRecord = [...issueRecords.values()].find((record) =>
+      !record.resolved && record.section.index === sectionIndex && record.row.index === rowIndex);
+    if (!targetRecord) return false;
+    search.value = targetRecord.entryId;
+    const sections = [...new Set([...issueRecords.values()]
+      .filter((record) => !record.resolved)
+      .map((record) => record.section.index))]
+      .sort((left, right) => left - right);
+    const sectionPosition = sections.indexOf(sectionIndex);
+    if (sectionPosition < 0) return false;
+
+    currentPage = Math.floor(sectionPosition / PAGE_SIZE);
+    render();
+    const details = [...issuesRoot.querySelectorAll(".qa-section")]
+      .find((group) => Number(group.querySelector("[data-qa-section-toggle]")?.dataset.qaSectionToggle)
+        === sectionIndex);
+    if (!details) return false;
+    details.open = true;
+    details.scrollIntoView({ block: "nearest" });
+    return true;
+  }
+
+  return {
+    setIssues,
+    reset,
+    getUnresolvedIssueCounts,
+    getUnresolvedIssues,
+    openIssue,
+    excludeSpellingWord,
+  };
 }
 
 function createRecord(issue, imported) {
@@ -426,6 +489,7 @@ function createRecord(issue, imported) {
     entryId,
     row: issue.row,
     kind: issue.kind,
+    word: issue.word,
     message: issue.message,
     translation: issue.row.fields[issue.section.columns.indexOf("Translation")] ?? "",
     resolved: false,

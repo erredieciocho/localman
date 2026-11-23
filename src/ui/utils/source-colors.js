@@ -155,6 +155,7 @@ export function createSourceColorStore(storage) {
 export function renderSourceColorLegend(root, values, colorStore, onChange, onSourceClick = () => {}) {
   const legend = root.querySelector("#source-color-legend");
   legend.replaceChildren();
+  legend.classList.toggle("source-color-legend--empty", !values.length);
   if (!values.length) {
     const message = document.createElement("p");
     message.className = "empty-state";
