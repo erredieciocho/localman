@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "LOCALMAN — Localisation Editor",
+  "name": "LOCALMAN",
   "short_name": "LOCALMAN",
   "description": "A local-first editor and analysis tool for TCOAAL game localisation files.",
   "start_url": "./",

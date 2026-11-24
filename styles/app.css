@@ -201,6 +201,39 @@ textarea:focus-visible {
   cursor: not-allowed;
 }
 
+.button-pair {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+}
+
+.button-pair > .button {
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.button-pair > .button:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.button-pair > .button:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.button-pair > .button + .button {
+  border-left: 1px solid var(--theme-border);
+}
+
+.button-pair.button-pair--single > .button {
+  border-radius: 6px;
+}
+
+.button-pair > .button[hidden] {
+  display: none;
+}
+
 .button-secondary {
   border-color: var(--theme-control-border);
   background: var(--theme-surface);
@@ -327,10 +360,13 @@ textarea:focus-visible {
 
 .tabs {
   display: flex;
+  width: 100%;
+  min-width: 0;
   align-items: stretch;
   gap: 4px;
   margin: 18px 0 14px;
   overflow-x: auto;
+  contain: paint;
   border-bottom: 1px solid var(--theme-border);
 }
 
@@ -349,8 +385,25 @@ textarea:focus-visible {
 }
 
 .tab-status-dot {
+  display: inline-block;
   width: 0.55rem;
   height: 0.55rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--theme-border);
+  border-radius: 50%;
+  background: var(--theme-error-text);
+}
+
+.tab-status-dot[data-status="available"] {
+  background: var(--theme-success-text);
+}
+
+.tab-status-dot[data-status="partial"] {
+  background: var(--theme-warning-text);
+}
+
+.tab-status-dot[data-status="unavailable"] {
+  background: var(--theme-error-text);
 }
 
 .tab-separator {
@@ -511,6 +564,13 @@ progress::-moz-progress-bar {
   cursor: pointer;
 }
 
+#settings-tab-dictionary,
+#about-tab-offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 .settings-tab.is-active {
   border-color: var(--theme-border);
   background: var(--theme-surface-raised);
@@ -591,6 +651,14 @@ progress::-moz-progress-bar {
   color: var(--theme-success-text);
 }
 
+#dashboard-unique-word-count [data-word-count-tone="greater"] {
+  color: var(--theme-success-text);
+}
+
+#dashboard-unique-word-count [data-word-count-tone="lesser"] {
+  color: var(--theme-error-text);
+}
+
 .settings-control {
   display: grid;
   max-width: 420px;
@@ -643,12 +711,6 @@ progress::-moz-progress-bar {
 .settings-note,
 #settings-status {
   padding: 0 18px;
-}
-
-.dictionary-exclusion-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .dictionary-exclusions-preview {
@@ -752,16 +814,6 @@ progress::-moz-progress-bar {
 
 .dictionary-status-dot {
   display: inline-block;
-  width: 0.72rem;
-  height: 0.72rem;
-  flex: 0 0 auto;
-  border: 1px solid var(--theme-border);
-  border-radius: 50%;
-  background: #b42332;
-}
-
-.dictionary-status-dot[data-loaded="true"] {
-  background: #238a4b;
 }
 
 .source-color-item input[type="color"] {
@@ -1462,6 +1514,10 @@ progress::-moz-progress-bar {
   text-decoration: none;
 }
 
+.about-social-link[hidden] {
+  display: none;
+}
+
 .about-social-link:hover {
   border-color: var(--theme-accent);
   background: var(--theme-surface-hover);
@@ -1526,33 +1582,6 @@ progress::-moz-progress-bar {
 
 .about-features > .muted {
   margin-top: 10px;
-}
-
-.offline-support-status {
-  margin: 0 12px 12px;
-  padding: 10px 12px;
-  border: 0;
-  border-bottom: 1px solid var(--theme-border);
-  border-radius: 0;
-  background: var(--theme-surface-raised);
-}
-
-.offline-support-status.is-ready {
-  border-color: var(--theme-success-text);
-  background: var(--theme-success-bg);
-  color: var(--theme-success-text);
-}
-
-.offline-support-status.is-warning {
-  border-color: var(--theme-warning-text);
-  background: var(--theme-warning-bg);
-  color: var(--theme-warning-text);
-}
-
-.offline-support-status.is-error {
-  border-color: var(--theme-error-text);
-  background: var(--theme-error-bg);
-  color: var(--theme-error-text);
 }
 
 .entry-count {
@@ -2443,11 +2472,7 @@ tbody tr:hover {
   display: none;
 }
 
-.qa-file-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+
 
 .qa-issues {
   display: grid;
@@ -2597,10 +2622,6 @@ tbody tr:hover {
 .qa-empty-state {
   margin: 0;
   padding: 16px;
-}
-
-.dictionary-status-dot.tab-status-dot[data-status="partial"] {
-  background: #d89600;
 }
 
 @media (max-width: 900px) {

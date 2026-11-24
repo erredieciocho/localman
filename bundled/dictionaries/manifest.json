@@ -4,6 +4,7 @@
       "id": "es",
       "name": "Spanish (Spain)",
       "language": "es",
+      "wordCount": 54971,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/es/index.aff",
       "dic": "../../../bundled/dictionaries/es/index.dic"
@@ -12,9 +13,64 @@
       "id": "ca",
       "name": "Catalan",
       "language": "ca",
+      "wordCount": 200071,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/ca/index.aff",
       "dic": "../../../bundled/dictionaries/ca/index.dic"
+    },
+    {
+      "id": "fr",
+      "name": "French",
+      "language": "fr",
+      "wordCount": 82327,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/fr/index.aff",
+      "dic": "../../../bundled/dictionaries/fr/index.dic"
+    },
+    {
+      "id": "de",
+      "name": "German",
+      "language": "de",
+      "wordCount": 71990,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/de/index.aff",
+      "dic": "../../../bundled/dictionaries/de/index.dic"
+    },
+    {
+      "id": "pt",
+      "name": "Portuguese (Portugal)",
+      "language": "pt",
+      "wordCount": 42485,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/pt/index.aff",
+      "dic": "../../../bundled/dictionaries/pt/index.dic"
+    },
+    {
+      "id": "pl",
+      "name": "Polish",
+      "language": "pl",
+      "wordCount": 297021,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/pl/index.aff",
+      "dic": "../../../bundled/dictionaries/pl/index.dic"
+    },
+    {
+      "id": "ru",
+      "name": "Russian",
+      "language": "ru",
+      "wordCount": 146269,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/ru/index.aff",
+      "dic": "../../../bundled/dictionaries/ru/index.dic"
+    },
+    {
+      "id": "ko",
+      "name": "Korean",
+      "language": "ko",
+      "wordCount": 99781,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/ko/index.aff",
+      "dic": "../../../bundled/dictionaries/ko/index.dic"
     }
   ]
 }

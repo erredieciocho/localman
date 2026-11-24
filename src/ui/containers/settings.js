@@ -2,6 +2,7 @@ import { createBrowserStorage } from "../../platform/browser/storage.js";
 
 export const SETTINGS_STORAGE_KEY = "tcoaal-localisation-editor-settings";
 const DENSITIES = new Set(["comfortable", "compact"]);
+const TARGET_LANGUAGES = new Set(["es", "ca", "fr", "de", "pt", "pl", "ru", "ko"]);
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   density: "compact",
@@ -26,6 +27,7 @@ export function createSettingsController(root, {
   spellcheckSupported = "spellcheck" in document.createElement("textarea"),
   storage,
   onError,
+  onChange = () => {},
   notify = () => {},
 } = {}) {
   let preferences;
@@ -92,6 +94,7 @@ export function createSettingsController(root, {
           ? "Settings saved automatically and applied."
           : "Settings applied for this session, but browser storage is unavailable.",
         saved ? "success" : "warning");
+        onChange(copyPreferences(preferences));
       } catch (error) {
         onError(error);
       }
@@ -132,6 +135,7 @@ export function createSettingsController(root, {
         ? "Preference saved automatically in this browser."
         : "Preference applied for this session, but browser storage is unavailable.",
       saved ? "success" : "warning", { notifyUser });
+      onChange(copyPreferences(preferences));
     },
     applyImportedPreferences(next) {
       validateImportedPreferences(next);
@@ -140,6 +144,7 @@ export function createSettingsController(root, {
       if (initialized) populateControls();
       applyPreferences(copyPreferences(preferences));
       setStatus("Configuration imported and applied.");
+      onChange(copyPreferences(preferences));
     },
     setStatus,
   };
@@ -201,7 +206,7 @@ function loadPreferences(storage) {
       : DEFAULT_PREFERENCES.dashboardIncompleteOnly,
     dashboardProgressThreshold: finiteInteger(stored.dashboardProgressThreshold, 0, 100)
       ?? DEFAULT_PREFERENCES.dashboardProgressThreshold,
-    targetLanguage: ["es", "ca"].includes(stored.targetLanguage)
+    targetLanguage: TARGET_LANGUAGES.has(stored.targetLanguage)
       ? stored.targetLanguage : DEFAULT_PREFERENCES.targetLanguage,
     sectionIds: Array.isArray(stored.sectionIds)
       ? stored.sectionIds.map(String).map((id) => id.trim()).filter(Boolean)
@@ -256,7 +261,7 @@ function validatePreferences(preferences) {
   if (!DENSITIES.has(preferences.editorDensity)) {
     throw new Error("Choose a supported Editor table density.");
   }
-  if (!["es", "ca"].includes(preferences.targetLanguage)) {
+  if (!TARGET_LANGUAGES.has(preferences.targetLanguage)) {
     throw new Error("Choose a supported target language.");
   }
   if (!Array.isArray(preferences.sectionIds) || preferences.sectionIds.some((id) => typeof id !== "string")) {

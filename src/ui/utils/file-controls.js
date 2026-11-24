@@ -13,6 +13,7 @@ export function setupFileControls(root, {
 }) {
   const openButton = root.querySelector("#open-button");
   const restoreButton = root.querySelector("#restore-file-button");
+  const openRestorePair = root.querySelector("#open-restore-button-pair");
   const fileInput = root.querySelector("#file-input");
   const saveButton = root.querySelector("#save-button");
   const exportButton = root.querySelector("#export-button");
@@ -35,7 +36,7 @@ export function setupFileControls(root, {
       const loaded = await onRestoreFile({ requestPermission: true });
       if (operation !== loadOperation) return;
       if (loaded) await showLoadedFile(loaded);
-      restoreButton.hidden = true;
+      setRestoreButtonHidden(true);
     } catch (error) {
       if (operation !== loadOperation) return;
       const details = error instanceof Error ? error.message : String(error);
@@ -115,7 +116,7 @@ export function setupFileControls(root, {
       : "Save requires a browser file picker; use Export to save a separate copy";
     exportButton.disabled = false;
     fileStatus.textContent = `${fileName} loaded`;
-    if (restoreButton) restoreButton.hidden = true;
+    setRestoreButtonHidden(true);
     notify(`Loaded ${fileName}.`);
     if (loaded.persistenceError) {
       const details = loaded.persistenceError instanceof Error
@@ -136,7 +137,7 @@ export function setupFileControls(root, {
       if (operation !== loadOperation) return;
       const details = error instanceof Error ? error.message : String(error);
       if (error?.name === "FileHandlePermissionError" && restoreButton) {
-        restoreButton.hidden = false;
+        setRestoreButtonHidden(false);
         notifyWarning("The previously opened localisation file needs read access. Select Restore last file to grant access.");
         return;
       }
@@ -146,6 +147,12 @@ export function setupFileControls(root, {
 
   function showError(error) {
     onError(error);
+  }
+
+  function setRestoreButtonHidden(hidden) {
+    if (!restoreButton) return;
+    restoreButton.hidden = hidden;
+    openRestorePair?.classList.toggle("button-pair--single", hidden);
   }
 
   return {

@@ -20,6 +20,16 @@ const SOURCE_DETAILS_PAGE_SIZE = 25;
 const WORD_TREEMAP_PAGE_SIZE = 50;
 const SOURCE_TAG_ROWS = 3;
 const SOURCE_TAG_COLUMNS = Object.freeze({ wide: 5, narrow: 3 });
+const TARGET_LANGUAGE_NAMES = Object.freeze({
+  es: "Spanish",
+  ca: "Catalan",
+  fr: "French",
+  de: "German",
+  pt: "Portuguese (Portugal)",
+  pl: "Polish",
+  ru: "Russian",
+  ko: "Korean",
+});
 
 export function getProgressTone(percentage) {
   return percentage < 25 ? "low" : percentage < 75 ? "medium" : "high";
@@ -77,9 +87,10 @@ export function setupDashboard(root, {
       { id: "stat-percentage", title: "Progress", value: "—", description: "Completion across translatable entries" },
     ],
     [
+      { id: "dashboard-section-count", title: "Total sections", value: "—", description: "Including unnamed sections" },
       { id: "dashboard-map-count", title: "Total maps", value: "—", description: "Named translatable sections" },
       { id: "dashboard-entry-count", title: "Total entries", value: "—", description: "Across all maps" },
-      { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "In target translations" },
+      { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "English vs target language" },
       { id: "dashboard-source-count", title: "Source tags", value: "—", description: "Distinct tags across maps" },
     ],
   ]);
@@ -105,6 +116,7 @@ export function setupDashboard(root, {
   const sourceDetailsEntryTable = createTableComponent(root.querySelector("#source-details-entry-rows").closest("table"));
   const mapDetailsTable = createTableComponent(root.querySelector("#map-details-results").closest("table"));
   let wordUsageIndex = null;
+  let sourceWords = new Set();
   let sectionWordCounts = new Map();
   let progressRecords = [];
   let visibleWords = [];
@@ -226,6 +238,7 @@ export function setupDashboard(root, {
     }
     if (documentChanged) {
       wordUsageIndex = localisation ? createTranslationWordUsageIndex(localisation) : null;
+      sourceWords = localisation ? buildSourceWordSet(localisation) : new Set();
       sectionWordCounts = localisation ? buildSectionWordCounts(localisation) : new Map();
       progressRecords = localisation ? buildProgressRecords(localisation) : [];
       sourceTagPage = 0;
@@ -331,7 +344,7 @@ export function setupDashboard(root, {
       translationStatisticsGrid.setValue(`stat-${id}`, "—");
       if (id === "percentage") delete root.querySelector("#stat-percentage").dataset.progressTone;
     }
-    for (const id of ["map-count", "entry-count", "unique-word-count", "source-count"]) {
+    for (const id of ["section-count", "map-count", "entry-count", "unique-word-count", "source-count"]) {
       translationStatisticsGrid.setValue(`dashboard-${id}`, "—");
     }
     renderMapDistribution();
@@ -488,11 +501,41 @@ export function setupDashboard(root, {
 
   function renderSummaryMetrics() {
     const sections = progressRecords;
+    translationStatisticsGrid.setValue(
+      "dashboard-section-count",
+      (currentDocument?.sections.length ?? 0).toLocaleString(),
+    );
     translationStatisticsGrid.setValue("dashboard-map-count", sections.length.toLocaleString());
     translationStatisticsGrid.setValue("dashboard-entry-count", sections
       .reduce((total, { section }) => total + section.rows.length, 0).toLocaleString());
-    translationStatisticsGrid.setValue("dashboard-unique-word-count", (wordUsageIndex?.words.size ?? 0).toLocaleString());
+    renderUniqueWordComparison();
     translationStatisticsGrid.setValue("dashboard-source-count", sourceStatistics.size.toLocaleString());
+  }
+
+  function renderUniqueWordComparison() {
+    const value = root.querySelector("#dashboard-unique-word-count");
+    if (!currentDocument) {
+      translationStatisticsGrid.setValue("dashboard-unique-word-count", "—");
+      return;
+    }
+
+    const sourceCount = sourceWords.size;
+    const targetCount = wordUsageIndex?.words.size ?? 0;
+    const targetLanguage = TARGET_LANGUAGE_NAMES[currentPreferences.targetLanguage]
+      ?? currentPreferences.targetLanguage;
+    const sourceValue = root.ownerDocument.createElement("span");
+    sourceValue.textContent = `English ${sourceCount.toLocaleString()}`;
+    const targetValue = root.ownerDocument.createElement("span");
+    targetValue.textContent = `${targetLanguage} ${targetCount.toLocaleString()}`;
+    if (sourceCount !== targetCount) {
+      sourceValue.dataset.wordCountTone = sourceCount > targetCount ? "greater" : "lesser";
+      targetValue.dataset.wordCountTone = targetCount > sourceCount ? "greater" : "lesser";
+    }
+    value.replaceChildren(
+      sourceValue,
+      root.ownerDocument.createTextNode(" vs "),
+      targetValue,
+    );
   }
 
   function renderMapDistribution() {
@@ -883,6 +926,21 @@ function buildSectionWordCounts(localisation) {
     sections.set(section, counts);
   }
   return sections;
+}
+
+function buildSourceWordSet(localisation) {
+  const words = new Set();
+  for (const section of localisation.sections) {
+    if (!section.name) continue;
+    const translationIndex = section.columns.indexOf("Translation");
+    if (translationIndex < 0) continue;
+    const englishIndex = section.columns.indexOf("English");
+    const sourceIndex = englishIndex >= 0 ? englishIndex : translationIndex - 1;
+    for (const row of section.rows) {
+      for (const word of extractWords(row.fields[sourceIndex] ?? "")) words.add(word);
+    }
+  }
+  return words;
 }
 
 function getSourceTagPageSize(isNarrow) {

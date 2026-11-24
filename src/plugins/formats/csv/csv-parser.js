@@ -79,7 +79,12 @@ export function parseCsvRecords(text, { delimiter = ",", quote = '"' } = {}) {
         finishRecord(lineEnding);
         line += 1;
       } else {
-        throw new CsvParseError("Unexpected character after a closing quote", line);
+        const codePoint = text.codePointAt(index);
+        const codePointLabel = codePoint.toString(16).toUpperCase().padStart(4, "0");
+        throw new CsvParseError(
+          `Unexpected character U+${codePointLabel} after a closing quote`,
+          line,
+        );
       }
       continue;
     }

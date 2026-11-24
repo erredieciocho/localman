@@ -33,10 +33,13 @@
         <div class="file-actions">
 
           <!-- File actions -->
-          <button id="open-button" class="button button-secondary" type="button"
-            title="Open a localisation file">Open</button>
-          <button id="restore-file-button" class="button button-secondary" type="button" hidden
-            title="Grant access and reload the previously opened localisation file">Restore last file</button>
+          <div id="open-restore-button-pair" class="button-pair button-pair--single" role="group"
+            aria-label="Open or restore a localisation file">
+            <button id="open-button" class="button button-primary" type="button"
+              title="Open a localisation file">Open</button>
+            <button id="restore-file-button" class="button button-secondary" type="button" hidden
+              title="Grant access and reload the previously opened localisation file">Restore last file</button>
+          </div>
           <input id="file-input" class="visually-hidden" type="file" accept=".csv,text/csv"
             aria-label="Open a localisation file">
           <button id="save-button" class="button button-secondary" type="button" disabled
@@ -90,10 +93,8 @@
           <span class="dictionary-status-dot tab-status-dot" data-loaded="true" aria-hidden="true"></span>
         </button>
         <span class="tab-separator" aria-hidden="true"></span>
-        <button class="tab-button" type="button" data-tab="settings" aria-selected="false">Settings
-        </button>
-        <button class="tab-button is-active" type="button" data-tab="about" aria-selected="true">About
-        </button>
+        <button class="tab-button" type="button" data-tab="settings" aria-selected="false">Settings</button>
+        <button class="tab-button is-active" type="button" data-tab="about" aria-selected="true">About</button>
       </nav>
 
       <!-- Sections -->
@@ -302,12 +303,14 @@
                     <option value="fuzzy">Exact and similar matches</option>
                   </select>
                 </label>
-                <button id="section-export-button" type="button" class="button button-secondary" disabled>
-                  Export section
-                </button>
-                <button id="section-import-button" type="button" class="button button-secondary" disabled>
-                  Import section
-                </button>
+                <div class="button-pair" role="group" aria-label="Section import and export">
+                  <button id="section-export-button" type="button" class="button button-secondary" disabled>
+                    Export section
+                  </button>
+                  <button id="section-import-button" type="button" class="button button-secondary" disabled>
+                    Import section
+                  </button>
+                </div>
                 <input id="section-import-input" type="file" accept=".csv,text/csv" hidden>
               </div>
             </div>
@@ -322,10 +325,14 @@
               <span>Replace with</span>
               <input id="editor-replace-input" type="text" placeholder="Replacement text">
             </label>
-            <button id="editor-find-next" class="button button-secondary" type="button" disabled>Find next</button>
-            <button id="editor-find-all" class="button button-secondary" type="button" disabled>Find all</button>
-            <button id="editor-replace-current" class="button button-secondary" type="button" disabled>Replace</button>
-            <button id="editor-replace-all" class="button button-secondary" type="button" disabled>Replace all</button>
+            <div class="button-pair" role="group" aria-label="Find matches">
+              <button id="editor-find-next" class="button button-secondary" type="button" disabled>Find next</button>
+              <button id="editor-find-all" class="button button-secondary" type="button" disabled>Find all</button>
+            </div>
+            <div class="button-pair" role="group" aria-label="Replace matches">
+              <button id="editor-replace-current" class="button button-secondary" type="button" disabled>Replace</button>
+              <button id="editor-replace-all" class="button button-secondary" type="button" disabled>Replace all</button>
+            </div>
             <p id="editor-find-status" class="muted" aria-live="polite"></p>
           </div>
 
@@ -411,11 +418,11 @@
               <span>Search issues</span>
               <input id="qa-search" type="search" placeholder="Search maps, entries or issue text">
             </label>
-            <div class="qa-file-actions">
+            <div class="button-pair qa-file-actions" role="group" aria-label="Import or export QA issues">
               <button id="qa-import-button" class="button button-secondary" type="button" disabled>Import issues</button>
-              <input id="qa-import-input" type="file" accept=".json,application/json" hidden>
               <button id="qa-export-button" class="button button-secondary" type="button" disabled>Export issues</button>
             </div>
+            <input id="qa-import-input" type="file" accept=".json,application/json" hidden>
           </div>
           <nav id="qa-pagination" class="qa-pagination" aria-label="QA section pages" hidden>
             <button type="button" class="button button-secondary" data-qa-page="previous"
@@ -637,7 +644,11 @@
               data-settings-tab="validation">Validation</button>
             <button type="button" class="settings-tab" id="settings-tab-dictionary"
               role="tab" aria-selected="false" aria-controls="settings-category-dictionary"
-              data-settings-tab="dictionary">Dictionary</button>
+              data-settings-tab="dictionary">Dictionary
+              <span id="dictionary-status-dot" class="dictionary-status-dot tab-status-dot"
+                data-loaded="false" data-status="partial" role="status" aria-label="Loading bundled dictionaries."
+                title="Loading bundled dictionaries."></span>
+            </button>
             <button type="button" class="settings-tab" id="settings-tab-appearance"
               role="tab" aria-selected="false" aria-controls="settings-category-appearance"
               data-settings-tab="appearance">Appearance</button>
@@ -655,6 +666,12 @@
                   <select id="target-language">
                     <option value="es">Spanish</option>
                     <option value="ca">Catalan</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="pt">Portuguese (Portugal)</option>
+                    <option value="pl">Polish</option>
+                    <option value="ru">Russian</option>
+                    <option value="ko">Korean</option>
                   </select>
                   <small>The matching bundled dictionary is selected and loaded automatically when available.</small>
                 </label>
@@ -717,32 +734,38 @@
                   <span>Check translated text with a Hunspell dictionary</span>
                 </label>
                 <label class="settings-control" for="dictionary-select">
-                  <span class="dictionary-label">Dictionary
-                    <span id="dictionary-status-dot" class="dictionary-status-dot" data-loaded="false"
-                      role="status" aria-label="Loading bundled dictionaries." title="Loading bundled dictionaries."></span>
-                  </span>
+                  <span class="dictionary-label">Dictionary</span>
                   <select id="dictionary-select" disabled>
                     <option value="">Loading available dictionaries...</option>
                   </select>
                   <input id="dictionary-custom-import" type="file"
                     accept=".aff,.dic,.oxt,.xpi,.zip" multiple hidden>
-                  <small>Select a bundled dictionary or choose “Import custom dictionary…” to load a supported format for this session. Custom dictionaries must be imported again in a new session.</small>
+                  <small>Select a bundled dictionary or choose “Import custom dictionary…” to load an AFF+DIC pair or OXT, XPI or ZIP package for this session.</small>
+                  <small>Dictionary words: <strong id="dictionary-word-count">—</strong></small>
                 </label>
+                <details id="dictionary-word-list-details">
+                  <summary>View dictionary word list</summary>
+                  <pre id="dictionary-word-list" class="dictionary-exclusions-preview"
+                    aria-label="Words in the selected dictionary" role="region" tabindex="0">
+                    No dictionary is loaded for the selected target language.
+                  </pre>
+                </details>
               </fieldset>
               <fieldset class="settings-group">
                 <legend>Dictionary exclusions</legend>
                 <input id="dictionary-exclusions-import" type="file" accept=".txt,text/plain" hidden>
-                <div class="dictionary-exclusion-actions">
-                  <button id="dictionary-exclusions-import-button" class="button button-secondary" type="button">
+                <div class="button-pair dictionary-exclusion-actions button-pair--single" role="group"
+                  aria-label="Import or export dictionary exclusions">
+                  <button id="dictionary-exclusions-import-button" class="button button-primary" type="button">
                     Import exclusion list
                   </button>
-                  <button id="dictionary-exclusions-export-button" class="button button-secondary" type="button">
+                  <button id="dictionary-exclusions-export-button" class="button button-secondary" type="button" hidden>
                     Export exclusion list
                   </button>
-                  <button id="dictionary-exclusions-clear-button" class="button button-secondary" type="button">
-                    Clear exclusion list
-                  </button>
                 </div>
+                <button id="dictionary-exclusions-clear-button" class="button button-secondary" type="button">
+                  Clear exclusion list
+                </button>
                 <small>Import a line-separated text file to add words; duplicates are skipped.</small>
                 <pre id="dictionary-exclusions-preview" class="dictionary-exclusions-preview"
                   aria-label="Dictionary exclusion list" role="region" tabindex="0">No excluded words.</pre>
@@ -783,8 +806,10 @@
             <fieldset class="settings-group">
               <legend>Configuration file</legend>
               <div class="configuration-actions">
-                <button id="configuration-export" class="button button-secondary" type="button">Export settings</button>
-                <button id="configuration-import-button" class="button button-secondary" type="button">Import settings</button>
+                <div class="button-pair button-pair--single" role="group" aria-label="Import or export settings">
+                  <button id="configuration-import-button" class="button button-primary" type="button">Import settings</button>
+                  <button id="configuration-export" class="button button-secondary" type="button" hidden>Export settings</button>
+                </div>
                 <input id="configuration-import-file" type="file" accept=".json,application/json" hidden>
               </div>
               <p id="configuration-status" class="muted settings-note" aria-live="polite"></p>
@@ -807,7 +832,12 @@
                 data-about-tab="overview">About</button>
               <button type="button" class="settings-tab" id="about-tab-offline"
                 role="tab" aria-selected="false" aria-controls="about-panel-offline" tabindex="-1"
-                data-about-tab="offline">Offline</button>
+                data-about-tab="offline" title="Checking offline support and installation availability.">Offline
+                <span id="offline-installation-status" class="dictionary-status-dot tab-status-dot is-warning"
+                  data-status="partial" role="status" aria-live="polite"
+                  aria-label="Checking offline support and installation availability."
+                  title="Checking offline support and installation availability."></span>
+              </button>
             </div>
             <a id="about-changelog-link" class="settings-tab about-changelog-link"
               href="./docs/changelog.md" target="_blank" rel="noopener noreferrer">
@@ -877,16 +907,11 @@
                   <p>Configure dictionaries, exclusions, validation and table density. Randomise Source-tag colours and import or export settings as JSON.</p>
                 </article>
               </div>
-              <p class="muted">Dictionary checks use bundled local Hunspell data. The application does not send files or settings to external services.</p>
             </section>
           </div>
           </section>
           <section id="about-panel-offline" class="about-tab-panel" role="tabpanel"
             aria-labelledby="about-tab-offline" data-about-panel="offline" hidden>
-            <p id="offline-installation-status" class="offline-support-status is-warning"
-              role="status" aria-live="polite">
-              Checking offline support and installation availability…
-            </p>
             <div class="about-content">
               <section class="about-how-to">
                 <h3>Install LOCALMAN</h3>
@@ -898,7 +923,7 @@
                 <p class="muted">The first visit prepares the offline copy. Localisation files stay on your device and are never uploaded. To update LOCALMAN, open it while connected to the same server again.</p>
               </section>
               <section>
-                <h3>Use the Python server instead</h3>
+                <h3>Use the Python server</h3>
                 <ol>
                   <li>Run <code>python launch.py</code> from the LOCALMAN project folder.</li>
                   <li>Open the displayed address (normally <code>http://127.0.0.1:8000</code>) in your browser and leave the server running while you work.</li>

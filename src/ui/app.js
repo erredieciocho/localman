@@ -12,6 +12,7 @@ import { setupMaps } from "./containers/maps.js";
 import { setupQA } from "./containers/qa.js";
 import { setupAbout } from "./containers/about.js";
 import {
+  SETTINGS_STORAGE_KEY,
   createSettingsController,
 } from "./containers/settings.js";
 import {
@@ -28,6 +29,7 @@ import { setupOccurrences } from "./utils/occurrences.js";
 import {
   createSourceColorStore,
   renderSourceColorLegend,
+  SOURCE_COLORS_STORAGE_KEY,
 } from "./utils/source-colors.js";
 import {
   createConfiguration,
@@ -69,6 +71,11 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     hasLoadedFile: false,
     mapDataStatus: "unknown",
   };
+  const dictionaryExclusionExport = root.querySelector("#dictionary-exclusions-export-button");
+  const dictionaryExclusionPair = dictionaryExclusionExport.parentElement;
+  const configurationExport = root.querySelector("#configuration-export");
+  const configurationPair = configurationExport.parentElement;
+  let configurationStorageReadError = "";
   let editor = null;
   let dashboard = null;
   let terminologyInitialized = false;
@@ -109,12 +116,15 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   let lastSourceColorError = "";
   const settings = createSettingsController(root, {
     onError: showError,
+    onChange: updateConfigurationExportVisibility,
     notify: (type, message) => notifications.show(type, message),
     storage: settingsStorage,
   });
   state.preferences = settings.preferences;
   renderDictionaryExclusionsPreview();
   const theme = setupThemeToggle(root, appWindow, showError, settingsStorage);
+  root.querySelector("#theme-toggle").addEventListener("click", updateConfigurationExportVisibility);
+  updateConfigurationExportVisibility();
   const dictionary = setupDictionary(root, () => state.preferences, () => {
     state.validationDirty = true;
     refreshIssues();
@@ -373,6 +383,26 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     const preview = root.querySelector("#dictionary-exclusions-preview");
     const exclusions = state.preferences.dictionaryExclusions;
     preview.textContent = exclusions.length ? exclusions.join("\n") : "No excluded words.";
+    dictionaryExclusionExport.hidden = exclusions.length === 0;
+    dictionaryExclusionPair.classList.toggle("button-pair--single", exclusions.length === 0);
+  }
+
+  function updateConfigurationExportVisibility() {
+    let hasConfiguration = false;
+    try {
+      hasConfiguration = Boolean(settingsStorage && [
+        SETTINGS_STORAGE_KEY,
+        SOURCE_COLORS_STORAGE_KEY,
+        THEME_STORAGE_KEY,
+      ].some((key) => settingsStorage.getItem(key) !== null));
+      configurationStorageReadError = "";
+    } catch (error) {
+      const message = `Could not check saved configuration: ${error.message ?? String(error)}`;
+      if (configurationStorageReadError !== message) showError(new Error(message));
+      configurationStorageReadError = message;
+    }
+    configurationExport.hidden = !hasConfiguration;
+    configurationPair.classList.toggle("button-pair--single", !hasConfiguration);
   }
 
   function renderLoadedDocument() {
@@ -610,6 +640,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     }).filter(Boolean))] : [];
     root.querySelector("#source-color-randomise").disabled = sourceValues.length === 0;
     const colorStorageError = sourceColors.ensure(sourceValues);
+    updateConfigurationExportVisibility();
     if (colorStorageError) {
       if (lastSourceColorError !== colorStorageError) showError(colorStorageError);
       lastSourceColorError = colorStorageError;
@@ -838,7 +869,10 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       button.setAttribute("aria-disabled", String(!available));
       button.disabled = tabName === "qa" && !available;
       button.classList.toggle("is-unavailable", !available);
-      button.title = `${TAB_DESCRIPTIONS[tabName]} ${statusText}`;
+      const tabStatus = tabName === "about"
+        ? root.querySelector("#offline-installation-status")?.title
+        : "";
+      button.title = `${TAB_DESCRIPTIONS[tabName]} ${statusText}${tabStatus ? ` ${tabStatus}` : ""}`;
       const indicator = button.querySelector(".tab-status-dot");
       if (indicator) {
         indicator.dataset.loaded = String(available);

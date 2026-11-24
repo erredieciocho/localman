@@ -1,4 +1,5 @@
 const status = document.querySelector("#offline-installation-status");
+const offlineTab = document.querySelector("#about-tab-offline");
 const displayMode = window.matchMedia("(display-mode: standalone)");
 let offlineReady = false;
 let offlineFailed = false;
@@ -39,13 +40,13 @@ function updateStatus() {
       : offlineFailed
         ? "LOCALMAN is installed, but offline support could not be enabled."
         : "LOCALMAN is installed; offline support is still being checked.";
-    statusClass = offlineReady ? "is-ready" : offlineFailed ? "is-error" : "is-warning";
+    statusClass = offlineReady ? "is-ready" : "is-warning";
   } else if (!window.isSecureContext || !("serviceWorker" in navigator)) {
     message = "Offline app installation is not supported from this browser or origin.";
     statusClass = "is-error";
   } else if (offlineFailed) {
     message = "Offline support is not ready. Open LOCALMAN from localhost or HTTPS and try again.";
-    statusClass = "is-error";
+    statusClass = "is-warning";
   } else if (!offlineReady) {
     message = "Offline support is not ready yet. Keep this page open while the app is prepared.";
     statusClass = "is-warning";
@@ -54,11 +55,16 @@ function updateStatus() {
     statusClass = "is-ready";
   } else {
     message = "Offline support is ready. This browser has not confirmed installation availability; follow the platform instructions below.";
-    statusClass = "is-warning";
+    statusClass = "is-ready";
   }
-  status.textContent = message;
+  status.title = message;
+  status.setAttribute("aria-label", message);
   status.classList.remove("is-ready", "is-warning", "is-error");
   status.classList.add(statusClass);
+  status.dataset.status = statusClass === "is-ready"
+    ? "available"
+    : statusClass === "is-error" ? "unavailable" : "partial";
+  offlineTab.title = message;
 }
 
 window.addEventListener("beforeinstallprompt", () => {

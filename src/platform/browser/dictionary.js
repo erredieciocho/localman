@@ -93,7 +93,8 @@ export async function loadBundledDictionaryCatalog() {
   const manifest = await response.json();
   if (!Array.isArray(manifest.dictionaries)
     || manifest.dictionaries.some((entry) => !entry.id || !entry.name || !entry.language
-      || entry.format !== "aff-dic" || !entry.aff || !entry.dic)) {
+      || entry.format !== "aff-dic" || !entry.aff || !entry.dic
+      || !Number.isInteger(entry.wordCount) || entry.wordCount < 0)) {
     throw new Error("The bundled dictionary list is malformed.");
   }
   return manifest.dictionaries;
@@ -165,5 +166,11 @@ export async function loadDictionary(affFile, dicFile, language) {
   if (!dictionary.loaded || dictionary.dictionaryTable.size === 0) {
     throw new Error("The dictionary contains no usable words.");
   }
+  Object.defineProperty(dictionary, "wordList", {
+    value: [...new Set(dic.split(/\r?\n/u).slice(1)
+      .filter((line) => line && !line.startsWith("\t"))
+      .map((line) => line.replace(/\s.*$/u, "").split("/", 2)[0].trim())
+      .filter(Boolean))],
+  });
   return dictionary;
 }
