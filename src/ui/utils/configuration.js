@@ -73,3 +73,28 @@ export function persistConfiguration(configuration, storage) {
     throw new Error(`Configuration could not be saved: ${error.message ?? String(error)}`);
   }
 }
+
+export function clearConfiguration(storage) {
+  if (!storage) throw new Error("Browser storage is unavailable; saved settings were not cleared.");
+  const previous = STORAGE_KEYS.map((key) => [key, storage.getItem(key)]);
+  try {
+    for (const [key] of previous) storage.removeItem(key);
+  } catch (error) {
+    const rollbackErrors = [];
+    for (const [key, value] of previous.reverse()) {
+      try {
+        if (value === null) storage.removeItem(key);
+        else storage.setItem(key, value);
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
+      }
+    }
+    if (rollbackErrors.length) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        "Saved settings could not be cleared and the previous configuration could not be fully restored.",
+      );
+    }
+    throw new Error(`Saved settings could not be cleared: ${error.message ?? String(error)}`);
+  }
+}

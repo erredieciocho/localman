@@ -14,6 +14,7 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   dashboardIncompleteOnly: true,
   dashboardProgressThreshold: 95,
   targetLanguage: "es",
+  dictionaryVariants: {},
   sectionIds: [],
   dictionaryExclusions: [],
   spellcheck: true,
@@ -34,6 +35,7 @@ export function createSettingsController(root, {
   let loadError = "";
   let statusMessage = "";
   let initialized = false;
+  let currentFormatId = null;
   let status;
   let controls;
   let applyPreferences = () => {};
@@ -81,7 +83,7 @@ export function createSettingsController(root, {
           sectionIds: controls.sectionIds.value.split(",").map((id) => id.trim()).filter(Boolean),
           spellcheck: spellcheckSupported && controls.spellcheck.checked,
           dictionaryValidation: controls.dictionaryValidation.checked,
-          terminologyValidation: controls.terminologyValidation.checked,
+          terminologyValidation: currentFormatId !== "txt" && controls.terminologyValidation.checked,
           minSentenceLength: readInteger(controls.minSentenceLength, "Minimum sentence length", 0, 100000),
           maxSentenceLength: readInteger(controls.maxSentenceLength, "Maximum sentence length", 1, 100000),
         };
@@ -111,6 +113,11 @@ export function createSettingsController(root, {
     controls.spellcheck.checked = spellcheckSupported && preferences.spellcheck;
     controls.dictionaryValidation.checked = preferences.dictionaryValidation;
     controls.terminologyValidation.checked = preferences.terminologyValidation;
+    controls.terminologyValidation.disabled = currentFormatId === "txt";
+    controls.terminologyValidation.title = currentFormatId === "txt"
+      ? "Glossary validation is unavailable for TXT files."
+      : "";
+    root.querySelector("#terminology-validation-support").hidden = currentFormatId !== "txt";
     controls.minSentenceLength.value = String(preferences.minSentenceLength);
     controls.maxSentenceLength.value = String(preferences.maxSentenceLength);
   }
@@ -128,6 +135,7 @@ export function createSettingsController(root, {
     },
     update(patch, { notify: notifyUser = true } = {}) {
       const next = { ...preferences, ...patch };
+      if (currentFormatId === "txt") next.terminologyValidation = false;
       validatePreferences(next);
       preferences = copyPreferences(next);
       const saved = savePreferences(next, storage);
@@ -140,11 +148,34 @@ export function createSettingsController(root, {
     applyImportedPreferences(next) {
       validateImportedPreferences(next);
       preferences = copyPreferences(next);
+      if (currentFormatId === "txt") preferences.terminologyValidation = false;
       applyDensity(root, preferences.density, preferences.editorDensity);
       if (initialized) populateControls();
       applyPreferences(copyPreferences(preferences));
       setStatus("Configuration imported and applied.");
       onChange(copyPreferences(preferences));
+    },
+    resetToDefaults() {
+      preferences = copyPreferences(DEFAULT_PREFERENCES);
+      applyDensity(root, preferences.density, preferences.editorDensity);
+      if (initialized) populateControls();
+      applyPreferences(copyPreferences(preferences));
+      onChange(copyPreferences(preferences));
+    },
+    setFormat(formatId) {
+      currentFormatId = formatId;
+      const wasEnabled = preferences.terminologyValidation;
+      if (formatId === "txt" && wasEnabled) {
+        preferences = copyPreferences({ ...preferences, terminologyValidation: false });
+        const saved = savePreferences(preferences, storage);
+        setStatus(saved
+          ? "Glossary validation is unavailable for TXT files and was turned off."
+          : "Glossary validation is unavailable for TXT files and was turned off for this session; the setting could not be saved.",
+        "warning", { notifyUser: false });
+        applyPreferences(copyPreferences(preferences));
+        onChange(copyPreferences(preferences));
+      }
+      if (initialized) populateControls();
     },
     setStatus,
   };
@@ -208,6 +239,7 @@ function loadPreferences(storage) {
       ?? DEFAULT_PREFERENCES.dashboardProgressThreshold,
     targetLanguage: TARGET_LANGUAGES.has(stored.targetLanguage)
       ? stored.targetLanguage : DEFAULT_PREFERENCES.targetLanguage,
+    dictionaryVariants: copyDictionaryVariants(stored.dictionaryVariants),
     sectionIds: Array.isArray(stored.sectionIds)
       ? stored.sectionIds.map(String).map((id) => id.trim()).filter(Boolean)
       : [],
@@ -263,6 +295,13 @@ function validatePreferences(preferences) {
   }
   if (!TARGET_LANGUAGES.has(preferences.targetLanguage)) {
     throw new Error("Choose a supported target language.");
+  }
+  if (!preferences.dictionaryVariants || typeof preferences.dictionaryVariants !== "object"
+    || Array.isArray(preferences.dictionaryVariants)
+    || Object.entries(preferences.dictionaryVariants).some(([language, variant]) =>
+      !TARGET_LANGUAGES.has(language) || typeof variant !== "string"
+      || !new RegExp(`^${language}-[A-Z]{2}$`, "u").test(variant))) {
+    throw new Error("Dictionary regional variants must match a supported target language.");
   }
   if (!Array.isArray(preferences.sectionIds) || preferences.sectionIds.some((id) => typeof id !== "string")) {
     throw new Error("Section IDs must be a list of text values.");
@@ -321,11 +360,18 @@ export function validateImportedPreferences(preferences) {
   }
   const expected = Object.keys(DEFAULT_PREFERENCES).sort();
   const actual = Object.keys(preferences).sort();
-  if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) {
+  const legacyExpected = expected.filter((key) => key !== "dictionaryVariants");
+  const isLegacy = actual.length === legacyExpected.length
+    && actual.every((key, index) => key === legacyExpected[index]);
+  if (!isLegacy
+    && (actual.length !== expected.length || actual.some((key, index) => key !== expected[index]))) {
     throw new Error("Configuration preferences do not match the supported settings format.");
   }
-  validatePreferences(preferences);
-  return copyPreferences(preferences);
+  const normalized = isLegacy
+    ? { ...preferences, dictionaryVariants: {} }
+    : preferences;
+  validatePreferences(normalized);
+  return copyPreferences(normalized);
 }
 
 function readInteger(input, label, min, max) {
@@ -343,9 +389,17 @@ function finiteInteger(value, min, max) {
 function copyPreferences(preferences) {
   return {
     ...preferences,
+    dictionaryVariants: { ...preferences.dictionaryVariants },
     sectionIds: [...preferences.sectionIds],
     dictionaryExclusions: [...preferences.dictionaryExclusions],
   };
+}
+
+function copyDictionaryVariants(variants) {
+  if (!variants || typeof variants !== "object" || Array.isArray(variants)) return {};
+  return Object.fromEntries(Object.entries(variants).filter(([language, variant]) =>
+    TARGET_LANGUAGES.has(language) && typeof variant === "string"
+    && new RegExp(`^${language}-[A-Z]{2}$`, "u").test(variant)));
 }
 
 function applyDensity(root, density, editorDensity) {

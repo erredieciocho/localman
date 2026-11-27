@@ -1,9 +1,11 @@
 import { extractWords } from "../../core/glossary/index.js";
 import {
   createTranslationWordUsageIndex,
+  getSectionTranslationStatistics,
   getTranslationStatistics,
   updateTranslationWordUsageIndex,
 } from "../../core/statistics/index.js";
+import { isMapSection } from "../../core/document/index.js";
 import { getSpellingResult, isWordExcluded } from "../../core/validation/index.js";
 import {
   createActionCell as linkCell,
@@ -88,9 +90,9 @@ export function setupDashboard(root, {
     ],
     [
       { id: "dashboard-section-count", title: "Total sections", value: "—", description: "Including unnamed sections" },
-      { id: "dashboard-map-count", title: "Total maps", value: "—", description: "Named translatable sections" },
+      { id: "dashboard-map-count", title: "Total maps", value: "—", description: "Recognised game map sections" },
       { id: "dashboard-entry-count", title: "Total entries", value: "—", description: "Across all maps" },
-      { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "English vs target language" },
+      { id: "dashboard-unique-word-count", title: "Unique words", value: "—", description: "English vs Spanish" },
       { id: "dashboard-source-count", title: "Source tags", value: "—", description: "Distinct tags across maps" },
     ],
   ]);
@@ -114,7 +116,14 @@ export function setupDashboard(root, {
   });
   const sourceDetailsMapTable = createTableComponent(root.querySelector("#source-details-map-rows").closest("table"));
   const sourceDetailsEntryTable = createTableComponent(root.querySelector("#source-details-entry-rows").closest("table"));
+  const sourceDetailsOriginalHeader = root.querySelector("#source-details-entry-original-header");
   const mapDetailsTable = createTableComponent(root.querySelector("#map-details-results").closest("table"));
+  const readOnlyDisabledComponents = [
+    root.querySelector("#dashboard-translation-statistics"),
+    root.querySelector(".map-distribution-panel"),
+    root.querySelector(".section-progress-panel"),
+    root.querySelector("#word-usage-grid").closest(".workspace"),
+  ];
   let wordUsageIndex = null;
   let sourceWords = new Set();
   let sectionWordCounts = new Map();
@@ -203,6 +212,8 @@ export function setupDashboard(root, {
     fileName = "",
     issueCounts = new Map(),
   } = {}) {
+    const readOnly = Boolean(localisation?.readonly);
+    setReadOnly(readOnly);
     const documentChanged = currentDocument !== localisation;
     const fileNameChanged = currentFileName !== fileName;
     const spellcheckChanged = currentPreferences?.dictionaryValidation !== preferences.dictionaryValidation
@@ -218,6 +229,7 @@ export function setupDashboard(root, {
     const progressFiltersChanged = currentPreferences?.dashboardIncompleteOnly !== preferences.dashboardIncompleteOnly
       || currentPreferences?.dashboardProgressThreshold !== preferences.dashboardProgressThreshold;
     currentDocument = localisation;
+    sourceDetailsOriginalHeader.hidden = localisation?.formatId === "txt";
     currentFileName = fileName;
     currentIssueCounts = issueCounts;
     currentPreferences = preferences;
@@ -237,17 +249,17 @@ export function setupDashboard(root, {
       maxOccurrences.value = preferences.dashboardMaximumWordOccurrences ?? "";
     }
     if (documentChanged) {
-      wordUsageIndex = localisation ? createTranslationWordUsageIndex(localisation) : null;
-      sourceWords = localisation ? buildSourceWordSet(localisation) : new Set();
-      sectionWordCounts = localisation ? buildSectionWordCounts(localisation) : new Map();
-      progressRecords = localisation ? buildProgressRecords(localisation) : [];
+      wordUsageIndex = localisation && !readOnly ? createTranslationWordUsageIndex(localisation) : null;
+      sourceWords = localisation && !readOnly ? buildSourceWordSet(localisation) : new Set();
+      sectionWordCounts = localisation && !readOnly ? buildSectionWordCounts(localisation) : new Map();
+      progressRecords = localisation && !readOnly ? buildProgressRecords(localisation) : [];
       sourceTagPage = 0;
       progressDirty = true;
       wordsDirty = true;
       sectionStatisticsDirty = true;
       sourceStatisticsDirty = true;
-      if (localisation) renderStatistics(localisation);
-      else renderEmptyStatistics();
+      if (localisation && !readOnly) renderStatistics(localisation);
+      else if (!localisation) renderEmptyStatistics();
     }
     if (progressFiltersChanged) progressDirty = true;
     const incompleteOnly = root.querySelector("#dashboard-incomplete-only");
@@ -262,12 +274,34 @@ export function setupDashboard(root, {
     if (wordFiltersChanged || spellcheckChanged) {
       wordsDirty = true;
     }
+    if (readOnly) {
+      progressDirty = true;
+      sectionStatisticsDirty = true;
+      sourceStatisticsDirty = true;
+      renderReadOnlyPlaceholders();
+      return;
+    }
     renderProgress();
     renderWords();
     renderSectionStatistics();
     renderSourceStatistics();
     renderSummaryMetrics();
     renderMapDistribution();
+  }
+
+  function setReadOnly(readOnly) {
+    for (const component of readOnlyDisabledComponents) {
+      component.inert = readOnly;
+      component.setAttribute("aria-disabled", String(readOnly));
+      component.classList.toggle("dashboard-readonly-disabled", readOnly);
+      component.title = readOnly ? "Disabled while this localisation file is read-only." : "";
+    }
+    if (readOnly) {
+      for (const id of ["#source-details-dialog", "#map-details-dialog"]) {
+        const dialog = root.querySelector(id);
+        if (dialog.open) dialog.close();
+      }
+    }
   }
 
   function updateRow(section, row, previousTranslation, nextTranslation, previousStatus, nextStatus, localisation) {
@@ -280,7 +314,16 @@ export function setupDashboard(root, {
       renderSummaryMetrics();
     }
     const progress = progressRecords.find((record) => record.section === section);
-    if (progress && previousStatus !== nextStatus) {
+    if (progress && currentDocument?.formatId === "txt" && previousTranslation !== nextTranslation) {
+      const statistics = getSectionTranslationStatistics(currentDocument, section);
+      progress.translated = statistics.translated;
+      progress.remaining = statistics.untranslated;
+      progress.total = statistics.total;
+      progress.progress = statistics.total
+        ? Math.min(100, Math.round(statistics.translated / statistics.total * 1000) / 10)
+        : 0;
+      progressDirty = true;
+    } else if (progress && previousStatus !== nextStatus) {
       if (previousStatus === "translated") progress.translated -= 1;
       if (previousStatus === "untranslated") progress.remaining -= 1;
       if (nextStatus === "translated") progress.translated += 1;
@@ -350,20 +393,75 @@ export function setupDashboard(root, {
     renderMapDistribution();
   }
 
+  function renderReadOnlyPlaceholders() {
+    for (const id of [
+      "stat-translated",
+      "stat-untranslated",
+      "stat-untranslatable",
+      "stat-percentage",
+      "dashboard-section-count",
+      "dashboard-map-count",
+      "dashboard-entry-count",
+      "dashboard-unique-word-count",
+      "dashboard-source-count",
+    ]) {
+      translationStatisticsGrid.setValue(id, "—");
+    }
+    delete root.querySelector("#stat-percentage").dataset.progressTone;
+    root.querySelector("#dashboard-unique-word-count")
+      .closest(".statistics-grid-cell")
+      .querySelector(".statistics-grid-description").textContent = "Not available for read-only files.";
+
+    const unavailableMessage = "Not available for read-only files.";
+    wordUsageIndex = null;
+    visibleWords = [];
+    wordPage = 0;
+    root.querySelector("#word-usage-unique-count").textContent = "—";
+    root.querySelector("#word-usage-occurrence-count").textContent = "—";
+    root.querySelector("#word-filter-status").textContent = "";
+    wordsTreemap.render({
+      items: [],
+      ...wordSortOptions,
+      emptyMessage: unavailableMessage,
+      label: "Target-language word usage",
+    });
+    root.querySelector("#word-usage-pagination").hidden = true;
+    root.querySelector("#dashboard-section-progress-summary").textContent = unavailableMessage;
+    progressTable.rows.replaceChildren(messageRow(4, unavailableMessage));
+    root.querySelector("#map-distribution-title").textContent = "Map distribution";
+    mapTreemap.render({
+      items: [],
+      getName: ({ section }) => section.name,
+      getValue: () => 0,
+      emptyMessage: unavailableMessage,
+      label: "Map distribution",
+    });
+    root.querySelector("#source-tag-pagination").hidden = true;
+    sourceTreemap.render({
+      items: [],
+      getName: ({ source }) => source,
+      getValue: () => 0,
+      emptyMessage: unavailableMessage,
+      label: "Source tag distribution",
+    });
+    sourceStatistics = new Map();
+  }
+
   function buildProgressRecords(localisation) {
     const sections = [];
     for (const section of localisation.sections) {
       if (!section.name || !section.columns.includes("Translation")) continue;
-      let translated = 0;
-      let remaining = 0;
-      for (const row of section.rows) {
-        const status = localisation.getRowStatus(section, row);
-        if (status === "translated") translated += 1;
-        if (status === "untranslated") remaining += 1;
-      }
-      const total = translated + remaining;
-      const progress = total ? Math.round(translated / total * 1000) / 10 : 0;
-      sections.push({ section, translated, total, remaining, progress });
+      const statistics = getSectionTranslationStatistics(localisation, section);
+      const progress = statistics.total
+        ? Math.min(100, Math.round(statistics.translated / statistics.total * 1000) / 10)
+        : 0;
+      sections.push({
+        section,
+        translated: statistics.translated,
+        total: statistics.total,
+        remaining: statistics.untranslated,
+        progress,
+      });
     }
     return sections;
   }
@@ -407,7 +505,9 @@ export function setupDashboard(root, {
     for (const { section, translated, total, remaining, progress } of sections) {
       const tr = document.createElement("tr");
       const untranslatedRows = remaining > 0
-        ? section.rows.filter((row) => currentDocument.getRowStatus(section, row) === "untranslated")
+        ? section.rows.filter((row) => currentDocument.formatId === "txt"
+          ? !(row.fields[section.columns.indexOf("Translation")] ?? "").trim()
+          : currentDocument.getRowStatus(section, row) === "untranslated")
         : [];
       const remainingCell = remaining > 0
         ? linkCell(String(remaining), () => onOccurrences(
@@ -416,7 +516,9 @@ export function setupDashboard(root, {
             section,
             row,
             rows: [row],
-            text: row.fields[section.columns.indexOf("English")] ?? "",
+            text: row.fields[section.columns.indexOf("English")]
+              || row.fields[section.columns.indexOf("Source")]
+              || row.key,
           })),
         ))
         : cell(String(remaining));
@@ -501,12 +603,13 @@ export function setupDashboard(root, {
 
   function renderSummaryMetrics() {
     const sections = progressRecords;
+    const maps = sections.filter(({ section }) => isMapSection(section));
     translationStatisticsGrid.setValue(
       "dashboard-section-count",
       (currentDocument?.sections.length ?? 0).toLocaleString(),
     );
-    translationStatisticsGrid.setValue("dashboard-map-count", sections.length.toLocaleString());
-    translationStatisticsGrid.setValue("dashboard-entry-count", sections
+    translationStatisticsGrid.setValue("dashboard-map-count", maps.length.toLocaleString());
+    translationStatisticsGrid.setValue("dashboard-entry-count", maps
       .reduce((total, { section }) => total + section.rows.length, 0).toLocaleString());
     renderUniqueWordComparison();
     translationStatisticsGrid.setValue("dashboard-source-count", sourceStatistics.size.toLocaleString());
@@ -514,6 +617,10 @@ export function setupDashboard(root, {
 
   function renderUniqueWordComparison() {
     const value = root.querySelector("#dashboard-unique-word-count");
+    const targetLanguage = TARGET_LANGUAGE_NAMES[currentPreferences.targetLanguage]
+      ?? currentPreferences.targetLanguage;
+    value.closest(".statistics-grid-cell").querySelector(".statistics-grid-description").textContent =
+      `English vs ${targetLanguage}`;
     if (!currentDocument) {
       translationStatisticsGrid.setValue("dashboard-unique-word-count", "—");
       return;
@@ -521,12 +628,10 @@ export function setupDashboard(root, {
 
     const sourceCount = sourceWords.size;
     const targetCount = wordUsageIndex?.words.size ?? 0;
-    const targetLanguage = TARGET_LANGUAGE_NAMES[currentPreferences.targetLanguage]
-      ?? currentPreferences.targetLanguage;
     const sourceValue = root.ownerDocument.createElement("span");
-    sourceValue.textContent = `English ${sourceCount.toLocaleString()}`;
+    sourceValue.textContent = sourceCount.toLocaleString();
     const targetValue = root.ownerDocument.createElement("span");
-    targetValue.textContent = `${targetLanguage} ${targetCount.toLocaleString()}`;
+    targetValue.textContent = targetCount.toLocaleString();
     if (sourceCount !== targetCount) {
       sourceValue.dataset.wordCountTone = sourceCount > targetCount ? "greater" : "lesser";
       targetValue.dataset.wordCountTone = targetCount > sourceCount ? "greater" : "lesser";
@@ -539,7 +644,7 @@ export function setupDashboard(root, {
   }
 
   function renderMapDistribution() {
-    const mapRecords = progressRecords.map((record) => ({
+    const mapRecords = progressRecords.filter(({ section }) => isMapSection(section)).map((record) => ({
       ...record,
       uniqueWords: sectionWordCounts.get(record.section)?.size ?? 0,
      issueCount: currentIssueCounts.get(record.section.index) ?? 0,
@@ -684,7 +789,10 @@ export function setupDashboard(root, {
         renderSourceDetailsPagination("maps", 0);
       }
       if (list === null || list === "entries") {
-        sourceDetailsEntryTable.rows.replaceChildren(messageRow(3, "No entries use this Source tag in the current localisation."));
+        sourceDetailsEntryTable.rows.replaceChildren(messageRow(
+          currentDocument?.formatId === "txt" ? 2 : 3,
+          "No entries use this Source tag in the current localisation.",
+        ));
         root.querySelector("#source-details-entry-summary").textContent = "0 entries";
         renderSourceDetailsPagination("entries", 0);
       }
@@ -732,7 +840,9 @@ export function setupDashboard(root, {
           onMap(section.index);
         });
         mapCell.append(mapLink);
-        row.append(mapCell, cell(english || "—"), cell(translation || "—"));
+        row.append(mapCell);
+        if (currentDocument?.formatId !== "txt") row.append(cell(english || "—"));
+        row.append(cell(translation || "—"));
         return row;
       });
       sourceDetailsEntryTable.rows.replaceChildren(...rows);
@@ -991,7 +1101,7 @@ function buildSourceStatistics(localisation) {
   const statistics = new Map();
   for (const section of localisation.sections) {
     const sourceIndex = section.columns.indexOf("Source");
-    if (!section.name || sourceIndex < 0 || !section.columns.includes("Translation")) continue;
+    if (!isMapSection(section) || sourceIndex < 0 || !section.columns.includes("Translation")) continue;
     const englishIndex = section.columns.indexOf("English");
     const translationIndex = section.columns.indexOf("Translation");
     for (const row of section.rows) {

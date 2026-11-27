@@ -1,4 +1,7 @@
-export { getTranslationStatistics } from "./statistics.js";
+export {
+  getSectionTranslationStatistics,
+  getTranslationStatistics,
+} from "./statistics.js";
 export {
   collectTranslationWordUsage,
   createTranslationWordUsageIndex,

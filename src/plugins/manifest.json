@@ -1,0 +1,25 @@
+{
+  "TCOAAL": {
+    "name": "The Coffin of Andy and Leyley",
+    "formats": {
+      "CSV": {
+        "name": "Comma-Separated Values",
+        "description": "A collection of CSV files representing sections and maps.",
+        "versions": ["2.*", "3.*"],
+        "readonly": false
+      },
+      "CLD": {
+        "name": "Compact Language Data",
+        "description": "A compact format for localisation files.",
+        "versions": ["3.*"],
+        "readonly": true
+      },
+      "TXT": {
+        "name": "Plain Text Localisation",
+        "description": "Section-separated plain-text localisation files.",
+        "versions": ["3.*"],
+        "readonly": false
+      }
+    }
+  }
+}

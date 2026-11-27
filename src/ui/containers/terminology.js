@@ -18,6 +18,7 @@ export function renderTerminology(
   onOccurrences = () => {},
   onEntry = () => {},
   onMap = () => {},
+  { targetOnly = false } = {},
 ) {
   const search = root.querySelector("#term-search");
   const typeFilter = root.querySelector("#term-type-filter");
@@ -38,11 +39,22 @@ export function renderTerminology(
       selectedKey: null,
       sourcePage: 0,
       targetPage: 0,
+      targetOnly,
       bound: false,
     };
     terminologyStates.set(root, state);
   }
-  Object.assign(state, { entries, query, onOccurrences, onEntry, onMap });
+  Object.assign(state, { entries, query, onOccurrences, onEntry, onMap, targetOnly });
+  const sourcePanel = root.querySelector("#term-source-map-panel");
+  sourcePanel.inert = targetOnly;
+  sourcePanel.hidden = targetOnly;
+  sourcePanel.setAttribute("aria-disabled", String(targetOnly));
+  const mapTables = sourcePanel.parentElement;
+  const visiblePanelCount = [...mapTables.children].filter((panel) => !panel.hidden).length;
+  mapTables.style.setProperty(
+    "--term-map-columns",
+    visiblePanelCount ? `repeat(${visiblePanelCount}, minmax(0, 1fr))` : "none",
+  );
   if (!state.bound) {
     root.addEventListener("click", (event) => {
       const selectedButton = event.target.closest("[data-term-select]");
@@ -50,7 +62,8 @@ export function renderTerminology(
         state.selectedKey = selectedButton.dataset.termSelect;
         state.sourcePage = 0;
         state.targetPage = 0;
-        renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap);
+        renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap,
+          { targetOnly: state.targetOnly });
         return;
       }
 
@@ -65,7 +78,8 @@ export function renderTerminology(
       ).length / MAP_PAGE_SIZE);
       state[pageKey] += action === "next" ? 1 : -1;
       state[pageKey] = Math.max(0, Math.min(state[pageKey], pageCount - 1));
-      renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap);
+      renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap,
+        { targetOnly: state.targetOnly });
     });
     state.bound = true;
   }
@@ -103,7 +117,9 @@ export function renderTerminology(
   emptyState.hidden = hasSelection;
   detailContent.hidden = !hasSelection;
   if (!selectedEntry) {
-    sourceRows.replaceChildren(createMessageRow(2, "Select a term to view matching maps."));
+    sourceRows.replaceChildren(createMessageRow(2, targetOnly
+      ? "Original-language maps are unavailable for TXT files."
+      : "Select a term to view matching maps."));
     targetRows.replaceChildren(createMessageRow(2, "Select a term to view matching maps."));
     setMapPagination(root, "source", 0, 0, 0);
     setMapPagination(root, "target", 0, 0, 0);
@@ -115,10 +131,17 @@ export function renderTerminology(
     selectedEntry.translatedDescription || "No translated description provided";
   root.querySelector("#term-detail-id").textContent = selectedEntry.id || "—";
   root.querySelector("#term-detail-type").textContent = selectedEntry.type || "—";
-  root.querySelector("#term-detail-usage").textContent = `${selectedEntry.usagePercentage.toFixed(2)}%`;
+  root.querySelector("#term-detail-usage").textContent = targetOnly
+    ? "—"
+    : `${selectedEntry.usagePercentage.toFixed(2)}%`;
   root.querySelector("#term-definition-button").onclick = () => state.onEntry(selectedEntry);
 
-  renderMapRows(root, "source", selectedEntry.englishOccurrences, sourceRows, onOccurrences, state);
+  if (targetOnly) {
+    sourceRows.replaceChildren(createMessageRow(2, "Original-language maps are unavailable for TXT files."));
+    setMapPagination(root, "source", 0, 0, 0);
+  } else {
+    renderMapRows(root, "source", selectedEntry.englishOccurrences, sourceRows, onOccurrences, state);
+  }
   renderMapRows(root, "target", selectedEntry.translationOccurrences, targetRows, onOccurrences, state);
 }
 
@@ -128,7 +151,8 @@ export function selectTerminologyEntry(root, entry) {
   state.selectedKey = getTermKey(entry);
   state.sourcePage = 0;
   state.targetPage = 0;
-  renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap);
+  renderTerminology(root, state.entries, state.query, state.onOccurrences, state.onEntry, state.onMap,
+    { targetOnly: state.targetOnly });
   return true;
 }
 
@@ -142,12 +166,13 @@ function createTermListItem(document, entry, selectedKey) {
   button.setAttribute("aria-pressed", String(getTermKey(entry) === selectedKey));
   const title = document.createElement("span");
   title.className = "term-list-title";
-  title.textContent = entry.english || "—";
+  title.textContent = entry.english || entry.translation || "—";
   button.append(title);
-  if (entry.description) {
+  const descriptionText = entry.description || entry.translatedDescription;
+  if (descriptionText) {
     const description = document.createElement("small");
     description.className = "term-list-description";
-    description.textContent = entry.description;
+    description.textContent = descriptionText;
     button.append(description);
   }
   const type = document.createElement("span");

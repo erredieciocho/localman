@@ -1,4 +1,4 @@
-import { compareLocalisationDocuments } from "../../core/document/index.js";
+import { compareLocalisationDocuments, isMapSection } from "../../core/document/index.js";
 import { createSourceTag } from "../utils/source-colors.js";
 
 const SECTIONS_PER_PAGE = 10;
@@ -41,7 +41,14 @@ export function setupCompare(root, {
     const [file] = fileInput.files ?? [];
     if (!file) return;
     try {
-      targetDocument = await onLoadTarget(file);
+      const loadedDocument = await onLoadTarget(file);
+      if (loadedDocument?.readonly) {
+        throw new Error("Compare only supports editable localisation formats.");
+      }
+      if (!currentDocument || loadedDocument?.formatId !== currentDocument.formatId) {
+        throw new Error("The target file must use the same format as the current localisation file.");
+      }
+      targetDocument = loadedDocument;
       targetFileName = file.name;
       sectionPage = 0;
       render();
@@ -55,14 +62,20 @@ export function setupCompare(root, {
   function render(nextCurrentDocument = currentDocument, nextCurrentFileName = currentFileName) {
     currentDocument = nextCurrentDocument;
     currentFileName = nextCurrentFileName;
+    fileInput.accept = getFormatAccept(currentDocument?.formatId);
+    selectButton.disabled = !isComparableFormat(currentDocument);
+    if (targetDocument && currentDocument?.formatId !== targetDocument.formatId) {
+      targetDocument = null;
+      targetFileName = "";
+      sectionPage = 0;
+    }
     currentLabel.textContent = currentFileName || "No current file";
     targetLabel.textContent = targetFileName || "No target file selected";
-    selectButton.disabled = !currentDocument;
     summary.replaceChildren();
     results.replaceChildren();
     pagination.hidden = true;
 
-    if (!currentDocument) {
+    if (!isComparableFormat(currentDocument)) {
       status.textContent = "Open a current localisation file to begin comparing.";
       return;
     }
@@ -108,6 +121,16 @@ export function setupCompare(root, {
   return { render };
 }
 
+function getFormatAccept(formatId) {
+  if (formatId === "csv") return ".csv,text/csv";
+  if (formatId === "txt") return ".txt,text/plain";
+  return "";
+}
+
+function isComparableFormat(document) {
+  return Boolean(document && !document.readonly && ["csv", "txt"].includes(document.formatId));
+}
+
 function renderSummary(root, { changed, currentOnly, targetOnly }) {
   const items = [
     ["Changed entries", changed],
@@ -148,7 +171,7 @@ function renderDifferences(
     sectionPanel.className = "compare-section";
     const heading = document.createElement("summary");
     const name = section.name || "Unnamed section";
-    if (isMapReferenceName(section.name)
+    if (isMapSection(section)
       || (!section.name && typeof section.currentSectionIndex === "number")) {
       const link = document.createElement("button");
       link.type = "button";
@@ -306,9 +329,4 @@ function createMessage(text) {
   message.className = "empty-state";
   message.textContent = text;
   return message;
-}
-
-function isMapReferenceName(name) {
-  return typeof name === "string"
-    && (/\.json$/iu.test(name) || /^(?:CommonEvents|Map\d+)$/iu.test(name));
 }

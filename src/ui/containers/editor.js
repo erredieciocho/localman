@@ -1,3 +1,4 @@
+import { isMapSection } from "../../core/document/index.js";
 import { findTranslationSuggestions } from "../../core/translation/index.js";
 import { isEditableColumn, renderEntries, updateEntryWarnings } from "../utils/entry-table.js";
 import { renderSections } from "../utils/section-list.js";
@@ -10,6 +11,7 @@ export function setupEditor(root, {
   onExportSection,
   onDownloadSection,
   onImportSection,
+  supportsSectionOperations = () => false,
   onRowIssues,
   getSourceColor,
   onSourceClick,
@@ -135,7 +137,7 @@ export function setupEditor(root, {
     const file = sectionImportInput.files?.[0];
     sectionImportInput.value = "";
     if (!file) return;
-    sectionFileStatus.textContent = `Reading ${file.name}…`;
+    sectionFileStatus.textContent = `Reading ${file.name}...`;
     try {
       const importedSection = await onImportSection(file, file.name, sectionIndex);
       sectionFileStatus.textContent = `Imported ${file.name} into ${importedSection}.`;
@@ -164,6 +166,7 @@ export function setupEditor(root, {
       spellcheck: preferences.spellcheck,
       targetLanguage: preferences.targetLanguage,
       autocompleteMode,
+      readonly: localisation.readonly,
       rowIndexes,
       sort: sort ? { column: sort, direction: sortDirection } : null,
       focusedMatch,
@@ -181,7 +184,7 @@ export function setupEditor(root, {
   function getFindSections() {
     if (!localisation) return [];
     if (findScope === "all") {
-      return localisation.sections.filter((section) => section.name
+      return localisation.sections.filter((section) => isMapSection(section)
         && section.columns.some((column) => isEditableColumn(section, column)));
     }
     return typeof findScope === "number"
@@ -370,10 +373,12 @@ export function setupEditor(root, {
 
   function updateFindControls() {
     const hasSection = getFindSections().length > 0;
+    const readonly = Boolean(localisation?.readonly);
     findNextButton.disabled = !localisation || !hasSection || !findInput.value;
     findAllButton.disabled = !localisation || !hasSection || !findInput.value;
-    replaceCurrentButton.disabled = !currentMatch || !hasSection;
-    replaceAllButton.disabled = !localisation || !hasSection || !findInput.value;
+    replaceInput.disabled = readonly;
+    replaceCurrentButton.disabled = readonly || !currentMatch || !hasSection;
+    replaceAllButton.disabled = readonly || !localisation || !hasSection || !findInput.value;
   }
 
   function renderWarnings() {
@@ -389,13 +394,15 @@ export function setupEditor(root, {
       updateFindControls();
       return;
     }
+    if (localisation.readonly && sectionIndex === "all") sectionIndex = null;
     if (typeof sectionIndex === "number"
       && !localisation.sections.some((section) => section.index === sectionIndex)) sectionIndex = null;
-    renderSections(sectionSelect, localisation.sections);
+    renderSections(sectionSelect, localisation.sections, { readOnly: localisation.readonly });
     sectionSelect.value = sectionIndex === null ? "" : String(sectionIndex);
     findScope = sectionIndex;
     searchInput.disabled = false;
     statusFilter.disabled = false;
+    autocompleteSelect.disabled = localisation.readonly;
     renderEntriesForSection();
     renderWarnings();
     updateFindControls();
@@ -421,7 +428,9 @@ export function setupEditor(root, {
   }
 
   function updateSectionActions() {
-    const canExportOrImport = Boolean(localisation && typeof sectionIndex === "number");
+    const canExportOrImport = Boolean(localisation && !localisation.readonly
+      && supportsSectionOperations(localisation))
+      && typeof sectionIndex === "number";
     sectionExportButton.disabled = !canExportOrImport;
     sectionImportButton.disabled = !canExportOrImport;
   }

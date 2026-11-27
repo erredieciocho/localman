@@ -1,3 +1,4 @@
+import { isMapSection } from "../../core/document/index.js";
 import { createSourceTag } from "./source-colors.js";
 import { createTableComponent } from "../components/table.js";
 
@@ -5,6 +6,8 @@ export function isEditableColumn(section, columnName) {
   return columnName === "Translation" && section.columns.includes(columnName)
     || isEditableMetadataSection(section);
 }
+
+const READ_ONLY_HIDDEN_COLUMNS = new Set(["Source"]);
 
 function isEditableMetadataSection(section) {
   const isLanguageFontMetadata = section.index === 1
@@ -33,6 +36,7 @@ export function renderEntries({
   spellcheck = true,
   targetLanguage = "es",
   autocompleteMode = "off",
+  readonly = false,
   rowIndexes,
   sort,
   focusedMatch,
@@ -47,7 +51,8 @@ export function renderEntries({
 }) {
   const allSections = sectionIndex === "all";
   const selectedSections = allSections
-    ? localisation.sections.filter((section) => section.name && section.columns.includes("Translation"))
+    ? localisation.sections.filter((section) => isMapSection(section)
+      && section.columns.includes("Translation"))
     : sectionIndex === null
       ? []
       : [localisation.sections[sectionIndex]].filter(Boolean);
@@ -74,13 +79,15 @@ export function renderEntries({
     return;
   }
 
-  const visibleColumns = allSections
+  const visibleColumns = (allSections
     ? [...new Set(selectedSections.flatMap((section) => section.columns.filter(Boolean)))]
-    : selectedSections[0].columns.filter(Boolean);
+    : selectedSections[0].columns.filter(Boolean))
+    .filter((column) => (!readonly || !READ_ONLY_HIDDEN_COLUMNS.has(column))
+      && !(localisation.formatId === "txt" && column === "English"));
   caption.textContent = allSections
     ? `All (Maps) (${selectedSections.length} sections)`
     : selectedSections[0].name || `Unnamed section ${selectedSections[0].index + 1}`;
-  const sortColumns = ["Index", ...(allSections ? ["Section"] : []), ...visibleColumns];
+  const sortColumns = [...(readonly ? [] : ["Index"]), ...(allSections ? ["Section"] : []), ...visibleColumns];
   const primaryColumns = sortColumns.filter((column) => column === "English" || column === "Translation");
   const primaryWidth = primaryColumns.length === 2 ? 35 : primaryColumns.length === 1 ? 70 : 0;
   const remainingColumns = sortColumns.length - primaryColumns.length;
@@ -96,7 +103,7 @@ export function renderEntries({
   for (const column of sortColumns) {
     const header = document.createElement("th");
     header.scope = "col";
-    if (column === "Translation") header.classList.add("editable-column");
+    if (column === "Translation" && !readonly) header.classList.add("editable-column");
     const button = document.createElement("button");
     button.type = "button";
     button.className = "text-button entry-sort-button";
@@ -158,19 +165,21 @@ export function renderEntries({
     const tableRow = document.createElement("tr");
     tableRow.dataset.sectionIndex = String(section.index);
     tableRow.dataset.rowIndex = String(entry.index);
-    const indexCell = document.createElement("td");
-    const warning = document.createElement("button");
-    warning.type = "button";
-    warning.className = "row-warning";
-    warning.dataset.rowWarning = "";
-    warning.addEventListener("click", () => onRowIssues(section, entry));
-    const sourceLine = document.createElement("span");
-    sourceLine.textContent = String(entry.sourceLine);
-    const indexContent = document.createElement("div");
-    indexContent.className = "entry-index-content";
-    indexContent.append(sourceLine, warning);
-    indexCell.append(indexContent);
-    tableRow.append(indexCell);
+    if (!readonly) {
+      const indexCell = document.createElement("td");
+      const warning = document.createElement("button");
+      warning.type = "button";
+      warning.className = "row-warning";
+      warning.dataset.rowWarning = "";
+      warning.addEventListener("click", () => onRowIssues(section, entry));
+      const sourceLine = document.createElement("span");
+      sourceLine.textContent = String(entry.sourceLine);
+      const indexContent = document.createElement("div");
+      indexContent.className = "entry-index-content";
+      indexContent.append(sourceLine, warning);
+      indexCell.append(indexContent);
+      tableRow.append(indexCell);
+    }
     if (allSections) {
       const cell = document.createElement("td");
       cell.textContent = section.name;
@@ -192,12 +201,17 @@ export function renderEntries({
         cell.classList.add("find-replace-match");
       }
       const value = entry.fields[columnIndex] ?? "";
-      cell.classList.toggle("editable-column", name === "Translation");
+      cell.classList.toggle("editable-column", name === "Translation" && !readonly);
       if (name === "ID") {
         cell.textContent = value;
       } else if (name === "Source" && value) {
         cell.append(createSourceTag(value, getSourceColor(value), onSourceClick));
       } else if (columnIndex === translationIndex) {
+        if (readonly) {
+          cell.textContent = value;
+          tableRow.append(cell);
+          continue;
+        }
         const input = document.createElement("textarea");
         input.className = "translation-input";
         input.rows = 2;
@@ -229,6 +243,11 @@ export function renderEntries({
         cell.append(input, showButton);
         updateAvailability();
       } else if (canEditMetadata) {
+        if (readonly) {
+          cell.textContent = value;
+          tableRow.append(cell);
+          continue;
+        }
         const input = document.createElement("input");
         input.className = "metadata-input";
         input.type = "text";

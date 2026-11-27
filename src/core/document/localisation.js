@@ -4,17 +4,20 @@ export class LocalisationDocument {
     sections,
     sectionIds = [],
     formatId,
+    readonly = false,
     encoding = "utf-8",
     hasByteOrderMark = false,
   } = {}) {
     if (!version || !Array.isArray(sections)) {
       throw new TypeError("A localisation document requires a version and sections.");
     }
-    if (typeof encoding !== "string" || !encoding.trim() || typeof hasByteOrderMark !== "boolean") {
+    if (typeof readonly !== "boolean" || typeof encoding !== "string" || !encoding.trim()
+      || typeof hasByteOrderMark !== "boolean") {
       throw new TypeError("A localisation document requires valid encoding metadata.");
     }
 
     this.formatId = formatId;
+    this.readonly = readonly;
     this.encoding = encoding;
     this.hasByteOrderMark = hasByteOrderMark;
     this.version = { ...version };
@@ -42,6 +45,9 @@ export class LocalisationDocument {
   }
 
   updateCell(sectionIndex, rowIndex, columnName, value) {
+    if (this.readonly) {
+      throw new Error("This localisation document is read-only.");
+    }
     const section = this.sections[sectionIndex];
     if (!section) {
       throw new RangeError(`Section index ${sectionIndex} does not exist.`);

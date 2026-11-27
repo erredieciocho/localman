@@ -16,7 +16,7 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **12/11/2026** – Added a reusable configurable statistics-grid component for Dashboard metadata and metrics.
 - **14/11/2026** – Made treemap sorting configurable in the shared component, and made shared table headers use only their occupied regions.
 
-## File handling and CSV
+## File handling and localisation formats
 
 - **07/11/2026 – 09/11/2026** – Added explicit Save and separate-copy Export workflows with unsaved-change protection, section import/export, and original CSV line indexes.
 - **12/11/2026** – Exposed the file encoding and BOM in Dashboard metadata, and preserved UTF-8, UTF-16LE and UTF-16BE through Save, Export, section Export and reload; unsupported UTF-32 and invalid input now give clear errors.
@@ -24,6 +24,17 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **23/11/2026** – Accepted horizontal whitespace after a quoted CSV field, including non-breaking spaces, while preserving the original record.
 - **23/11/2026** – Stored localisation and custom-dictionary file handles in IndexedDB where supported and restored them on startup, reporting inaccessible handles through notifications (Compare targets are not retained). Startup no longer requests permission itself; a "Restore last file" action does so from the user's click.
 - **24/11/2026** – CSV errors now include the Unicode code point of the unexpected character, so invisible characters after closing quotes can be identified.
+- **24/11/2026** – Added a CLD format plugin for opening, editing, saving and exporting `LANGDATA` JSON localisation files while preserving translation segments and unrelated payload data.
+- **25/11/2026** – Moved supported game and format metadata into `src/plugins/manifest.json`; the Version tab now displays the version ranges for each format.
+- **25/11/2026** – Revised CLD handling to validate the documented payload fields and expose language metadata and translation tables in read-only mode; relocated format plugins beneath their game codename and made document actions respect format editability.
+- **25/11/2026** – Disabled Compare, QA, Terminology and Maps for read-only files, limited Dashboard interactions to metadata and word usage, and displayed each format's editing mode in About → Version.
+- **25/11/2026** – Added editable TCOAAL 3.x TXT localisation support with lossless untouched round trips and section import/export; Open now filters to CSV, CLD and TXT, and Compare accepts editable formats only.
+- **25/11/2026** – Read-only Dashboard statistics and distributions now show placeholders without calculating disabled results.
+- **25/11/2026** – Read-only Editor views now omit the `All (Maps)` option, translation suggestions and unavailable `Index`/`Source` columns.
+- **25/11/2026** – Moved Version after Offline and added a cached Credits tab backed by `credits.md`, covering project attribution, agents, third-party components and licences.
+- **26/11/2026** – Open and restore now reject filenames outside the supported `.csv`, `.cld` and `.txt` extensions before reading.
+- **27/11/2026** – Open file dialogues now filter by supported extensions without generic binary or plain-text MIME associations.
+- **25/11/2026** – Disabled Dashboard word usage for read-only files and centred the Source-tag empty state across its distribution grid.
 
 ## Editor
 
@@ -32,6 +43,8 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **15/11/2026** – Showed the longest original sentence beside the maximum-length setting and added a modal summarising YEP/Yanfly Message Core text escape codes.
 - **16/11/2026** – Linked the longest original sentence's section and entry in Settings directly to its Editor row.
 - **23/11/2026** – Added Find All highlighting and Enter-triggered Find Next.
+- **25/11/2026** – Hid the source-only English column in the Editor for TXT localisations while retaining it in the document model.
+- **26/11/2026** – Longest-source guidance now counts visible text without RPG Maker escape codes.
 
 ## Spellcheck and dictionaries
 
@@ -43,6 +56,8 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **23/11/2026** – Spellcheck now tries variants for initial-letter stutters (such as `o-okay`) and elongated letter runs, retaining the original token for reporting.
 - **24/11/2026** – Added bundled dictionaries for French, German, Portuguese (Portugal), Polish, Russian and Korean. Italian and Dutch are deferred because their affix and compound rules exceed the loader's time limit; Japanese and Chinese remain deferred for compatibility.
 - **24/11/2026** – Showed distinct entry counts for bundled and custom dictionaries, with an expandable list of the selected dictionary's entries.
+- **25/11/2026** – Added Mexican Spanish as an MPL-licensed Hunspell regional variant, with per-language variant preferences, manifest-defined defaults and offline caching.
+- **26/11/2026** – Selecting a bundled dictionary clears any remembered custom-dictionary files and prevents an in-progress restore from overriding the selection after reload.
 
 ## Dashboard and analysis
 
@@ -54,6 +69,9 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **16/11/2026** – Added a map-issue ranking mode synchronised with unresolved QA counts.
 - **23/11/2026** – Merged translation statistics and the localisation overview into one grid with themed status and threshold-based progress colours; the complexity treemap's Other tile now shows its map count.
 - **24/11/2026** – Added a total-section count (including unnamed sections) and compared distinct English source and selected target words in the overview, colouring the larger count green, the smaller red, and leaving ties in the default colour.
+- **24/11/2026** – Kept the Unique words metric value to numeric counts and moved the source/target language names into its description.
+- **25/11/2026** – Updated TXT Dashboard progress to count non-empty target-text lines as translated, empty target entries as remaining and exclude empty source fields from untranslatable totals.
+- **25/11/2026** – Standardised map-section recognition across Dashboard metrics, Maps, Compare navigation, Editor map selection and terminology occurrences; only `Map` followed by digits or `CommonEvents`, optionally suffixed with `.json`, count as maps.
 
 ## Terminology, Maps and Compare
 
@@ -65,6 +83,11 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **15/11/2026** – Replaced map confidence metadata with ending names, highlighted ending-associated maps and restyled route tags.
 - **16/11/2026** – Added a Maps legend for ending colours and a heading action listing unique endings with excerpts from their map summaries.
 - **23/11/2026** – Kept lowercase continuation text after quoted question marks in game-ending summaries (e.g. Map214's “Any regrets?”).
+- **25/11/2026** – Restricted Compare targets and the file picker to the current editable format, and added TXT terminology definitions from Speakers, Items and Descriptions.
+- **25/11/2026** – TXT terminology now finds translated-term occurrences in recognised maps and disables the unavailable original-language map table.
+- **25/11/2026** – Hid the Original-language maps panel for TXT files and replaced the unavailable T/S usage percentage with a placeholder.
+- **25/11/2026** – Adjusted Terminology's map-table grid to use only the columns required by visible tables.
+- **25/11/2026** – TXT Maps progress now uses non-empty target-text lines, and map-entry details hide the empty Original column.
 
 ## QA and validation
 
@@ -75,12 +98,19 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **18/11/2026** – Added live per-type issue counts to the legend.
 - **23/11/2026** – Editor warning icons now open the matching expanded QA section, on the correct page and filtered to the selected entry ID; removed the redundant issue modal and the Editor Issues section.
 - **23/11/2026** – Moved QA counts into a Summary with interactive issue-type filters, grouped legend styling and red theme-aware count badges.
+- **25/11/2026** – Spellchecked non-empty TXT target text without requiring English source text.
+- **27/11/2026** – Sentence-length validation ignores lowercase as well as uppercase escape codes, fixing false maximum-length warnings on translated text.
+- **27/11/2026** – Sentence-length validation now checks individual translation rows and trims surrounding whitespace, avoiding false warnings when IDs repeat.
+- **27/11/2026** – Longest-original guidance measures each source row independently instead of combining rows with duplicate entry IDs.
 
 ## Settings
 
 - **14/11/2026** – Added category tabs, validated JSON import/export for preferences, theme and Source-tag colours, global table-density controls (under Appearance), palette randomisation, muted Source-tag colours and contrast-aware tag text.
 - **15/11/2026** – Moved dictionary controls into a dedicated Dictionary tab.
 - **23/11/2026** – Moved browser spellcheck to the Editor tab; grouped dictionary settings with custom imports in the dictionary dropdown; separated dictionary exclusions into their own group with import, export, clear and a scrollable preview kept in sync with Dashboard actions; Source-tag colour controls are disabled until a file is open.
+- **24/11/2026** – Joined dictionary exclusion Import, Export and Clear into one three-button group; Export and Clear are hidden when the list is empty.
+- **25/11/2026** – Disabled TXT glossary validation, turning off and persisting the preference when an enabled setting encounters a TXT file.
+- **26/11/2026** – Added a confirmed Configuration → Clear all action that resets settings and removes remembered localisation and custom-dictionary handles.
 
 ## Interface and visual design
 
@@ -90,6 +120,7 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **18/11/2026** – Added visible success and detailed error confirmations for Save.
 - **23/11/2026** – Replaced message-oriented dialogs with accessible bottom-right toasts (success and warning auto-dismiss; errors and confirmations persist; at most five visible), routing file, settings, QA, configuration and Source-tag feedback through them while keeping detail and selection dialogs and the unsaved-changes safeguard.
 - **24/11/2026** – Grouped related actions into joined button pairs with dynamic Restore and conditional-export visibility; made the tab strip scroll internally; moved dictionary and offline status indicators to Settings → Dictionary and About → Offline with consistent green/yellow/red styling.
+- **25/11/2026** – Hid the empty Original text column in Source-tag entry details for TXT localisations.
 
 ## Offline support, About and hosting
 
@@ -97,7 +128,10 @@ Entries are grouped by category and listed in chronological order (oldest first)
 - **23/11/2026** – Renamed the About installation tab to Offline, added desktop, Android and iOS installation instructions and a local Python-server alternative, and reported unsupported/not-ready, installable and standalone states above the instructions.
 - **23/11/2026** – Added repository and hosted-site links at the top of About and replaced the Changelog tab with a link opening `docs/changelog.md` in a new tab.
 - **23/11/2026** – Hid the hosted-site link on GitHub Pages.
+- **24/11/2026** – Added a Version tab backed by root `version.json`, displaying the application release and supported game versions/formats by codename.
 - **24/11/2026** – Fixed the hosted-site link so its hidden state overrides its flex styling, and added a browser regression check for visibility on the hosted site and in local development.
+- **25/11/2026** – Changed Credits from an in-app panel to a right-aligned link to `credits.md` that opens in a new tab before Changelog.
+- **25/11/2026** – Renamed Offline to Installation, opened Credits and Changelog in scrollable Markdown modal dialogues, and added full game names and format descriptions to Version support rows.
 
 ## Testing and documentation
 

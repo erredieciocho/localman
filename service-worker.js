@@ -1,8 +1,12 @@
-const CACHE_NAME = "localman-shell-v1";
+const CACHE_NAME = "localman-shell-v3";
 const APP_SHELL_URLS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./version.json",
+  "./credits.md",
+  "./docs/changelog.md",
+  "./src/plugins/manifest.json",
   "./service-worker.js",
   "./assets/localman.svg",
   "./assets/localman.png",
@@ -25,6 +29,8 @@ const APP_SHELL_URLS = [
   "./src/core/statistics/index.js",
   "./src/core/statistics/statistics.js",
   "./src/core/statistics/word-usage.js",
+  "./src/core/text/index.js",
+  "./src/core/text/visible-text.js",
   "./src/core/translation/autocomplete.js",
   "./src/core/translation/index.js",
   "./src/core/validation/index.js",
@@ -33,10 +39,15 @@ const APP_SHELL_URLS = [
   "./src/platform/browser/file-handle-store.js",
   "./src/platform/browser/file-system.js",
   "./src/platform/browser/storage.js",
-  "./src/plugins/formats/csv/csv-document.js",
-  "./src/plugins/formats/csv/csv-format.js",
-  "./src/plugins/formats/csv/csv-parser.js",
-  "./src/plugins/formats/csv/index.js",
+  "./src/plugins/TCOAAL/index.js",
+  "./src/plugins/TCOAAL/formats/csv/csv-document.js",
+  "./src/plugins/TCOAAL/formats/csv/csv-format.js",
+  "./src/plugins/TCOAAL/formats/csv/csv-parser.js",
+  "./src/plugins/TCOAAL/formats/csv/index.js",
+  "./src/plugins/TCOAAL/formats/cld/cld-format.js",
+  "./src/plugins/TCOAAL/formats/cld/index.js",
+  "./src/plugins/TCOAAL/formats/txt/txt-format.js",
+  "./src/plugins/TCOAAL/formats/txt/index.js",
   "./src/ui/app.js",
   "./src/ui/components/modal.js",
   "./src/ui/components/notifications.js",
@@ -85,6 +96,10 @@ const APP_SHELL_URLS = [
   "./bundled/dictionaries/ko/license",
   "./bundled/dictionaries/es/index.aff",
   "./bundled/dictionaries/es/index.dic",
+  "./bundled/dictionaries/es-MX/index.aff",
+  "./bundled/dictionaries/es-MX/index.dic",
+  "./bundled/dictionaries/es-MX/ATTRIBUTION.txt",
+  "./bundled/dictionaries/es-MX/LICENSE-MPL-1.1.txt",
 ];
 
 self.addEventListener("install", (event) => {

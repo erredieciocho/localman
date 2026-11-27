@@ -20,7 +20,9 @@ export function setupFileControls(root, {
   const fileStatus = root.querySelector("#file-status");
   let hasDocument = false;
   let fileName = "";
+  let formatId = "csv";
   let canSave = false;
+  let readonly = false;
   let loadOperation = 0;
 
   fileInput.addEventListener("change", async () => {
@@ -84,7 +86,7 @@ export function setupFileControls(root, {
       return;
     }
     try {
-      const suggestedName = getEditedFileName(fileName);
+      const suggestedName = getEditedFileName(fileName, formatId);
       const outputName = await onExport(suggestedName);
       if (!outputName) return;
       fileStatus.textContent = `Exported ${outputName}`;
@@ -96,7 +98,7 @@ export function setupFileControls(root, {
 
   async function loadFile(file) {
     loadOperation += 1;
-    fileStatus.textContent = `Reading ${file.name}…`;
+    fileStatus.textContent = `Reading ${file.name}...`;
     try {
       await showLoadedFile(await onLoadFile(file));
     } catch (error) {
@@ -109,12 +111,19 @@ export function setupFileControls(root, {
     await onLoad(loaded);
     hasDocument = true;
     fileName = loaded.fileName;
-    canSave = loaded.canSave;
-    saveButton.disabled = !canSave;
-    saveButton.title = canSave
-      ? "Overwrite the currently open localisation file"
-      : "Save requires a browser file picker; use Export to save a separate copy";
-    exportButton.disabled = false;
+    formatId = loaded.document?.formatId ?? "csv";
+    readonly = Boolean(loaded.document?.readonly);
+    canSave = Boolean(loaded.canSave) && !readonly;
+    saveButton.disabled = readonly || !canSave;
+    saveButton.title = readonly
+      ? "Save is unavailable because this format is read-only"
+      : canSave
+        ? "Overwrite the currently open localisation file"
+        : "Save requires a browser file picker; use Export to save a separate copy";
+    exportButton.disabled = readonly;
+    exportButton.title = readonly
+      ? "Export is unavailable because this format is read-only"
+      : "Export a separate copy of the currently open file";
     fileStatus.textContent = `${fileName} loaded`;
     setRestoreButtonHidden(true);
     notify(`Loaded ${fileName}.`);
@@ -165,22 +174,26 @@ export function setupFileControls(root, {
       fileStatus.textContent = message;
     },
     setUnsavedStatus(message = "Unsaved edits") {
-      fileStatus.textContent = canSave
+      fileStatus.textContent = readonly
+        ? `${message} — this file format is read-only`
+        : canSave
         ? `${message} — Save to overwrite this file or Export to save a copy`
         : `${message} — Save is unavailable for this file; Export to save a copy`;
     },
   };
 }
 
-export function getEditedFileName(fileName) {
+export function getEditedFileName(fileName, formatId = "csv") {
   const baseName = fileName.replace(/\.[^.]*$/u, "") || "localisation";
-  return `${baseName}.edited.csv`;
+  const extension = formatId === "txt" ? "txt" : formatId === "cld" ? "cld" : "csv";
+  return `${baseName}.edited.${extension}`;
 }
 
-export function getSectionExportFileName(fileName, sectionName, sectionIndex) {
+export function getSectionExportFileName(fileName, sectionName, sectionIndex, formatId = "csv") {
   const baseName = fileName.replace(/\.[^.]*$/u, "") || "localisation";
   const sectionLabel = (sectionName || `section-${sectionIndex + 1}`)
     .replace(/[<>:"/\\|?*\u0000-\u001f]/gu, "_")
     .replace(/[. ]+$/u, "") || `section-${sectionIndex + 1}`;
-  return `${baseName}.${sectionLabel}.csv`;
+  const extension = formatId === "txt" ? "txt" : "csv";
+  return `${baseName}.${sectionLabel}.${extension}`;
 }

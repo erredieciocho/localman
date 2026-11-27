@@ -1,4 +1,6 @@
 import { extractWords } from "../../core/glossary/index.js";
+import { isMapSection } from "../../core/document/index.js";
+import { getSectionTranslationStatistics } from "../../core/statistics/index.js";
 import { createTableComponent } from "../components/table.js";
 import { createModalComponent } from "../components/modal.js";
 import { createSourceTag } from "../utils/source-colors.js";
@@ -64,7 +66,7 @@ export function setupMaps(root, {
     if (records) return records;
     if (pendingLoad) return pendingLoad;
     onStatus("loading");
-    mapCount.textContent = "Loading map data…";
+    mapCount.textContent = "Loading map data...";
     pendingLoad = loadMapRecords()
       .then((loadedRecords) => {
         records = loadedRecords;
@@ -255,6 +257,8 @@ export function setupMaps(root, {
     const pageCount = Math.max(1, Math.ceil(section.rows.length / MAP_ENTRIES_PER_PAGE));
     entryPage = Math.max(0, Math.min(entryPage, pageCount - 1));
     const start = entryPage * MAP_ENTRIES_PER_PAGE;
+    const targetOnly = localisation?.formatId === "txt";
+    root.querySelector("[data-map-original-header]").hidden = targetOnly;
     const indexes = {
       id: section.columns.indexOf("ID"),
       source: section.columns.indexOf("Source"),
@@ -266,6 +270,7 @@ export function setupMaps(root, {
     const rows = section.rows.slice(start, start + MAP_ENTRIES_PER_PAGE).map((entry) => {
       const row = root.ownerDocument.createElement("tr");
       for (const [key, index] of Object.entries(indexes)) {
+        if (targetOnly && key === "original") continue;
         const cell = root.ownerDocument.createElement("td");
         const value = index >= 0 ? entry.fields[index] ?? "" : "";
         if (key === "id" && value) {
@@ -288,7 +293,7 @@ export function setupMaps(root, {
     if (!rows.length) {
       const row = root.ownerDocument.createElement("tr");
       const cell = root.ownerDocument.createElement("td");
-      cell.colSpan = 4;
+      cell.colSpan = targetOnly ? 3 : 4;
       cell.className = "empty-state";
       cell.textContent = "This map has no entries.";
       row.append(cell);
@@ -313,25 +318,19 @@ function buildSectionMetrics(localisation) {
 
   for (const section of localisation.sections) {
     const translationIndex = section.columns.indexOf("Translation");
-    if (!section.name || translationIndex < 0) continue;
+    if (!isMapSection(section) || translationIndex < 0) continue;
 
     const uniqueWords = new Set();
     for (const row of section.rows) {
       for (const word of extractWords(row.fields[translationIndex] ?? "")) uniqueWords.add(word);
     }
-    let translated = 0;
-    let remaining = 0;
-    for (const row of section.rows) {
-      const status = localisation.getRowStatus(section, row);
-      if (status === "translated") translated += 1;
-      if (status === "untranslated") remaining += 1;
-    }
+    const translationStatistics = getSectionTranslationStatistics(localisation, section);
     records.push({
       section,
       entries: section.rows.length,
       uniqueWords: uniqueWords.size,
-      progress: translated + remaining
-        ? Math.round(translated / (translated + remaining) * 1000) / 10
+      progress: translationStatistics.total
+        ? Math.round(translationStatistics.translated / translationStatistics.total * 1000) / 10
         : 0,
     });
   }
@@ -372,7 +371,7 @@ function findMapSection(localisation, mapName) {
   if (!localisation) return null;
   const targetName = normaliseMapName(mapName);
   return localisation.sections.find((section) =>
-    section.name && normaliseMapName(section.name) === targetName) ?? null;
+    isMapSection(section) && normaliseMapName(section.name) === targetName) ?? null;
 }
 
 function normaliseMapName(name) {

@@ -7,7 +7,7 @@ import {
 
 const CUSTOM_DICTIONARY_ACTION = "__import_custom_dictionary__";
 
-export function setupDictionary(root, getPreferences, onChange, onError, fileSystem = {}) {
+export function setupDictionary(root, getPreferences, onChange, onError, fileSystem = {}, onVariantChange = () => {}) {
   const dictionaries = new Map();
   const wordCounts = new Map();
   const customLanguages = new Map();
@@ -18,10 +18,13 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
   const wordListDetails = root.querySelector("#dictionary-word-list-details");
   const wordList = root.querySelector("#dictionary-word-list");
   let catalog = [];
+  let defaultVariants = {};
   let request = 0;
+  let customRestoreRequest = 0;
   let selectedValue = "";
-  select.addEventListener("change", () => {
+  select.addEventListener("change", async () => {
     if (select.value === CUSTOM_DICTIONARY_ACTION) {
+      customRestoreRequest += 1;
       select.value = selectedValue;
       if (fileSystem.supportsOpenPicker && fileSystem.openDictionaryFiles) {
         void chooseCustomDictionaryFiles();
@@ -31,6 +34,7 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
       return;
     }
     if ([...customLanguages.values()].some(({ id }) => id === select.value)) {
+      customRestoreRequest += 1;
       selectedValue = select.value;
       renderStatus();
       return;
@@ -46,12 +50,34 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
       setStatus(false, `Choose a ${getPreferences().targetLanguage} dictionary for the selected target language.`);
       return;
     }
+    customRestoreRequest += 1;
+    const currentRequest = ++request;
+    select.disabled = true;
+    try {
+      if (fileSystem.supportsPersistentHandles) {
+        if (typeof fileSystem.removeFileHandleData !== "function") {
+          throw new Error("Persistent custom dictionary storage cannot be cleared.");
+        }
+        await fileSystem.removeFileHandleData("custom-dictionary");
+      }
+    } catch (error) {
+      select.value = selectedValue;
+      onError(new Error(`Bundled dictionary selected, but the saved custom dictionary could not be cleared: ${error.message ?? String(error)}`));
+      return;
+    } finally {
+      select.disabled = false;
+    }
+    if (currentRequest !== request) return;
     if (customLanguages.has(entry.language)) {
-      customLanguages.get(entry.language).option.remove();
+      const custom = customLanguages.get(entry.language);
+      custom.option.remove();
       customLanguages.delete(entry.language);
-      dictionaries.delete(entry.language);
+      dictionaries.delete(custom.id);
+      wordCounts.delete(custom.id);
     }
     selectedValue = entry.id;
+    onVariantChange(entry.language, entry.id);
+    onChange();
     loadForSelectedLanguage(entry);
   });
   customInput.addEventListener("change", importCustomDictionary);
@@ -62,10 +88,12 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
     select.disabled = true;
     setStatus(false, "Loading bundled dictionaries.", "partial");
     try {
-      catalog = await loadBundledDictionaryCatalog();
-      select.replaceChildren(new Option("Import custom dictionary…", CUSTOM_DICTIONARY_ACTION));
+      const loaded = await loadBundledDictionaryCatalog();
+      catalog = loaded.dictionaries;
+      defaultVariants = loaded.defaultVariants;
+      select.replaceChildren(new Option("Import custom dictionary...", CUSTOM_DICTIONARY_ACTION));
       for (const entry of catalog) {
-        select.add(new Option(`${entry.name} (${entry.language})`, entry.id));
+        select.add(new Option(`${entry.name} (${entry.id})`, entry.id));
       }
       select.disabled = false;
       selectForLanguage(getPreferences().targetLanguage);
@@ -79,8 +107,7 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
   }
 
   async function loadForSelectedLanguage(entry) {
-    const language = entry.language;
-    if (dictionaries.has(language)) {
+    if (dictionaries.has(entry.id)) {
       renderStatus();
       return;
     }
@@ -89,15 +116,15 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
     try {
       const dictionary = await loadBundledDictionary(entry);
       if (currentRequest !== request) return;
-      dictionaries.set(language, dictionary);
-      wordCounts.set(language, entry.wordCount);
+      dictionaries.set(entry.id, dictionary);
+      wordCounts.set(entry.id, entry.wordCount);
       renderStatus();
       onChange();
     } catch (error) {
       if (currentRequest !== request) return;
-      setStatus(false, `Could not load the ${language} dictionary.`);
+      setStatus(false, `Could not load the ${entry.name} dictionary.`);
       onError(new Error(`Could not load dictionary: ${error.message ?? String(error)}.`
-        + (dictionaries.has(language) ? ` The previously loaded ${language} dictionary remains available.` : "")));
+        + (dictionaries.has(entry.id) ? ` The previously loaded ${entry.name} dictionary remains available.` : "")));
     }
   }
 
@@ -166,14 +193,16 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
 
   async function loadCustomDictionary(load, handles) {
     const language = getPreferences().targetLanguage;
+    const id = `custom-${language}`;
     const currentRequest = ++request;
     setStatus(false, `Loading custom ${language} dictionary.`, "partial");
     try {
       const dictionary = await load();
       if (currentRequest !== request || language !== getPreferences().targetLanguage) return;
-      dictionaries.set(language, dictionary);
-      wordCounts.set(language, dictionary.wordList.length);
-      if (typeof fileSystem.saveFileHandleData === "function") {
+      dictionaries.set(id, dictionary);
+      wordCounts.set(id, dictionary.wordList.length);
+      if (fileSystem.supportsPersistentHandles
+        && typeof fileSystem.saveFileHandleData === "function") {
         try {
           if (handles.length) {
             await fileSystem.saveFileHandleData("custom-dictionary", { language, handles });
@@ -184,14 +213,13 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
           onError(new Error(`Custom dictionary loaded, but its file handle could not be remembered: ${error.message ?? String(error)}`));
         }
       }
-      const id = `custom-${language}`;
       const option = select.querySelector(`option[value="${id}"]`)
         ?? new Option(`Custom dictionary (${language}, this session)`, id);
       if (!option.parentElement) select.add(option);
       customLanguages.set(language, { id, option });
       selectedValue = id;
       select.value = id;
-      renderWordCount(language);
+      renderWordCount(id);
       setStatus(true, `Custom dictionary loaded for ${language} this session.`
         + (getPreferences().dictionaryValidation ? "" : " Spelling validation is disabled."));
       onChange();
@@ -205,11 +233,14 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
   async function restoreCustomDictionary() {
     if (!fileSystem.supportsPersistentHandles
       || typeof fileSystem.getFileHandleData !== "function") return;
+    const currentRestoreRequest = ++customRestoreRequest;
     try {
       const saved = await fileSystem.getFileHandleData("custom-dictionary");
+      if (currentRestoreRequest !== customRestoreRequest) return;
       if (!saved || saved.language !== getPreferences().targetLanguage
         || !Array.isArray(saved.handles) || !saved.handles.length) return;
       const files = await Promise.all(saved.handles.map((handle) => fileSystem.readFileHandle(handle)));
+      if (currentRestoreRequest !== customRestoreRequest) return;
       const byName = new Map(files.map((file) => [file.name.toLocaleLowerCase(), file]));
       let load;
       if (files.length === 1 && /\.(?:oxt|xpi|zip)$/iu.test(files[0].name)) {
@@ -230,8 +261,12 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
 
   function renderStatus() {
     const preferences = getPreferences();
-    const loaded = dictionaries.has(preferences.targetLanguage);
-    renderWordCount(preferences.targetLanguage);
+    const language = preferences.targetLanguage;
+    const entry = getBundledEntry(language);
+    const custom = customLanguages.get(language);
+    const dictionaryId = custom?.id ?? entry?.id;
+    const loaded = dictionaryId ? dictionaries.has(dictionaryId) : false;
+    renderWordCount(dictionaryId);
     for (const option of select.options) {
       const entry = catalog.find(({ id }) => id === option.value);
       const custom = [...customLanguages.entries()].find(([, value]) => value.id === option.value);
@@ -239,14 +274,16 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
       else if (custom) option.disabled = custom[0] !== preferences.targetLanguage;
     }
     if (loaded) {
-      setStatus(true, `${customLanguages.has(preferences.targetLanguage) ? "Custom dictionary" : "Dictionary"}`
-        + ` loaded for ${preferences.targetLanguage} this session.`
+      const message = custom
+        ? `Custom dictionary loaded for ${language} this session.`
+        : `Dictionary loaded for ${entry.id} this session.`;
+      setStatus(true, message
         + (preferences.dictionaryValidation ? "" : " Spelling validation is disabled."));
     } else {
-      const available = catalog.some(({ language }) => language === preferences.targetLanguage);
+      const available = catalog.some((item) => item.language === language);
       setStatus(false, available
-        ? `No dictionary loaded for ${preferences.targetLanguage}. Select its bundled dictionary to enable spelling issues.`
-        : `No bundled dictionary is available for ${preferences.targetLanguage}.`);
+        ? `No dictionary loaded for ${language}. Select its bundled dictionary to enable spelling issues.`
+        : `No bundled dictionary is available for ${language}.`);
     }
   }
 
@@ -266,7 +303,10 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
 
   function renderWordList() {
     if (!wordList) return;
-    const dictionary = dictionaries.get(getPreferences().targetLanguage);
+    const preferences = getPreferences();
+    const custom = customLanguages.get(preferences.targetLanguage);
+    const entry = getBundledEntry(preferences.targetLanguage);
+    const dictionary = dictionaries.get(custom?.id ?? entry?.id);
     if (!dictionary) {
       wordList.textContent = "No dictionary is loaded for the selected target language.";
     } else if (wordListDetails?.open) {
@@ -284,33 +324,61 @@ export function setupDictionary(root, getPreferences, onChange, onError, fileSys
       renderStatus();
       return;
     }
-    const entry = catalog.find((item) => item.language === language);
+    const preferences = getPreferences();
+    const requestedVariant = preferences.dictionaryVariants?.[language];
+    const entry = getBundledEntry(language);
     if (!entry) {
       select.value = "";
       selectedValue = "";
       renderStatus();
       return;
     }
+    if (requestedVariant && requestedVariant !== entry.id) {
+      onVariantChange(language, entry.id);
+    }
     select.value = entry.id;
     selectedValue = entry.id;
     loadForSelectedLanguage(entry);
   }
 
+  function getBundledEntry(language) {
+    const selectedVariant = getPreferences().dictionaryVariants?.[language];
+    return catalog.find((item) => item.language === language && item.id === selectedVariant)
+      ?? catalog.find((item) => item.id === defaultVariants[language]);
+  }
+
+  function getLoadedDictionary(language) {
+    const custom = customLanguages.get(language);
+    const entry = getBundledEntry(language);
+    return dictionaries.get(custom?.id ?? entry?.id) ?? null;
+  }
+
   return {
     get dictionary() {
       const preferences = getPreferences();
-      return preferences.dictionaryValidation ? dictionaries.get(preferences.targetLanguage) ?? null : null;
+      return preferences.dictionaryValidation ? getLoadedDictionary(preferences.targetLanguage) : null;
     },
     renderStatus,
     selectForLanguage,
-    getLoadedDictionary(language = getPreferences().targetLanguage) {
-      return dictionaries.get(language) ?? null;
+    clearCustomDictionaries() {
+      request += 1;
+      for (const custom of customLanguages.values()) {
+        custom.option.remove();
+        dictionaries.delete(custom.id);
+        wordCounts.delete(custom.id);
+      }
+      customLanguages.clear();
+      selectedValue = "";
+      select.value = "";
     },
+    getLoadedDictionary,
     getWordCount(language = getPreferences().targetLanguage) {
-      return wordCounts.get(language) ?? null;
+      const custom = customLanguages.get(language);
+      const entry = getBundledEntry(language);
+      return wordCounts.get(custom?.id ?? entry?.id) ?? null;
     },
     getDictionaryWords(language = getPreferences().targetLanguage) {
-      return [...(dictionaries.get(language)?.wordList ?? [])];
+      return [...(getLoadedDictionary(language)?.wordList ?? [])];
     },
     get catalog() {
       return [...catalog];

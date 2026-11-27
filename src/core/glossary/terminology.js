@@ -1,3 +1,5 @@
+import { isMapSection } from "../document/index.js";
+
 const WORD_PATTERN = /\p{L}+(?:['’\-]\p{L}+)*/gu;
 const TERM_COLUMNS = new Set(["Speakers", "Items"]);
 
@@ -11,20 +13,26 @@ export function getTermDefinitions(localisation) {
 
   for (const section of localisation.sections) {
     const typeIndex = section.columns.findIndex((column) => TERM_COLUMNS.has(column));
+    const txtType = localisation.formatId === "txt"
+      && ["Speakers", "Items"].includes(section.name)
+      ? section.name.replace(/s$/u, "")
+      : "";
     const englishIndex = section.columns.indexOf("English");
     const translationIndex = section.columns.indexOf("Translation");
-    if (typeIndex < 0 || englishIndex < 0 || translationIndex < 0) {
+    if ((typeIndex < 0 && !txtType) || englishIndex < 0 || translationIndex < 0) {
       continue;
     }
 
-    const type = section.columns[typeIndex].replace(/s$/u, "");
+    const type = txtType || section.columns[typeIndex].replace(/s$/u, "");
     for (const row of section.rows) {
-      const english = row.fields[englishIndex] ?? "";
-      const englishWords = new Set(extractWords(english));
-      if (englishWords.size === 0) {
+      const english = txtType ? "" : row.fields[englishIndex] ?? "";
+      const translation = row.fields[translationIndex] ?? "";
+      const termText = txtType ? translation : english;
+      const termWords = new Set(extractWords(termText));
+      if (termWords.size === 0) {
         continue;
       }
-      const id = row.fields[typeIndex] ?? "";
+      const id = typeIndex >= 0 ? row.fields[typeIndex] ?? "" : row.key;
       let term = id ? byId.get(id) : null;
       if (!term) {
         term = {
@@ -47,14 +55,18 @@ export function getTermDefinitions(localisation) {
         if (id) byId.set(id, term);
       }
       term.english = mergeText(term.english, english);
-      term.translation = mergeText(term.translation, row.fields[translationIndex] ?? "");
+      term.translation = mergeText(term.translation, translation);
       term.englishWords = new Set(extractWords(term.english));
       term.translationWords = new Set(extractWords(term.translation));
     }
   }
 
   for (const section of localisation.sections) {
-    const descriptionsIndex = section.columns.indexOf("Descriptions");
+    const descriptionsIndex = section.columns.indexOf("Descriptions") >= 0
+      ? section.columns.indexOf("Descriptions")
+      : localisation.formatId === "txt" && section.name === "Descriptions"
+        ? 0
+        : -1;
     const itemIndex = section.columns.indexOf("Item") >= 0
       ? section.columns.indexOf("Item")
       : section.columns.indexOf("Items");
@@ -116,18 +128,25 @@ export function getGroupedRows(section) {
 export function collectTerminology(localisation) {
   const terms = getTermDefinitions(localisation);
   const termsByEnglishWord = new Map();
+  const termsByTranslationWord = new Map();
   for (const term of terms) {
     for (const word of term.englishWords) {
       const candidates = termsByEnglishWord.get(word) ?? [];
       candidates.push(term);
       termsByEnglishWord.set(word, candidates);
     }
+    for (const word of term.translationWords) {
+      const candidates = termsByTranslationWord.get(word) ?? [];
+      candidates.push(term);
+      termsByTranslationWord.set(word, candidates);
+    }
   }
 
+  const targetOnly = localisation.formatId === "txt";
   for (const section of localisation.sections) {
     const englishIndex = section.columns.indexOf("English");
     const translationIndex = section.columns.indexOf("Translation");
-    if (!section.name || englishIndex < 0 || translationIndex < 0) {
+    if (!isMapSection(section) || englishIndex < 0 || translationIndex < 0) {
       continue;
     }
 
@@ -135,12 +154,21 @@ export function collectTerminology(localisation) {
       const englishWords = new Set(extractWords(group.english));
       const translationWords = new Set(extractWords(group.translation));
       const candidates = new Set();
-      for (const word of englishWords) {
-        for (const term of termsByEnglishWord.get(word) ?? []) {
+      const words = targetOnly ? translationWords : englishWords;
+      const termsByWord = targetOnly ? termsByTranslationWord : termsByEnglishWord;
+      for (const word of words) {
+        for (const term of termsByWord.get(word) ?? []) {
           candidates.add(term);
         }
       }
       for (const term of candidates) {
+        if (targetOnly) {
+          if (term.translationWords.size > 0 && containsAll(translationWords, term.translationWords)) {
+            term.translationCount += 1;
+            term.translationOccurrences.push({ section, row: group.first, rows: group.rows, text: group.translation });
+          }
+          continue;
+        }
         if (!containsAll(englishWords, term.englishWords)) {
           continue;
         }

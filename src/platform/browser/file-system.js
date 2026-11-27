@@ -42,7 +42,12 @@ export function createBrowserFileSystem(appWindow, {
     async openFile() {
       if (!openPicker) return null;
       const [handle] = await openPicker({
-        types: [{ description: "Localisation CSV", accept: { "text/csv": [".csv"] } }],
+        types: [{
+          description: "Localisation files",
+          accept: {
+            "application/vnd.tcoaal.localisation": [".csv", ".cld", ".txt"],
+          },
+        }],
       });
       return handle ? { file: await handle.getFile(), handle } : null;
     },
@@ -108,7 +113,10 @@ export function createBrowserFileSystem(appWindow, {
       }
       const handle = await savePicker({
         suggestedName,
-        types: [{ description: "Localisation CSV", accept: { "text/csv": [".csv"] } }],
+        types: [
+          { description: "Localisation CSV", accept: { "text/csv": [".csv"] } },
+          { description: "Localisation TXT", accept: { "text/plain": [".txt"] } },
+        ],
       });
       if (!handle) return null;
       if (sourceHandle && await handle.isSameEntry?.(sourceHandle)) {
@@ -124,7 +132,7 @@ function downloadBlob(contents, fileName, appWindow, contentType) {
   if (!appWindow?.document || !appWindow.URL || !appWindow.Blob) {
     throw new Error("Browser downloads are unavailable in this environment.");
   }
-  const blob = new appWindow.Blob([contents], { type: contentType || getCsvContentType(contents) });
+  const blob = new appWindow.Blob([contents], { type: contentType || getContentType(contents, fileName) });
   const url = appWindow.URL.createObjectURL(blob);
   const link = appWindow.document.createElement("a");
   link.href = url;
@@ -136,7 +144,22 @@ function downloadBlob(contents, fileName, appWindow, contentType) {
   appWindow.setTimeout(() => appWindow.URL.revokeObjectURL(url), 0);
 }
 
-function getCsvContentType(contents) {
+function getContentType(contents, fileName) {
+  if (fileName.toLocaleLowerCase().endsWith(".cld")) {
+    if (contents instanceof Uint8Array) {
+      if (startsWithBytes(contents, [0xff, 0xfe])) return "application/json;charset=utf-16le";
+      if (startsWithBytes(contents, [0xfe, 0xff])) return "application/json;charset=utf-16be";
+    }
+    return "application/json;charset=utf-8";
+  }
+  if (fileName.toLocaleLowerCase().endsWith(".txt")) {
+    if (contents instanceof Uint8Array) {
+      if (startsWithBytes(contents, [0xff, 0xfe])) return "text/plain;charset=utf-16le";
+      if (startsWithBytes(contents, [0xfe, 0xff])) return "text/plain;charset=utf-16be";
+      return "text/plain";
+    }
+    return "text/plain;charset=utf-8";
+  }
   if (contents instanceof Uint8Array) {
     if (startsWithBytes(contents, [0xff, 0xfe])) return "text/csv;charset=utf-16le";
     if (startsWithBytes(contents, [0xfe, 0xff])) return "text/csv;charset=utf-16be";

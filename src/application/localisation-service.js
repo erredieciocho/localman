@@ -7,6 +7,9 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
   let hasUnsavedChanges = false;
 
   async function loadFile(file, options = {}, selectedFileHandle = null) {
+    if (typeof file?.name !== "string" || !/\.(?:csv|cld|txt)$/iu.test(file.name)) {
+      throw new Error("Unsupported localisation file extension. Open a .csv, .cld or .txt file.");
+    }
     const document = await readDocument(file, options);
     fileHandle = selectedFileHandle;
     restoreHandle = selectedFileHandle;
@@ -17,7 +20,7 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
       fileName: file.name,
       encoding: document.encoding,
       hasByteOrderMark: document.hasByteOrderMark,
-      canSave: Boolean(fileHandle),
+      canSave: Boolean(fileHandle) && !document.readonly,
       persistenceError,
     };
   }
@@ -61,6 +64,7 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
 
   function prepareSectionExport(document, sectionIndex) {
     if (!document) throw new Error("Load a localisation file before exporting a section.");
+    if (document.readonly) throw new Error("This localisation format is read-only.");
     const text = parsers.serializeSection(document, sectionIndex);
     return Object.freeze({
       text,
@@ -98,6 +102,9 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     parseFile(file, options) {
       return readDocument(file, options);
     },
+    supportsSectionOperations(document) {
+      return parsers.supportsSectionOperations(document);
+    },
     serialize(document) {
       return parsers.serialize(document);
     },
@@ -109,7 +116,10 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     },
     reparseDocument(document, options) {
       if (!document) throw new Error("Load a localisation file before applying document options.");
-      return parsers.parse(parsers.serialize(document), {
+      const reparse = parsers.reparse
+        ? (inputOptions) => parsers.reparse(document, inputOptions)
+        : (inputOptions) => parsers.parse(parsers.serialize(document), inputOptions);
+      return reparse({
         ...options,
         encoding: document.encoding,
         hasByteOrderMark: document.hasByteOrderMark,
@@ -117,6 +127,7 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     },
     async saveFile(document) {
       if (!document) throw new Error("Load a localisation file before saving.");
+      if (document.readonly) throw new Error("This localisation format is read-only.");
       if (!fileHandle) throw new Error("Save requires a writable handle for the opened file.");
       await fileSystem.writeFile(fileHandle, encodeDocument(parsers.serialize(document), document));
       hasUnsavedChanges = false;
@@ -124,6 +135,7 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     },
     async exportFile(document, suggestedName) {
       if (!document) throw new Error("Load a localisation file before exporting.");
+      if (document.readonly) throw new Error("This localisation format is read-only.");
       const outputName = await fileSystem.exportFile(
         encodeDocument(parsers.serialize(document), document),
         suggestedName,
@@ -134,6 +146,7 @@ export function createLocalisationService({ parsers, fileSystem } = {}) {
     },
     async importSection(document, sectionIndex, file) {
       if (!document) throw new Error("Load a localisation file before importing a section.");
+      if (document.readonly) throw new Error("This localisation format is read-only.");
       if (typeof sectionIndex !== "number") {
         throw new Error("Select an individual section before importing.");
       }

@@ -40,7 +40,8 @@
             <button id="restore-file-button" class="button button-secondary" type="button" hidden
               title="Grant access and reload the previously opened localisation file">Restore last file</button>
           </div>
-          <input id="file-input" class="visually-hidden" type="file" accept=".csv,text/csv"
+          <input id="file-input" class="visually-hidden" type="file"
+            accept=".csv,.cld,.txt"
             aria-label="Open a localisation file">
           <button id="save-button" class="button button-secondary" type="button" disabled
             title="Overwrite the currently open localisation file">Save</button>
@@ -284,7 +285,7 @@
                 </label>
                 <label class="search-control">
                   <span>Search entries</span>
-                  <input id="search-input" type="search" placeholder="Search keys or text…" disabled>
+                  <input id="search-input" type="search" placeholder="Search keys or text..." disabled>
                 </label>
                 <label>
                   <span>Translation status</span>
@@ -311,7 +312,7 @@
                     Import section
                   </button>
                 </div>
-                <input id="section-import-input" type="file" accept=".csv,text/csv" hidden>
+                <input id="section-import-input" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
               </div>
             </div>
           </header>
@@ -364,7 +365,7 @@
             <button id="compare-target-button" class="button button-secondary" type="button" disabled>
               Select target file
             </button>
-            <input id="compare-target-file" type="file" accept=".csv,text/csv" hidden>
+            <input id="compare-target-file" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
             <p id="compare-status" class="muted" aria-live="polite">Open a current localisation file to begin comparing.</p>
           </div>
           <div id="compare-summary" class="compare-summary" aria-label="Comparison summary"></div>
@@ -459,7 +460,7 @@
                 </label>
                 <label class="search-control" for="map-search">
                   <span>Search maps</span>
-                  <input id="map-search" type="search" placeholder="Search map details…" disabled>
+                  <input id="map-search" type="search" placeholder="Search map details..." disabled>
                 </label>
               </div>
             </header>
@@ -521,7 +522,7 @@
                     <thead><tr id="map-entry-headers">
                       <th scope="col">ID</th>
                       <th scope="col">Source</th>
-                      <th scope="col">Original</th>
+                      <th scope="col" data-map-original-header>Original</th>
                       <th scope="col">Translation</th>
                     </tr></thead>
                     <tbody id="map-entry-rows"></tbody>
@@ -551,7 +552,7 @@
                 </label>
                 <label class="search-control" for="term-search">
                   <span>Filter terms</span>
-                  <input id="term-search" type="search" placeholder="Search either language…" disabled>
+                  <input id="term-search" type="search" placeholder="Search either language..." disabled>
                 </label>
               </div>
             </header>
@@ -579,7 +580,7 @@
                 </dl>
               </header>
               <div class="term-map-tables">
-                <section class="workspace ui-table-component term-map-panel" aria-label="Maps containing the original term">
+                <section id="term-source-map-panel" class="workspace ui-table-component term-map-panel" aria-label="Maps containing the original term">
                   <header class="ui-table-header">
                     <div class="ui-table-heading">
                       <h3 class="ui-table-title">Original-language maps</h3>
@@ -707,6 +708,9 @@
                   <input id="terminology-validation" type="checkbox">
                   <span>Check against defined glossary terms</span>
                 </label>
+                <small id="terminology-validation-support" class="settings-note" hidden>
+                  Glossary validation is unavailable for TXT files.
+                </small>
               </fieldset>
               <fieldset class="settings-group">
                 <legend>Validation limits</legend>
@@ -740,7 +744,7 @@
                   </select>
                   <input id="dictionary-custom-import" type="file"
                     accept=".aff,.dic,.oxt,.xpi,.zip" multiple hidden>
-                  <small>Select a bundled dictionary or choose “Import custom dictionary…” to load an AFF+DIC pair or OXT, XPI or ZIP package for this session.</small>
+                  <small>The target language selects its default regional variant. Choose another available variant here, or import an AFF+DIC pair or OXT, XPI or ZIP package for this session.</small>
                   <small>Dictionary words: <strong id="dictionary-word-count">—</strong></small>
                 </label>
                 <details id="dictionary-word-list-details">
@@ -755,17 +759,17 @@
                 <legend>Dictionary exclusions</legend>
                 <input id="dictionary-exclusions-import" type="file" accept=".txt,text/plain" hidden>
                 <div class="button-pair dictionary-exclusion-actions button-pair--single" role="group"
-                  aria-label="Import or export dictionary exclusions">
+                  aria-label="Import, export or clear dictionary exclusions">
                   <button id="dictionary-exclusions-import-button" class="button button-primary" type="button">
                     Import exclusion list
                   </button>
                   <button id="dictionary-exclusions-export-button" class="button button-secondary" type="button" hidden>
                     Export exclusion list
                   </button>
+                  <button id="dictionary-exclusions-clear-button" class="button button-secondary" type="button" hidden>
+                    Clear exclusion list
+                  </button>
                 </div>
-                <button id="dictionary-exclusions-clear-button" class="button button-secondary" type="button">
-                  Clear exclusion list
-                </button>
                 <small>Import a line-separated text file to add words; duplicates are skipped.</small>
                 <pre id="dictionary-exclusions-preview" class="dictionary-exclusions-preview"
                   aria-label="Dictionary exclusion list" role="region" tabindex="0">No excluded words.</pre>
@@ -806,9 +810,10 @@
             <fieldset class="settings-group">
               <legend>Configuration file</legend>
               <div class="configuration-actions">
-                <div class="button-pair button-pair--single" role="group" aria-label="Import or export settings">
+                <div class="button-pair button-pair--single" role="group" aria-label="Import, export or clear all settings">
                   <button id="configuration-import-button" class="button button-primary" type="button">Import settings</button>
                   <button id="configuration-export" class="button button-secondary" type="button" hidden>Export settings</button>
+                  <button id="configuration-clear-all" class="button button-secondary" type="button" hidden>Clear all</button>
                 </div>
                 <input id="configuration-import-file" type="file" accept=".json,application/json" hidden>
               </div>
@@ -832,17 +837,20 @@
                 data-about-tab="overview">About</button>
               <button type="button" class="settings-tab" id="about-tab-offline"
                 role="tab" aria-selected="false" aria-controls="about-panel-offline" tabindex="-1"
-                data-about-tab="offline" title="Checking offline support and installation availability.">Offline
+                data-about-tab="offline" title="Checking offline support and installation availability.">Installation
                 <span id="offline-installation-status" class="dictionary-status-dot tab-status-dot is-warning"
                   data-status="partial" role="status" aria-live="polite"
                   aria-label="Checking offline support and installation availability."
                   title="Checking offline support and installation availability."></span>
               </button>
+              <button type="button" class="settings-tab" id="about-tab-version"
+                role="tab" aria-selected="false" aria-controls="about-panel-version" tabindex="-1"
+                data-about-tab="version">Version</button>
             </div>
-            <a id="about-changelog-link" class="settings-tab about-changelog-link"
-              href="./docs/changelog.md" target="_blank" rel="noopener noreferrer">
-              Changelog
-            </a>
+            <nav class="about-resource-links" aria-label="About resources">
+              <button id="about-credits-button" type="button" class="settings-tab about-resource-link">Credits</button>
+              <button id="about-changelog-button" type="button" class="settings-tab about-resource-link">Changelog</button>
+            </nav>
           </div>
           <section id="about-panel-overview" class="about-tab-panel" role="tabpanel"
             aria-labelledby="about-tab-overview" data-about-panel="overview">
@@ -862,10 +870,10 @@
             <section class="about-how-to">
               <h3>How to use</h3>
               <ol>
-                <li>Choose <strong>Open</strong> to load a localisation CSV. <strong>Save</strong> overwrites the opened file when supported; <strong>Export</strong> always saves a separate copy.</li>
+                <li>Choose <strong>Open</strong> to load a localisation CSV, CLD or TXT file. <strong>Save</strong> overwrites the opened file when supported; <strong>Export</strong> always saves a separate copy.</li>
                 <li>Review translation progress, maps, Source tags and target-language word usage in <strong>Dashboard</strong>.</li>
                 <li>Use <strong>Editor</strong> to select a section, search or filter entries, edit translations, and import or export a section.</li>
-                <li>Open <strong>Compare</strong> and select a target CSV to view changed fields, extra current entries and entries missing from the current file side by side.</li>
+                <li>Open <strong>Compare</strong> and select an editable CSV or TXT file to view changed fields, extra current entries and entries missing from the current file side by side.</li>
                 <li>Use <strong>QA</strong> to filter, search and track validation issues by map; import or export review state as JSON.</li>
                 <li>Use <strong>Maps</strong> to browse episodes, routes and descriptions, and <strong>Terminology</strong> to search defined terms and inspect their map occurrences.</li>
                 <li>Adjust language, validation, dictionary, appearance and configuration settings in <strong>Settings</strong>.</li>
@@ -876,7 +884,7 @@
               <div class="about-feature-grid">
                 <article class="about-feature-card">
                   <h4>File management</h4>
-                  <p>Edit localisation CSVs while preserving supported encodings. Save changes to the opened file when available, or export a separate copy or section.</p>
+                  <p>Edit CSV and TXT localisation files, and inspect read-only CLD files. Save changes to an opened editable file when available, or export a separate copy; sections can also be exported individually.</p>
                 </article>
                 <article class="about-feature-card">
                   <h4>File comparison</h4>
@@ -910,17 +918,40 @@
             </section>
           </div>
           </section>
+          <section id="about-panel-version" class="about-tab-panel" role="tabpanel"
+            aria-labelledby="about-tab-version" data-about-panel="version" hidden>
+            <div class="about-content">
+              <section class="about-version-summary" aria-label="Application release">
+                <h3>Application</h3>
+                <p><strong>Version</strong> <span id="about-version-number">—</span></p>
+                <p><strong>Release date</strong> <time id="about-version-date">—</time></p>
+              </section>
+              <section>
+                <h3>Supported game versions and formats</h3>
+                <p id="about-version-status" role="status" aria-live="polite">
+                  Select this tab to load version information.
+                </p>
+                <div class="table-scroll about-version-table">
+                  <table>
+                    <thead>
+                      <tr><th scope="col">Game</th><th scope="col">Format</th><th scope="col">Supported versions</th><th scope="col">Mode</th></tr>
+                    </thead>
+                    <tbody id="about-version-supported"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          </section>
           <section id="about-panel-offline" class="about-tab-panel" role="tabpanel"
             aria-labelledby="about-tab-offline" data-about-panel="offline" hidden>
             <div class="about-content">
               <section class="about-how-to">
-                <h3>Install LOCALMAN</h3>
+                <h3>Install LOCALMAN as a Progressive Web App (PWA)</h3>
                 <ol>
                   <li><strong>Desktop (Edge or Chrome):</strong> Open LOCALMAN and choose the install icon in the address bar or <strong>Install this site as an app</strong> from the browser menu.</li>
                   <li><strong>Android (Chrome):</strong> Open LOCALMAN, open the browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
                   <li><strong>iOS (Safari):</strong> Open LOCALMAN in Safari, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</li>
                 </ol>
-                <p class="muted">The first visit prepares the offline copy. Localisation files stay on your device and are never uploaded. To update LOCALMAN, open it while connected to the same server again.</p>
               </section>
               <section>
                 <h3>Use the Python server</h3>
@@ -936,6 +967,20 @@
       </section>
 
       <!-- Dialogues -->
+      <dialog id="about-credits-dialog" aria-labelledby="about-credits-title"
+        data-modal-title="Credits" data-modal-close-id="about-credits-close">
+        <div class="about-markdown-content">
+          <p id="about-credits-status" class="muted" role="status" aria-live="polite">Loading content...</p>
+          <article id="about-credits-content"></article>
+        </div>
+      </dialog>
+      <dialog id="about-changelog-dialog" aria-labelledby="about-changelog-title"
+        data-modal-title="Changelog" data-modal-close-id="about-changelog-close">
+        <div class="about-markdown-content">
+          <p id="about-changelog-status" class="muted" role="status" aria-live="polite">Loading content...</p>
+          <article id="about-changelog-content"></article>
+        </div>
+      </dialog>
       <dialog id="occurrences-dialog" aria-labelledby="occurrences-title" data-modal-title="Occurrences" data-modal-close-id="occurrences-close">
         <div class="ui-table-body table-scroll"><table><thead><tr><th scope="col">Section</th><th scope="col">Entry</th><th scope="col">Text</th></tr></thead><tbody id="occurrences-rows"></tbody></table></div>
         <footer class="ui-table-footer" hidden></footer>
@@ -987,7 +1032,7 @@
             </header>
             <div class="ui-table-body table-scroll">
               <table>
-                <thead><tr><th scope="col">Map</th><th scope="col">Original text</th><th scope="col">Translated text</th></tr></thead>
+                <thead><tr><th scope="col">Map</th><th id="source-details-entry-original-header" scope="col">Original text</th><th scope="col">Translated text</th></tr></thead>
                 <tbody id="source-details-entry-rows"></tbody>
               </table>
             </div>
@@ -1032,11 +1077,11 @@
       <dialog id="section-export-dialog" aria-labelledby="section-export-title" data-modal-title="Export section" data-modal-close-id="section-export-close">
         <p id="section-export-file-name" class="section-export-file-name"></p>
         <label class="section-export-label" for="section-export-preview">
-          <span>Exported CSV text</span>
+          <span>Exported localisation text</span>
           <textarea id="section-export-preview" class="section-export-preview" rows="24" readonly spellcheck="false"></textarea>
         </label>
         <div class="section-export-actions">
-          <button id="section-export-download-button" type="button" class="button button-primary">Download CSV</button>
+          <button id="section-export-download-button" type="button" class="button button-primary">Download section</button>
         </div>
       </dialog>
       <div id="notification-toasts" class="notification-toasts" aria-label="Notifications"></div>

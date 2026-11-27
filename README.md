@@ -14,10 +14,13 @@ Files are handled locally in the browser, and the application can be installed a
 
 ### Localisation Editor
 - Browse and edit localisation entries by section.
+- Open CSV, CLD and TXT localisation files; CLD files are read-only, while CSV and TXT files can be edited, saved and exported. TXT support currently covers TCOAAL 3.x.
+- TXT files contain target-language text without English source strings, so English-based progress and source-word statistics are unavailable.
+- For read-only CLD files, Dashboard retains file metadata; Compare, QA, Terminology and Maps are unavailable.
 - Search, filter and sort entries.
 - Find and replace text in editable fields.
-- Import and export individual sections.
-- Save changes to the opened file where supported, or export a separate copy.
+- Import and export individual CSV and TXT sections.
+- Save changes to an opened editable file where supported, or export a separate copy.
 - Receive suggestions from exact and similar translations already present in the file.
 
 ### Dashboard and Statistics
@@ -44,12 +47,15 @@ Files are handled locally in the browser, and the application can be installed a
 - Navigate between catalogue entries and matching localisation content.
 
 ### File Comparison
-- Compare the currently open localisation file with another CSV file.
+- Compare the currently open localisation file with another editable CSV or TXT file.
 - Identify changed fields, additional entries and missing entries.
 - Match sections by name and entries by ID.
 
+### About
+- View the application release, supported game versions and formats, and credits.
+
 ### Settings and Customisation
-- Configure the target language, validation options and dictionary settings.
+- Configure the target language, validation options and dictionary settings; available regional dictionary variants include Spanish (Spain) and Spanish (Mexico).
 - Import and export application configuration.
 
 ## Getting Started

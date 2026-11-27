@@ -1,8 +1,9 @@
 import { createParserRegistry } from "../core/parser/index.js";
-import { getGroupedRows } from "../core/glossary/index.js";
+import { isMapSection } from "../core/document/index.js";
+import { getVisibleTextLength } from "../core/text/index.js";
 import { collectValidationIssues, isWordExcluded } from "../core/validation/index.js";
 import { createLocalisationService } from "../application/index.js";
-import { csvFormat } from "../plugins/formats/csv/index.js";
+import { tcoaalFormats } from "../plugins/TCOAAL/index.js";
 import { createBrowserFileSystem } from "../platform/browser/file-system.js";
 import { createBrowserStorage } from "../platform/browser/storage.js";
 import { setupDashboard } from "./containers/dashboard.js";
@@ -32,6 +33,7 @@ import {
   SOURCE_COLORS_STORAGE_KEY,
 } from "./utils/source-colors.js";
 import {
+  clearConfiguration,
   createConfiguration,
   parseConfiguration,
   persistConfiguration,
@@ -48,6 +50,7 @@ const TAB_DESCRIPTIONS = {
   settings: "Configure application preferences.",
   about: "Read about LOCALMAN and how to use it.",
 };
+const READ_ONLY_UNAVAILABLE_TABS = new Set(["compare", "qa", "terminology", "maps"]);
 
 export function initApp(root = document, { download, openFilePicker, saveFilePicker } = {}) {
   setupModalComponents(root);
@@ -72,10 +75,14 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     mapDataStatus: "unknown",
   };
   const dictionaryExclusionExport = root.querySelector("#dictionary-exclusions-export-button");
+  const dictionaryExclusionClear = root.querySelector("#dictionary-exclusions-clear-button");
   const dictionaryExclusionPair = dictionaryExclusionExport.parentElement;
   const configurationExport = root.querySelector("#configuration-export");
+  const configurationClearAll = root.querySelector("#configuration-clear-all");
   const configurationPair = configurationExport.parentElement;
   let configurationStorageReadError = "";
+  let configurationHandleReadError = "";
+  let configurationVisibilityRequest = 0;
   let editor = null;
   let dashboard = null;
   let terminologyInitialized = false;
@@ -83,7 +90,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   const appWindow = root.ownerDocument?.defaultView ?? root.defaultView ?? globalThis.window;
   const fileSystem = createBrowserFileSystem(appWindow, { download, openFilePicker, saveFilePicker });
   const application = createLocalisationService({
-    parsers: createParserRegistry([csvFormat]),
+    parsers: createParserRegistry(tcoaalFormats),
     fileSystem,
   });
   const compare = setupCompare(root, {
@@ -91,7 +98,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     onError: showError,
     onOpenSection: (sectionName, sectionIndex) => {
       if (typeof sectionIndex === "number") navigateMapOrEditor(sectionIndex);
-      else if (isMapReferenceName(sectionName)) navigateToMapName(sectionName);
+      else if (isMapSection(sectionName)) navigateToMapName(sectionName);
       else showError(new Error("This unnamed section exists only in the comparison target file."));
     },
     onOpenEntry: (sectionIndex, rowIndex, sectionName, entryId) => {
@@ -114,6 +121,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   const settingsStorage = createBrowserStorage(appWindow);
   const sourceColors = createSourceColorStore(settingsStorage);
   let lastSourceColorError = "";
+  let wasReadOnly = false;
   const settings = createSettingsController(root, {
     onError: showError,
     onChange: updateConfigurationExportVisibility,
@@ -129,7 +137,15 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     state.validationDirty = true;
     refreshIssues();
     renderDashboard();
-  }, showError, fileSystem);
+  }, showError, fileSystem, (language, variant) => {
+    settings.update({
+      dictionaryVariants: {
+        ...settings.preferences.dictionaryVariants,
+        [language]: variant,
+      },
+    }, { notify: false });
+    state.preferences = settings.preferences;
+  });
   dictionary.renderStatus();
   const navigate = (sectionIndex, rowIndex, untranslated = false) => {
     ensureEditor().setSelection(sectionIndex, rowIndex, untranslated ? "untranslated" : "");
@@ -173,6 +189,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       qa.reset();
       state.localisation = loaded.document;
       state.fileName = loaded.fileName;
+      settings.setFormat(loaded.document.formatId);
+      state.preferences = settings.preferences;
       editor?.setSelection(null);
       state.validationDirty = true;
       state.terminologyDirty = true;
@@ -180,6 +198,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       termTypeFilter.disabled = false;
       renderLoadedDocument();
       updateTabsAvailability(true);
+      void updateConfigurationExportVisibility();
       if (!state.hasLoadedFile) {
         state.hasLoadedFile = true;
         activateTab("dashboard");
@@ -270,6 +289,54 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     }
   });
 
+  configurationClearAll.addEventListener("click", async () => {
+    const confirm = appWindow.confirm;
+    if (typeof confirm !== "function") {
+      showError(new Error("This browser cannot confirm clearing saved settings."));
+      return;
+    }
+    if (!confirm.call(appWindow,
+      "Clear all saved settings and remembered localisation and custom dictionary files? This cannot be undone.")) {
+      return;
+    }
+
+    configurationClearAll.disabled = true;
+    let savedHandles;
+    try {
+      savedHandles = await clearSavedFileHandles(fileSystem);
+      try {
+        clearConfiguration(settingsStorage);
+      } catch (error) {
+        try {
+          await restoreSavedFileHandles(fileSystem, savedHandles);
+        } catch (restoreError) {
+          throw new AggregateError(
+            [error, restoreError],
+            "Saved settings could not be cleared, and remembered file handles could not be fully restored.",
+          );
+        }
+        throw error;
+      }
+
+      dictionary.clearCustomDictionaries();
+      sourceColors.replace({}, { persistChanges: false });
+      theme.setTheme("dark", { persist: false });
+      settings.resetToDefaults();
+      dictionary.selectForLanguage(settings.preferences.targetLanguage);
+      state.preferences = settings.preferences;
+      renderDictionaryExclusionsPreview();
+      renderSourceColorSettings();
+      root.querySelector("#configuration-status").textContent = "All settings and remembered files cleared.";
+      root.querySelector("#settings-status").textContent = "Settings reset to their defaults.";
+      notifications.confirmation("All settings and remembered files cleared.");
+      void updateConfigurationExportVisibility();
+    } catch (error) {
+      showError(error);
+    } finally {
+      configurationClearAll.disabled = false;
+    }
+  });
+
   const configurationInput = root.querySelector("#configuration-import-file");
   root.querySelector("#configuration-import-button").addEventListener("click", () => configurationInput.click());
   configurationInput.addEventListener("change", async () => {
@@ -326,6 +393,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     const sectionIdsChanged = previousPreferences.sectionIds.join("\u0000")
       !== preferences.sectionIds.join("\u0000");
     const languageChanged = previousPreferences.targetLanguage !== preferences.targetLanguage;
+    const dictionaryVariantChanged = previousPreferences.dictionaryVariants[preferences.targetLanguage]
+      !== preferences.dictionaryVariants[preferences.targetLanguage];
     if (state.localisation && sectionIdsChanged) {
       const currentSelection = editor?.sectionIndex ?? null;
       const selectedSectionName = typeof currentSelection === "number"
@@ -339,7 +408,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
         : currentSelection;
       if (typeof sectionIndex === "number" && sectionIndex < 0) {
         sectionIndex = state.localisation.sections.find(
-          (section) => section.name && section.columns.includes("Translation"),
+          (section) => isMapSection(section) && section.columns.includes("Translation"),
         )?.index ?? 0;
       }
       editor?.setSelection(sectionIndex);
@@ -348,7 +417,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     state.preferences = preferences;
     renderDictionaryExclusionsPreview();
     dictionary.renderStatus();
-    if (languageChanged) dictionary.selectForLanguage(preferences.targetLanguage);
+    if (languageChanged || dictionaryVariantChanged) {
+      dictionary.selectForLanguage(preferences.targetLanguage);
+    }
     if (previousPreferences.targetLanguage !== preferences.targetLanguage
       || previousPreferences.spellcheck !== preferences.spellcheck) {
       for (const input of root.querySelectorAll(".translation-input")) {
@@ -384,11 +455,15 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     const exclusions = state.preferences.dictionaryExclusions;
     preview.textContent = exclusions.length ? exclusions.join("\n") : "No excluded words.";
     dictionaryExclusionExport.hidden = exclusions.length === 0;
+    dictionaryExclusionClear.hidden = exclusions.length === 0;
     dictionaryExclusionPair.classList.toggle("button-pair--single", exclusions.length === 0);
   }
 
-  function updateConfigurationExportVisibility() {
+  async function updateConfigurationExportVisibility() {
+    const currentRequest = ++configurationVisibilityRequest;
     let hasConfiguration = false;
+    let hasSavedHandles = false;
+    let couldNotCheckSavedData = false;
     try {
       hasConfiguration = Boolean(settingsStorage && [
         SETTINGS_STORAGE_KEY,
@@ -400,9 +475,32 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       const message = `Could not check saved configuration: ${error.message ?? String(error)}`;
       if (configurationStorageReadError !== message) showError(new Error(message));
       configurationStorageReadError = message;
+      couldNotCheckSavedData = true;
     }
     configurationExport.hidden = !hasConfiguration;
-    configurationPair.classList.toggle("button-pair--single", !hasConfiguration);
+    configurationClearAll.hidden = !hasConfiguration && !couldNotCheckSavedData;
+    configurationPair.classList.toggle("button-pair--single",
+      !hasConfiguration && !couldNotCheckSavedData);
+    if (fileSystem.supportsPersistentHandles) {
+      try {
+        const [localisationHandle, dictionaryHandles] = await Promise.all([
+          fileSystem.getFileHandleData("localisation"),
+          fileSystem.getFileHandleData("custom-dictionary"),
+        ]);
+        hasSavedHandles = Boolean(localisationHandle || dictionaryHandles);
+        configurationHandleReadError = "";
+      } catch (error) {
+        const message = `Could not check remembered files: ${error.message ?? String(error)}`;
+        if (configurationHandleReadError !== message) showError(new Error(message));
+        configurationHandleReadError = message;
+        couldNotCheckSavedData = true;
+      }
+    }
+    if (currentRequest !== configurationVisibilityRequest) return;
+    configurationExport.hidden = !hasConfiguration;
+    configurationClearAll.hidden = !hasConfiguration && !hasSavedHandles && !couldNotCheckSavedData;
+    configurationPair.classList.toggle("button-pair--single",
+      !hasConfiguration && !hasSavedHandles && !couldNotCheckSavedData);
   }
 
   function renderLoadedDocument() {
@@ -428,8 +526,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     let longest = 0;
     let longestEntry = null;
     const considerSentence = (sentence, section, row) => {
-      if (sentence.length > longest) {
-        longest = sentence.length;
+      const visibleLength = getVisibleTextLength(sentence);
+      if (visibleLength > longest) {
+        longest = visibleLength;
         longestEntry = { section, row };
       }
     };
@@ -439,14 +538,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       const originalIndex = englishIndex >= 0 ? englishIndex : section.columns.indexOf("Original");
       if (originalIndex < 0) continue;
 
-      if (englishIndex >= 0) {
-        for (const group of getGroupedRows(section)) {
-          considerSentence(group.english, section, group.first);
-        }
-      } else {
-        for (const row of section.rows) {
-          considerSentence(row.fields[originalIndex] ?? "", section, row);
-        }
+      for (const row of section.rows) {
+        considerSentence(row.fields[originalIndex] ?? "", section, row);
       }
     }
 
@@ -479,7 +572,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
 
   function renderComparison() {
     const currentDocument = state.localisation
-      ? application.parse(application.serialize(state.localisation))
+      ? application.reparseDocument(state.localisation, { sectionIds: [] })
       : null;
     compare.render(currentDocument, state.fileName);
   }
@@ -537,7 +630,12 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
           if (!state.localisation) throw new Error("Load a localisation file before exporting a section.");
           const section = state.localisation.sections[sectionIndex];
           if (!section) throw new RangeError(`Section index ${sectionIndex} does not exist.`);
-          const fileName = getSectionExportFileName(state.fileName, section.name, sectionIndex);
+          const fileName = getSectionExportFileName(
+            state.fileName,
+            section.name,
+            sectionIndex,
+            state.localisation.formatId,
+          );
           return {
             ...application.prepareSectionExport(state.localisation, sectionIndex),
             fileName,
@@ -550,6 +648,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
           return exportData.fileName;
         },
         onImportSection: importSection,
+        supportsSectionOperations: (document) => application.supportsSectionOperations(document),
         getSourceColor: (source) => sourceColors.get(source),
         onSourceClick: openSourceDetails,
         onError: showError,
@@ -591,7 +690,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
 
   function navigateMapOrEditor(sectionIndex) {
     const section = state.localisation?.sections.find(({ index }) => index === sectionIndex);
-    if (!isMapReferenceName(section?.name)) {
+    if (state.localisation?.readonly && isMapSection(section)) return;
+    if (!isMapSection(section)) {
       navigate(sectionIndex);
       return;
     }
@@ -601,6 +701,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   }
 
   function navigateToMapName(mapName) {
+    if (state.localisation?.readonly) return;
     ensureMaps();
     maps.openMap(mapName);
     activateTab("maps");
@@ -619,6 +720,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
       showOccurrences,
       (entry) => navigate(entry.definitionSection.index, entry.definitionRow.index),
       (sectionIndex) => navigateMapOrEditor(sectionIndex),
+      { targetOnly: state.localisation.formatId === "txt" },
     );
   }
 
@@ -672,8 +774,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
 
   function findSourceTerm(source) {
     ensureTerminology();
+    const target = source.trim().toLocaleLowerCase();
     return state.terminology.find((entry) =>
-      entry.english.trim().toLocaleLowerCase() === source.trim().toLocaleLowerCase());
+      (entry.english || entry.translation).trim().toLocaleLowerCase() === target);
   }
 
   function openTermInTerminology(entry) {
@@ -697,6 +800,9 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
 
   function editCell(section, row, columnName, value) {
     try {
+      if (state.localisation?.readonly) {
+        throw new Error("This localisation format is read-only.");
+      }
       const translationIndex = section.columns.indexOf("Translation");
       const previousTranslation = row.fields[translationIndex] ?? "";
       const previousStatus = state.localisation.getRowStatus(section, row);
@@ -820,6 +926,7 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   function activateTab(tabName) {
     const button = root.querySelector(`[data-tab="${tabName}"]`);
     if (!button) return;
+    if (button.disabled) return;
     if (button.getAttribute("aria-disabled") === "true") {
       notifications.warning("Load a valid localisation file first to use this tab.");
       return;
@@ -854,30 +961,60 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
   }
 
   function updateTabsAvailability(hasDocument) {
+    const readOnly = hasDocument && Boolean(state.localisation?.readonly);
+    if (readOnly && !wasReadOnly) {
+      for (const dialog of root.querySelectorAll("dialog[open]")) dialog.close();
+    }
+    wasReadOnly = readOnly;
     for (const button of root.querySelectorAll("[data-tab]")) {
       const tabName = button.dataset.tab;
+      const readOnlyRestricted = readOnly && READ_ONLY_UNAVAILABLE_TABS.has(tabName);
       let status = "available";
-      if (tabName === "maps") {
+      if (readOnlyRestricted) {
+        status = "unavailable";
+      } else if (tabName === "dashboard" && readOnly) {
+        status = "partial";
+      } else if (tabName === "maps") {
         status = state.mapDataStatus === "unavailable"
           ? "unavailable"
           : hasDocument ? "available" : "partial";
       } else if (["dashboard", "editor", "compare", "qa", "terminology"].includes(tabName) && !hasDocument) {
         status = "unavailable";
       }
+      const readonlyEditor = tabName === "editor" && hasDocument && state.localisation?.readonly;
+      if (readonlyEditor) status = "partial";
       const available = status !== "unavailable";
-      const statusText = status === "partial" ? "[Partially available]" : available ? "[Available]" : "[Unavailable]";
+      const readonlyDashboard = tabName === "dashboard" && readOnly;
+      const statusText = readOnlyRestricted
+        ? "[Unavailable for read-only files]"
+        : readonlyEditor
+          ? "[Read-only]"
+          : readonlyDashboard || status === "partial"
+            ? "[Partially available]"
+            : available ? "[Available]" : "[Unavailable]";
       button.setAttribute("aria-disabled", String(!available));
-      button.disabled = tabName === "qa" && !available;
+      button.disabled = readOnlyRestricted || (tabName === "qa" && !available);
       button.classList.toggle("is-unavailable", !available);
       const tabStatus = tabName === "about"
         ? root.querySelector("#offline-installation-status")?.title
         : "";
-      button.title = `${TAB_DESCRIPTIONS[tabName]} ${statusText}${tabStatus ? ` ${tabStatus}` : ""}`;
+      const readonlyMessage = readonlyEditor ? " This format is read-only." : "";
+      const dashboardMessage = readonlyDashboard
+        ? " Only file metadata and word usage remain available in the Dashboard."
+        : "";
+      const unavailableMessage = readOnlyRestricted
+        ? " This module is unavailable for read-only formats."
+        : "";
+      button.title = `${TAB_DESCRIPTIONS[tabName]} ${statusText}${readonlyMessage}`
+        + `${dashboardMessage}${unavailableMessage}${tabStatus ? ` ${tabStatus}` : ""}`;
       const indicator = button.querySelector(".tab-status-dot");
       if (indicator) {
         indicator.dataset.loaded = String(available);
         indicator.dataset.status = status;
       }
+    }
+    if (readOnly && READ_ONLY_UNAVAILABLE_TABS.has(state.activeTab)) {
+      activateTab("dashboard");
     }
   }
 
@@ -886,7 +1023,8 @@ export function initApp(root = document, { download, openFilePicker, saveFilePic
     state.terminology = collectTerminology(state.localisation);
     renderTerminology(root, state.terminology, searchTerms.value, showOccurrences,
       (entry) => navigate(entry.definitionSection.index, entry.definitionRow.index),
-      (sectionIndex) => navigateMapOrEditor(sectionIndex));
+      (sectionIndex) => navigateMapOrEditor(sectionIndex),
+      { targetOnly: state.localisation.formatId === "txt" });
     state.terminologyDirty = false;
   }
 
@@ -967,9 +1105,37 @@ function setupThemeToggle(root, appWindow, onError, storage) {
   };
 }
 
-function isMapReferenceName(name) {
-  return typeof name === "string"
-    && (/\.json$/iu.test(name) || /^(?:CommonEvents|Map\d+)$/iu.test(name));
+async function clearSavedFileHandles(fileSystem) {
+  if (!fileSystem.supportsPersistentHandles) return null;
+  const keys = ["localisation", "custom-dictionary"];
+  const handles = new Map(await Promise.all(keys.map(async (key) =>
+    [key, await fileSystem.getFileHandleData(key)])));
+  try {
+    await Promise.all(keys.map((key) => fileSystem.removeFileHandleData(key)));
+  } catch (error) {
+    try {
+      await restoreSavedFileHandles(fileSystem, handles);
+    } catch (restoreError) {
+      throw new AggregateError(
+        [error, restoreError],
+        "Remembered files could not be cleared and the previous handles could not be fully restored.",
+      );
+    }
+    throw new Error(`Remembered files could not be cleared: ${error.message ?? String(error)}`);
+  }
+  return handles;
+}
+
+async function restoreSavedFileHandles(fileSystem, handles) {
+  if (!handles) return;
+  const operations = [...handles].map(([key, handle]) => handle === undefined
+    ? fileSystem.removeFileHandleData(key)
+    : fileSystem.saveFileHandleData(key, handle));
+  const results = await Promise.allSettled(operations);
+  const errors = results.filter(({ status }) => status === "rejected").map(({ reason }) => reason);
+  if (errors.length) {
+    throw new AggregateError(errors, "Remembered file handles could not be fully restored.");
+  }
 }
 
 if (typeof document !== "undefined" && document.querySelector("#app")) {

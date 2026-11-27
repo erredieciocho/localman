@@ -1,5 +1,6 @@
 import { extractWords, getGroupedRows, getTermDefinitions } from "../glossary/index.js";
 import { spellingVariants, spellingWords } from "../spellcheck/index.js";
+import { getVisibleTextLength } from "../text/index.js";
 
 const spellingCache = new WeakMap();
 
@@ -45,7 +46,11 @@ export function collectValidationIssues(localisation, {
     }
     if (dictionary) {
       for (const row of section.rows) {
-        if (localisation.getRowStatus(section, row) !== "translated") continue;
+        const hasTargetText = Boolean((row.fields[translationIndex] ?? "").trim());
+        const isSpellingCheckable = localisation.formatId === "txt"
+          ? hasTargetText
+          : localisation.getRowStatus(section, row) === "translated";
+        if (!isSpellingCheckable) continue;
         const words = new Set(spellingWords(row.fields[translationIndex] ?? ""));
         for (const word of words) {
           if (exclusions.has(word.toLocaleLowerCase())) continue;
@@ -61,12 +66,13 @@ export function collectValidationIssues(localisation, {
         }
       }
     }
-    for (const group of getGroupedRows(section)) {
-      if (!group.translation.trim()) {
+    for (const row of section.rows) {
+      const translation = row.fields[translationIndex] ?? "";
+      if (!translation.trim()) {
         continue;
       }
-      const row = group.first;
-      if (group.translation.length <= minSentenceLength) {
+      const translationLength = getVisibleTextLength(translation.trim());
+      if (translationLength <= minSentenceLength) {
         issues.push({
           kind: "sentence-length",
           message: `Translation is at or below the ${minSentenceLength}-character minimum.`,
@@ -74,7 +80,7 @@ export function collectValidationIssues(localisation, {
           row,
         });
       }
-      if (group.translation.length > maxSentenceLength) {
+      if (translationLength > maxSentenceLength) {
         issues.push({
           kind: "sentence-length",
           message: `Translation exceeds the ${maxSentenceLength}-character maximum.`,
@@ -82,6 +88,12 @@ export function collectValidationIssues(localisation, {
           row,
         });
       }
+    }
+    for (const group of getGroupedRows(section)) {
+      if (!group.translation.trim()) {
+        continue;
+      }
+      const row = group.first;
       if (!terminologyValidation || englishIndex < 0 || !terms.length) {
         continue;
       }

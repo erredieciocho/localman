@@ -91,17 +91,37 @@ export async function loadBundledDictionaryCatalog() {
   const response = await fetch(new URL("../../../bundled/dictionaries/manifest.json", import.meta.url));
   if (!response.ok) throw new Error(`Dictionary list request failed (${response.status}).`);
   const manifest = await response.json();
-  if (!Array.isArray(manifest.dictionaries)
-    || manifest.dictionaries.some((entry) => !entry.id || !entry.name || !entry.language
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)
+    || !manifest.defaultVariants || typeof manifest.defaultVariants !== "object"
+    || Array.isArray(manifest.defaultVariants) || !Array.isArray(manifest.dictionaries)
+    || manifest.dictionaries.some((entry) => !entry || typeof entry !== "object"
+      || typeof entry.id !== "string" || !/^[a-z]{2,3}-[A-Z]{2}$/u.test(entry.id)
+      || typeof entry.name !== "string" || !entry.name.trim()
+      || typeof entry.language !== "string" || !/^[a-z]{2,3}$/u.test(entry.language)
+      || entry.id.split("-")[0] !== entry.language
+      || entry.region !== entry.id.split("-")[1]
       || entry.format !== "aff-dic" || !entry.aff || !entry.dic
       || !Number.isInteger(entry.wordCount) || entry.wordCount < 0)) {
     throw new Error("The bundled dictionary list is malformed.");
   }
-  return manifest.dictionaries;
+  for (const [language, defaultVariant] of Object.entries(manifest.defaultVariants)) {
+    if (typeof defaultVariant !== "string"
+      || !manifest.dictionaries.some((entry) => entry.language === language && entry.id === defaultVariant)) {
+      throw new Error(`The default dictionary variant for "${language}" is invalid.`);
+    }
+  }
+  if (manifest.dictionaries.some((entry) => !manifest.defaultVariants[entry.language])) {
+    throw new Error("Every bundled dictionary language must define a default regional variant.");
+  }
+  return {
+    dictionaries: manifest.dictionaries,
+    defaultVariants: manifest.defaultVariants,
+  };
 }
 
 export async function loadBundledDictionary(entry) {
-  if (!entry || entry.format !== "aff-dic" || !entry.aff || !entry.dic || !entry.language) {
+  if (!entry || entry.format !== "aff-dic" || !entry.aff || !entry.dic
+    || !entry.language || !entry.id || entry.id.split("-")[0] !== entry.language) {
     throw new Error("The bundled dictionary manifest entry is invalid.");
   }
   const fetchAsset = async (path) => {
@@ -110,7 +130,7 @@ export async function loadBundledDictionary(entry) {
     return new File([await response.arrayBuffer()], path.split("/").at(-1));
   };
   const [aff, dic] = await Promise.all([fetchAsset(entry.aff), fetchAsset(entry.dic)]);
-  return loadDictionary(aff, dic, entry.language);
+  return loadDictionary(aff, dic, entry.id);
 }
 
 export async function loadDictionary(affFile, dicFile, language) {
