@@ -1,0 +1,9 @@
+Mexican Spanish Hunspell dictionary
+
+Source: https://github.com/soyperrito/es_MX/tree/5b572c76849a5a47ec233fef86b528ca8d12044c
+Dictionary author and maintainer: Rodrigo Quintanar.
+Base dictionary: LibreOffice RLA es_MX dictionary and its contributors.
+
+The upstream dictionary is offered under GPLv3-or-later, LGPLv3-or-later, or
+MPL 1.1-or-later. This distribution selects the MPL 1.1 option; the complete
+licence text is in LICENSE-MPL-1.1.txt.

@@ -1,72 +1,100 @@
 {
+  "defaultVariants": {
+    "es": "es-ES",
+    "ca": "ca-ES",
+    "fr": "fr-FR",
+    "de": "de-DE",
+    "pt": "pt-PT",
+    "pl": "pl-PL",
+    "ru": "ru-RU",
+    "ko": "ko-KR"
+  },
   "dictionaries": [
     {
-      "id": "es",
+      "id": "es-ES",
       "name": "Spanish (Spain)",
       "language": "es",
+      "region": "ES",
       "wordCount": 54971,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/es/index.aff",
       "dic": "../../../bundled/dictionaries/es/index.dic"
     },
     {
-      "id": "ca",
+      "id": "es-MX",
+      "name": "Spanish (Mexico)",
+      "language": "es",
+      "region": "MX",
+      "wordCount": 62628,
+      "format": "aff-dic",
+      "aff": "../../../bundled/dictionaries/es-MX/index.aff",
+      "dic": "../../../bundled/dictionaries/es-MX/index.dic"
+    },
+    {
+      "id": "ca-ES",
       "name": "Catalan",
       "language": "ca",
+      "region": "ES",
       "wordCount": 200071,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/ca/index.aff",
       "dic": "../../../bundled/dictionaries/ca/index.dic"
     },
     {
-      "id": "fr",
+      "id": "fr-FR",
       "name": "French",
       "language": "fr",
+      "region": "FR",
       "wordCount": 82327,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/fr/index.aff",
       "dic": "../../../bundled/dictionaries/fr/index.dic"
     },
     {
-      "id": "de",
+      "id": "de-DE",
       "name": "German",
       "language": "de",
+      "region": "DE",
       "wordCount": 71990,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/de/index.aff",
       "dic": "../../../bundled/dictionaries/de/index.dic"
     },
     {
-      "id": "pt",
+      "id": "pt-PT",
       "name": "Portuguese (Portugal)",
       "language": "pt",
+      "region": "PT",
       "wordCount": 42485,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/pt/index.aff",
       "dic": "../../../bundled/dictionaries/pt/index.dic"
     },
     {
-      "id": "pl",
+      "id": "pl-PL",
       "name": "Polish",
       "language": "pl",
+      "region": "PL",
       "wordCount": 297021,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/pl/index.aff",
       "dic": "../../../bundled/dictionaries/pl/index.dic"
     },
     {
-      "id": "ru",
+      "id": "ru-RU",
       "name": "Russian",
       "language": "ru",
+      "region": "RU",
       "wordCount": 146269,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/ru/index.aff",
       "dic": "../../../bundled/dictionaries/ru/index.dic"
     },
     {
-      "id": "ko",
+      "id": "ko-KR",
       "name": "Korean",
       "language": "ko",
+      "region": "KR",
       "wordCount": 99781,
       "format": "aff-dic",
       "aff": "../../../bundled/dictionaries/ko/index.aff",
